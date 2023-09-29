@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="面试题 你知道Java里面有哪些锁？ 你说你用过读写锁，锁饥饿问题是什么？ 有没有比读写锁更快的锁？ StampedLock知道吗？（邮戳锁&#x2F;票据锁） ReentrantReadWriteLock有锁降级机制，你知道吗  读写锁ReentrantReadWriteLock定义：个资源能够被多个读线程访问，或者被一个写线程访问，但是不能同时存在读写线程  排他锁和共享锁排它锁：又称独占锁，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读写锁&amp;邮戳锁">
+<meta property="og:url" content="https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&%E9%82%AE%E6%88%B3%E9%94%81/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="面试题 你知道Java里面有哪些锁？ 你说你用过读写锁，锁饥饿问题是什么？ 有没有比读写锁更快的锁？ StampedLock知道吗？（邮戳锁&#x2F;票据锁） ReentrantReadWriteLock有锁降级机制，你知道吗  读写锁ReentrantReadWriteLock定义：个资源能够被多个读线程访问，或者被一个写线程访问，但是不能同时存在读写线程  排他锁和共享锁排它锁：又称独占锁，">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310151327548.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311123406861.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311123749230.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310180356916.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310180601675.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311132138252.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311133955653.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311125319350.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310182524156.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310182623545.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311145247383.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311151340613.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311151413191.png">
+<meta property="article:published_time" content="2023-03-11T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-28T08:11:17.271Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="并发">
+<meta property="article:tag" content="JUC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310151327548.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>读写锁&amp;邮戳锁</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&text=读写锁&amp;邮戳锁"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&is_video=false&description=读写锁&amp;邮戳锁"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=读写锁&amp;邮戳锁&body=Check out this article: https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&name=读写锁&amp;邮戳锁&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&t=读写锁&amp;邮戳锁"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text">面试题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81ReentrantReadWriteLock"><span class="toc-number"></span> <span class="toc-text">读写锁ReentrantReadWriteLock</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%92%E4%BB%96%E9%94%81%E5%92%8C%E5%85%B1%E4%BA%AB%E9%94%81"><span class="toc-number">1.</span> <span class="toc-text">排他锁和共享锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E4%BC%98%E5%8A%BF"><span class="toc-number">2.</span> <span class="toc-text">读写锁优势</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E8%AF%BB%E4%B8%8D%E4%BA%92%E6%96%A5"><span class="toc-number">2.1.</span> <span class="toc-text">读读不互斥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E9%94%81%E9%99%8D%E7%BA%A7"><span class="toc-number">2.2.</span> <span class="toc-text">读写锁的锁降级</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">2.2.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E8%BF%9D%E8%83%8C%E9%94%81%E9%99%8D%E7%BA%A7%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">如果违背锁降级的步骤</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E9%81%B5%E5%BE%AA%E9%94%81%E9%99%8D%E7%BA%A7%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">如果遵循锁降级的步骤</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E9%94%81%E9%A5%A5%E9%A5%BF%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">写锁饥饿问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%82%AE%E6%88%B3%E9%94%81StampedLock"><span class="toc-number"></span> <span class="toc-text">邮戳锁StampedLock</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#StampedLock%E6%98%AF%E7%94%B1%E9%94%81%E9%A5%A5%E9%A5%BF%E9%97%AE%E9%A2%98%E5%BC%95%E5%87%BA%E7%9A%84"><span class="toc-number">1.</span> <span class="toc-text">StampedLock是由锁饥饿问题引出的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%AE%E6%88%B3%E9%94%81%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">邮戳锁原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%AE%E6%88%B3%E9%94%81%E4%BC%A0%E7%BB%9F%E7%89%88%E8%AF%BB%E5%86%99%E9%94%81%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA"><span class="toc-number">3.</span> <span class="toc-text">邮戳锁传统版读写锁功能演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%AE%E6%88%B3%E9%94%81%E5%A2%9E%E5%BC%BA%E7%89%88%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA-%E5%85%81%E8%AE%B8%E5%86%99%E7%BA%BF%E7%A8%8B%E4%BB%8B%E5%85%A5"><span class="toc-number">4.</span> <span class="toc-text">邮戳锁增强版功能演示|允许写线程介入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8B%A5%E5%86%99%E7%BA%BF%E7%A8%8B%E5%AE%8C%E6%88%90%E4%BF%AE%E6%94%B9%EF%BC%8C%E5%88%99%E6%AD%A4%E5%90%8E%E4%B9%90%E8%A7%82%E8%AF%BB%E9%94%81%E5%8D%87%E7%BA%A7%E4%B8%BA%E6%82%B2%E8%A7%82%E9%94%81"><span class="toc-number">4.1.</span> <span class="toc-text">若写线程完成修改，则此后乐观读锁升级为悲观锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8B%A5%E5%86%99%E7%BA%BF%E7%A8%8B%E6%B2%A1%E6%9D%A5%E5%BE%97%E5%8F%8A%E5%AE%8C%E6%88%90%E4%BF%AE%E6%94%B9%EF%BC%8C%E5%88%99%E4%B9%90%E8%A7%82%E8%AF%BB%E9%94%81%E6%97%A0%E9%9C%80%E5%8D%87%E7%BA%A7"><span class="toc-number">4.2.</span> <span class="toc-text">若写线程没来得及完成修改，则乐观读锁无需升级</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#StampedLock%E7%BC%BA%E7%82%B9"><span class="toc-number">5.</span> <span class="toc-text">StampedLock缺点</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        读写锁&amp;邮戳锁
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-03-11T08:51:33.000Z" class="dt-published" itemprop="datePublished">2023-03-11</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/JUC/" rel="tag">JUC</a>, <a class="p-category" href="/tags/Java/" rel="tag">Java</a>, <a class="p-category" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><ul>
+<li>你知道Java里面有哪些锁？</li>
+<li>你说你用过读写锁，锁饥饿问题是什么？</li>
+<li>有没有比读写锁更快的锁？</li>
+<li>StampedLock知道吗？（邮戳锁&#x2F;票据锁）</li>
+<li>ReentrantReadWriteLock有锁降级机制，你知道吗</li>
+</ul>
+<h1 id="读写锁ReentrantReadWriteLock"><a href="#读写锁ReentrantReadWriteLock" class="headerlink" title="读写锁ReentrantReadWriteLock"></a>读写锁ReentrantReadWriteLock</h1><p>定义：个资源能够被<strong>多个读线程</strong>访问，或者被<strong>一个写线程</strong>访问，但是不能同时存在读写线程</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310151327548.png" alt="image-20230310151327548"></p>
+<h2 id="排他锁和共享锁"><a href="#排他锁和共享锁" class="headerlink" title="排他锁和共享锁"></a>排他锁和共享锁</h2><p><strong>排它锁</strong>：又称独占锁，独享锁 synchronized，ReentrantLock都是排它锁</p>
+<p>以ReentrantLock为例，会发现读操作互斥，只能一个线程一个线程读，性能差</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 资源类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyResource</span> &#123;</span><br><span class="line">    Map&lt;String,String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">    <span class="type">Lock</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantLock</span>(); <span class="comment">// 独占锁 类似synchronized</span></span><br><span class="line">    <span class="type">ReadWriteLock</span> <span class="variable">rwLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantReadWriteLock</span>();</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">write</span><span class="params">(String key,String value)</span>&#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t正在写入&quot;</span>);</span><br><span class="line">            map.put(key,value);</span><br><span class="line">            <span class="keyword">try</span>&#123; TimeUnit.MILLISECONDS.sleep(<span class="number">500</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t完成写入&quot;</span>);</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">read</span><span class="params">(String key)</span>&#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t正在读取&quot;</span>);</span><br><span class="line">            <span class="type">String</span> <span class="variable">res</span> <span class="operator">=</span> map.get(key);</span><br><span class="line">            <span class="keyword">try</span>&#123; TimeUnit.MILLISECONDS.sleep(<span class="number">200</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t完成读取&quot;</span>+res);</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ReentrantReadWriteLockDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">MyResource</span> <span class="variable">myResource</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyResource</span>();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">finalI</span> <span class="operator">=</span> i;</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">                myResource.write(finalI +<span class="string">&quot;&quot;</span>, finalI +<span class="string">&quot;&quot;</span>);</span><br><span class="line">            &#125;,String.valueOf(i)).start();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">finalI</span> <span class="operator">=</span> i;</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">                myResource.read(finalI +<span class="string">&quot;&quot;</span>);</span><br><span class="line">            &#125;,String.valueOf(i)).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到输出结果中写写&#x2F;写读&#x2F;读读都互斥</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311123406861.png" alt="image-20230311123406861"></p>
+<p><strong>共享锁</strong>：又称为读锁，获得共享锁后，可以查看，但无法删除和修改数据， 其他线程此时也可以获取到共享锁，也可以查看但是 无法修改和删除数据</p>
+<ul>
+<li>共享锁和排它锁典型是ReentranReadWriteLock</li>
+<li><strong>写锁是排它锁</strong></li>
+<li><strong>读锁是共享锁</strong></li>
+</ul>
+<h2 id="读写锁优势"><a href="#读写锁优势" class="headerlink" title="读写锁优势"></a>读写锁优势</h2><p>大实际生活中多实际场景是<strong>“读&#x2F;读”线程间并不存在互斥关系</strong>, 只有“读&#x2F;写”线程或”写&#x2F;写”线程间的操作需要互斥的。因此引ReentrantReadWriteLock。</p>
+<p>ReentrantReadWriteLock它<strong>只允许读读共存,而读写和写写依然是互斥的</strong>,</p>
+<p>一个ReentrantReadWriteLock同时只能存在一个写锁但是可以存在多个读锁,但不能同时存在写锁和读锁(切菜还是拍蒜选一个)。 也即</p>
+<ul>
+<li>一个资源可以被多个读操作访问</li>
+<li>一个写操作访问,</li>
+<li>读写仍然互斥。</li>
+</ul>
+<p><strong>只有在读多写少情景之下,读写锁才具有较高的性能体现。</strong></p>
+<h3 id="读读不互斥"><a href="#读读不互斥" class="headerlink" title="读读不互斥"></a>读读不互斥</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyResource</span> &#123;</span><br><span class="line">    Map&lt;String,String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">    <span class="type">Lock</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantLock</span>(); <span class="comment">// 独占锁 类似synchronized</span></span><br><span class="line">    <span class="type">ReadWriteLock</span> <span class="variable">rwLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantReadWriteLock</span>();</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">write</span><span class="params">(String key,String value)</span>&#123;</span><br><span class="line">        rwLock.writeLock().lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t正在写入&quot;</span>);</span><br><span class="line">            map.put(key,value);</span><br><span class="line">            <span class="keyword">try</span>&#123; TimeUnit.MILLISECONDS.sleep(<span class="number">500</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t完成写入&quot;</span>);</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            rwLock.writeLock().unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">read</span><span class="params">(String key)</span>&#123;</span><br><span class="line">        rwLock.readLock().lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t正在读取&quot;</span>);</span><br><span class="line">            <span class="type">String</span> <span class="variable">res</span> <span class="operator">=</span> map.get(key);</span><br><span class="line">            <span class="keyword">try</span>&#123; TimeUnit.MILLISECONDS.sleep(<span class="number">200</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t完成读取&quot;</span>+res);</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            rwLock.readLock().unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311123749230.png" alt="image-20230311123749230"></p>
+<h3 id="读写锁的锁降级"><a href="#读写锁的锁降级" class="headerlink" title="读写锁的锁降级"></a>读写锁的锁降级</h3><p><code>ReentrantReadWriteLock</code>锁降级 : 将写入锁降级为读锁(类似Linux文件读写权限理解,就像写权限要高于读权限一样),</p>
+<p><strong>锁的严苛程度变强叫做升级，反之叫做降级</strong>。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310180356916.png" alt="image-20230310180356916"></p>
+<p>写锁的降级,降级成为了读锁 </p>
+<ul>
+<li>即如果同一个线程持有了写锁,在没有释放写锁的情况下,它还可以继续获得读锁。这就是写锁的降级,降级成为了读锁。</li>
+<li>降级的规则是：<ul>
+<li>按照先获取写锁,然后获取读锁,再释放写锁的次序。</li>
+<li>如果释放了写锁,那么就完全转换为读锁。</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310180601675.png" alt="image-20230310180601675"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LockDownGradingDemo</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="type">String</span> <span class="variable">cacheValid</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ReentrantReadWriteLock</span> <span class="variable">readWriteLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantReadWriteLock</span>();</span><br><span class="line">        ReentrantReadWriteLock.<span class="type">ReadLock</span> <span class="variable">readLock</span> <span class="operator">=</span> readWriteLock.readLock();</span><br><span class="line">        ReentrantReadWriteLock.<span class="type">WriteLock</span> <span class="variable">writeLock</span> <span class="operator">=</span> readWriteLock.writeLock();</span><br><span class="line">        <span class="comment">// 锁降级 写锁 -&gt; 读锁</span></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            writeLock.lock();</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+LocalTime.now()+<span class="string">&quot;\t正在写入&quot;</span>);</span><br><span class="line">            <span class="keyword">try</span>&#123; TimeUnit.SECONDS.sleep(<span class="number">2</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">            cacheValid=<span class="string">&quot;A&quot;</span>;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+LocalTime.now()+<span class="string">&quot;\t完成写入&quot;</span>);</span><br><span class="line">            readLock.lock();</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+LocalTime.now()+<span class="string">&quot;\t正在读取&quot;</span>);</span><br><span class="line">            <span class="keyword">try</span>&#123; TimeUnit.SECONDS.sleep(<span class="number">1</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+LocalTime.now()+<span class="string">&quot;\t完成读取\t&quot;</span>+cacheValid);</span><br><span class="line">            writeLock.unlock();</span><br><span class="line">            readLock.unlock();</span><br><span class="line">        &#125;,<span class="string">&quot;A&quot;</span>).start();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            readLock.lock();</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+LocalTime.now()+<span class="string">&quot;\t正在读取&quot;</span>);</span><br><span class="line">            <span class="keyword">try</span>&#123; TimeUnit.SECONDS.sleep(<span class="number">1</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">            System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+LocalTime.now()+<span class="string">&quot;\t完成读取\t&quot;</span>+cacheValid);</span><br><span class="line">            readLock.unlock();</span><br><span class="line">        &#125;,<span class="string">&quot;B&quot;</span>).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311132138252.png" alt="image-20230311132138252"></p>
+<h4 id="设计思想"><a href="#设计思想" class="headerlink" title="设计思想"></a>设计思想</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311133955653.png" alt="image-20230311133955653"></p>
+<ol>
+<li>代码中声明了一个<strong>volatile</strong>类型的<strong>cacheValid</strong>变量,保证其可见性。</li>
+<li>首先获取读锁,如果<strong>cache</strong>不可用, 则释放读锁。获取写锁，写点东西，在更改数据之前, 再检查一次<strong>cacheValid</strong>的值（双检），然后修改数据,将 <strong>cacheValid</strong>置为<strong>true</strong>,</li>
+<li><strong>然后在释放写锁前立刻抢夺获取读锁</strong>；此时, <strong>cache</strong>中数据可用, 处理<strong>cache</strong>中数据,最后释放读锁。</li>
+</ol>
+<p>这个过程就是一个完整的锁降级的过程,目的是保证数据可见性。</p>
+<h5 id="如果违背锁降级的步骤"><a href="#如果违背锁降级的步骤" class="headerlink" title="如果违背锁降级的步骤"></a>如果违背锁降级的步骤</h5><p>如果当前的线程C在修改完cache中的数据后，没有获取读锁而是直接释放了写锁</p>
+<p>那么假设此时另一个线程D获取了写锁并修改了数据，则C线程无法感知到数据已被修改，数据出现错误。</p>
+<h5 id="如果遵循锁降级的步骤"><a href="#如果遵循锁降级的步骤" class="headerlink" title="如果遵循锁降级的步骤"></a>如果遵循锁降级的步骤</h5><p>在ReentrantReadWriteLock中，当读锁被使用时，如果有线程尝试获取写锁，该写线程会被阻塞。</p>
+<p>所以，需要释放所有读锁，才可获取写锁，</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311125319350.png"></p>
+<ul>
+<li><strong>写后立刻读</strong>：写后读的数据保证是这次更新的数据，该机制是专门为缓存设计的</li>
+<li><strong>写后重入读</strong>：同一个线程自己持有写锁时再去拿读锁,其本质相当于重入。防止写完数据释放写锁之后被别的写线程抢占，这样可以立马使用自己修改过的最新数据</li>
+</ul>
+<h2 id="写锁饥饿问题"><a href="#写锁饥饿问题" class="headerlink" title="写锁饥饿问题"></a>写锁饥饿问题</h2><p><strong>写锁和读锁是互斥的</strong>（这里的互斥是指<strong>线程间的互斥</strong>，当前线程可以获取到写锁又获取到读锁，但是获取到了读锁不能继续获取写锁），这是因为读写锁要<strong>保持写操作的可见性</strong>。因为，如果允许读锁在被获取的情况下对写锁的获取，那么正在运行的其他读线程无法感知到当前写线程的操作。</p>
+<p>因此，分析读写锁ReentrantReadWriteLock，会发现它有个潜在的问题:</p>
+<ul>
+<li>读锁结束，写锁有望</li>
+<li>写锁独占，读写全堵</li>
+</ul>
+<p>如果有线程正在读，写线程需要等待读线程释放锁后才能获取写锁</p>
+<p>即ReentrantReadWriteLock<strong>读的过程中不允许写</strong>，只有等待线程都释放了读锁，当前线程才能获取写锁，</p>
+<p>也就是写入必须等待，这是一种悲观的读锁</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310182524156.png" alt="image-20230310182524156"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="邮戳锁StampedLock"><a href="#邮戳锁StampedLock" class="headerlink" title="邮戳锁StampedLock"></a>邮戳锁StampedLock</h1><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310182623545.png" alt="image-20230310182623545"></p>
+<p>缓解写锁饥饿问题：使用“公平”策略可以一定程度上缓解这个问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new Reentrant ReadWriteLock(true)</span><br></pre></td></tr></table></figure>
+
+<p>但是”公平”策略是以牺牲系统吞吐量为代价的 ，有没有比读写锁更快的锁？</p>
+<blockquote>
+<p>StampedLock是JDK1.8中新增的一个读写锁, 也是对JDK1.5中的读写锁ReentrantReadWriteLock的优化。</p>
+</blockquote>
+<h2 id="StampedLock是由锁饥饿问题引出的"><a href="#StampedLock是由锁饥饿问题引出的" class="headerlink" title="StampedLock是由锁饥饿问题引出的"></a>StampedLock是由锁饥饿问题引出的</h2><blockquote>
+<p>锁饥饿问题 : ReentrantReadWriteLock实现了读写分离,但是一旦读操作比较多的时候,想要获取写锁就变得比较困难了,</p>
+<p>假如当前1000个线程,999个读,1个写,有可能999个读取线程长时间抢到了锁,那1个写线程就悲剧了 因为<strong>当前有可能会一直存在读锁,而无法获得写锁</strong>,根本没机会写</p>
+</blockquote>
+<p>StampedLock横空出世</p>
+<p>ReentrantReadWriteLock的读锁被占用的时候，其他线程尝试获取写锁的时候会被阻塞。</p>
+<ul>
+<li>但是<strong>StampedLock采取乐观获取读锁</strong>，获取读锁之后其他线程再尝试获取写锁时<strong>不会被阻塞</strong>，这其实是对读锁的优化。使用乐观读锁模式可以提高吞吐量</li>
+<li>所以，<strong>在获取乐观读锁后，还需要对结果进行校验</strong>。</li>
+</ul>
+<h2 id="邮戳锁原理"><a href="#邮戳锁原理" class="headerlink" title="邮戳锁原理"></a>邮戳锁原理</h2><p>邮戳锁的基本特点：</p>
+<ul>
+<li>所有<strong>获取锁</strong>的方法,都返回一个邮戳(Stamp),Stamp为零表示获取失败,其余都表示成功;</li>
+<li>所有<strong>释放锁</strong>的方法,都需要一个邮戳(Stamp),这个Stamp必须是和成功获取锁时得到的Stamp一致;</li>
+<li>StampedLock是<strong>不可重入</strong>的，没有Re开头。危险(如果一个线程已经持有了写锁,再去获取写锁的话就会造成死锁)</li>
+<li>StampedLock 的悲观读锁和写锁都不支持条件变量(Condition),这个也需要注意。</li>
+<li>使用 StampedLock一定不要调用中断操作,即不要调用interrupt()方法</li>
+</ul>
+<p>StampedLock有三种访问模式：</p>
+<ul>
+<li><strong>Reading(读模式悲观)</strong> : 功能和ReentrantReadWriteLock的读锁类似</li>
+<li><strong>Writing(写模式悲观)</strong> : 功能和ReentrantReadWriteLock的写锁类似</li>
+<li><strong>Optimistic reading</strong>(<strong>乐观读模式</strong>) : 无锁机制,类似于数据库中的乐观锁, 支持读写并发,<strong>很乐观认为读取时没人修改,假如被修改再实现升级为悲观读模式</strong><ul>
+<li>乐观的阅读。 仅当锁定当前未处于写入模式时,方法**<code>tryOptimisticRead()</code>**才返回非零戳记。 如果自获得给定标记以来没有在写入模式下获取锁定,则方法validate(long)返回 true。 这种模式可以被认为是读锁的极弱版本,可以随时被作者破坏。 对短的只读代码段使用乐观模式通常可以减少争用并提高吞吐量。 但是,它的使用本质上是脆弱的。</li>
+<li>乐观读取部分 应该只读取字段并将它们保存在局部变量中,以便以后在验证后使用。 在乐观模式下读取的字段可能非常不一致,因此仅在您熟悉数据表示以检查一致性和&#x2F;或重复调用方法validate() 例如,在首次读取对象或数组引用,然后访问其中一个字段,元素或方法时,通常需要执行此类步骤。</li>
+</ul>
+</li>
+</ul>
+<h2 id="邮戳锁传统版读写锁功能演示"><a href="#邮戳锁传统版读写锁功能演示" class="headerlink" title="邮戳锁传统版读写锁功能演示"></a>邮戳锁传统版读写锁功能演示</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StampLockDemo</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="type">int</span> <span class="variable">number</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="type">StampedLock</span> <span class="variable">stampedLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StampedLock</span>();</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">write</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">stamp</span> <span class="operator">=</span> stampedLock.writeLock();</span><br><span class="line">        System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t写线程准备修改&quot;</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            number++;</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            stampedLock.unlockWrite(stamp);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t写线程结束修改&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 悲观读</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">read</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">stamp</span> <span class="operator">=</span> stampedLock.readLock();</span><br><span class="line">        System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t读线程准备读取&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">try</span>&#123;TimeUnit.SECONDS.sleep(<span class="number">1</span>);&#125;<span class="keyword">catch</span>(InterruptedException e)&#123;e.printStackTrace();&#125;</span><br><span class="line">            System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t正在读取中&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> number;</span><br><span class="line">            System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t获得成员变量值 &quot;</span>+result);</span><br><span class="line">            System.out.println(<span class="string">&quot;写线程没有修改成功，读锁时写锁无法介入，传统的读写互斥&quot;</span>);</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            stampedLock.unlockRead(stamp);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">        <span class="type">StampLockDemo</span> <span class="variable">resource</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StampLockDemo</span>();</span><br><span class="line">        <span class="type">CountDownLatch</span> <span class="variable">countDownLatch</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            resource.read();</span><br><span class="line">            countDownLatch.countDown();</span><br><span class="line">        &#125;,<span class="string">&quot;readThread&quot;</span>).start();</span><br><span class="line">        <span class="keyword">try</span>&#123; TimeUnit.SECONDS.sleep(<span class="number">1</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t------come in&quot;</span>);</span><br><span class="line">            resource.write();</span><br><span class="line">            countDownLatch.countDown();</span><br><span class="line">        &#125;,<span class="string">&quot;writeThread&quot;</span>).start();</span><br><span class="line">        countDownLatch.await();</span><br><span class="line">        System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t获得成员变量值 &quot;</span>+number);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311145247383.png" alt="image-20230311145247383"></p>
+<h2 id="邮戳锁增强版功能演示-允许写线程介入"><a href="#邮戳锁增强版功能演示-允许写线程介入" class="headerlink" title="邮戳锁增强版功能演示|允许写线程介入"></a>邮戳锁增强版功能演示|允许写线程介入</h2><ul>
+<li>获取stamp ：<code>long stamp = stampedLock.tryOptimisticRead();</code></li>
+<li>校验：<code>validate public boolean validate(long stamp)</code><ul>
+<li>如果自获得给定标记以来没有在写入模式下获取锁定,则方法validate(long)返回 true。</li>
+<li>如果标记代表当前持有的锁,则始终返回true。</li>
+<li>如果标记为零,则始终返回false</li>
+</ul>
+</li>
+</ul>
+<h3 id="若写线程完成修改，则此后乐观读锁升级为悲观锁"><a href="#若写线程完成修改，则此后乐观读锁升级为悲观锁" class="headerlink" title="若写线程完成修改，则此后乐观读锁升级为悲观锁"></a>若写线程完成修改，则此后乐观读锁升级为悲观锁</h3><p>读线程代码块后面短暂的暂停2秒钟线程，使得写线程可介入</p>
+<p>若<code>optimisticRead()</code>发现写线程介入了，则升级乐观读锁tryOptimisticRead为悲观读锁readLock</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 乐观读，读锁过程中可以获取写锁</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">optimisticRead</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">stamp</span> <span class="operator">=</span> stampedLock.tryOptimisticRead();</span><br><span class="line">    System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\tvalidate值 &quot;</span>+stampedLock.validate(stamp));</span><br><span class="line">    <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> number;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">try</span>&#123;TimeUnit.SECONDS.sleep(<span class="number">1</span>);&#125;<span class="keyword">catch</span>(InterruptedException e)&#123;e.printStackTrace();&#125;</span><br><span class="line">        System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t正在读取中 validate值 &quot;</span>+stampedLock.validate(stamp));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!stampedLock.validate(stamp))&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;被修改过-----有写操作&quot;</span>);</span><br><span class="line">        stamp = stampedLock.readLock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;乐观锁升级为悲观锁&quot;</span>);</span><br><span class="line">            result=number;</span><br><span class="line">            System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t重新悲观读后result &quot;</span>+result);</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            stampedLock.unlockRead(stamp);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\tfinally result &quot;</span>+result);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">    <span class="type">StampLockDemo</span> <span class="variable">resource</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StampLockDemo</span>();</span><br><span class="line">    <span class="type">CountDownLatch</span> <span class="variable">countDownLatch</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">2</span>);</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">        resource.optimisticRead();</span><br><span class="line">        countDownLatch.countDown();</span><br><span class="line">    &#125;,<span class="string">&quot;readThread&quot;</span>).start();</span><br><span class="line">    <span class="keyword">try</span>&#123; TimeUnit.SECONDS.sleep(<span class="number">2</span>); &#125;<span class="keyword">catch</span>(InterruptedException e)&#123; e.printStackTrace(); &#125;</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">        System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t------come in&quot;</span>);</span><br><span class="line">        resource.write();</span><br><span class="line">        countDownLatch.countDown();</span><br><span class="line">    &#125;,<span class="string">&quot;writeThread&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line">    System.out.println(LocalTime.now()+<span class="string">&quot;\t&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;\t获得成员变量值 &quot;</span>+number);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311151340613.png" alt="image-20230311151340613"></p>
+<h3 id="若写线程没来得及完成修改，则乐观读锁无需升级"><a href="#若写线程没来得及完成修改，则乐观读锁无需升级" class="headerlink" title="若写线程没来得及完成修改，则乐观读锁无需升级"></a>若写线程没来得及完成修改，则乐观读锁无需升级</h3><p>读线程代码块后面暂停6秒钟线程，使得写线程不可介入</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230311151413191.png" alt="image-20230311151413191"></p>
+<h2 id="StampedLock缺点"><a href="#StampedLock缺点" class="headerlink" title="StampedLock缺点"></a>StampedLock缺点</h2><ul>
+<li>不可重入</li>
+<li>悲观读锁和写锁不支持条件变量（Condition）</li>
+<li>使用StampedLock一定不要调用中断操作，即不要调用<code>interrupt()</code>方法</li>
+</ul>
+<blockquote>
+<p>大部分用的还是排他锁和读写锁</p>
+</blockquote>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text">面试题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81ReentrantReadWriteLock"><span class="toc-number"></span> <span class="toc-text">读写锁ReentrantReadWriteLock</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%92%E4%BB%96%E9%94%81%E5%92%8C%E5%85%B1%E4%BA%AB%E9%94%81"><span class="toc-number">1.</span> <span class="toc-text">排他锁和共享锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E4%BC%98%E5%8A%BF"><span class="toc-number">2.</span> <span class="toc-text">读写锁优势</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E8%AF%BB%E4%B8%8D%E4%BA%92%E6%96%A5"><span class="toc-number">2.1.</span> <span class="toc-text">读读不互斥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E9%94%81%E9%99%8D%E7%BA%A7"><span class="toc-number">2.2.</span> <span class="toc-text">读写锁的锁降级</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-number">2.2.1.</span> <span class="toc-text">设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E8%BF%9D%E8%83%8C%E9%94%81%E9%99%8D%E7%BA%A7%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">如果违背锁降级的步骤</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E9%81%B5%E5%BE%AA%E9%94%81%E9%99%8D%E7%BA%A7%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">如果遵循锁降级的步骤</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E9%94%81%E9%A5%A5%E9%A5%BF%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">写锁饥饿问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%82%AE%E6%88%B3%E9%94%81StampedLock"><span class="toc-number"></span> <span class="toc-text">邮戳锁StampedLock</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#StampedLock%E6%98%AF%E7%94%B1%E9%94%81%E9%A5%A5%E9%A5%BF%E9%97%AE%E9%A2%98%E5%BC%95%E5%87%BA%E7%9A%84"><span class="toc-number">1.</span> <span class="toc-text">StampedLock是由锁饥饿问题引出的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%AE%E6%88%B3%E9%94%81%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">邮戳锁原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%AE%E6%88%B3%E9%94%81%E4%BC%A0%E7%BB%9F%E7%89%88%E8%AF%BB%E5%86%99%E9%94%81%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA"><span class="toc-number">3.</span> <span class="toc-text">邮戳锁传统版读写锁功能演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%AE%E6%88%B3%E9%94%81%E5%A2%9E%E5%BC%BA%E7%89%88%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA-%E5%85%81%E8%AE%B8%E5%86%99%E7%BA%BF%E7%A8%8B%E4%BB%8B%E5%85%A5"><span class="toc-number">4.</span> <span class="toc-text">邮戳锁增强版功能演示|允许写线程介入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8B%A5%E5%86%99%E7%BA%BF%E7%A8%8B%E5%AE%8C%E6%88%90%E4%BF%AE%E6%94%B9%EF%BC%8C%E5%88%99%E6%AD%A4%E5%90%8E%E4%B9%90%E8%A7%82%E8%AF%BB%E9%94%81%E5%8D%87%E7%BA%A7%E4%B8%BA%E6%82%B2%E8%A7%82%E9%94%81"><span class="toc-number">4.1.</span> <span class="toc-text">若写线程完成修改，则此后乐观读锁升级为悲观锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8B%A5%E5%86%99%E7%BA%BF%E7%A8%8B%E6%B2%A1%E6%9D%A5%E5%BE%97%E5%8F%8A%E5%AE%8C%E6%88%90%E4%BF%AE%E6%94%B9%EF%BC%8C%E5%88%99%E4%B9%90%E8%A7%82%E8%AF%BB%E9%94%81%E6%97%A0%E9%9C%80%E5%8D%87%E7%BA%A7"><span class="toc-number">4.2.</span> <span class="toc-text">若写线程没来得及完成修改，则乐观读锁无需升级</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#StampedLock%E7%BC%BA%E7%82%B9"><span class="toc-number">5.</span> <span class="toc-text">StampedLock缺点</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&text=读写锁&amp;邮戳锁"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&is_video=false&description=读写锁&amp;邮戳锁"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=读写锁&amp;邮戳锁&body=Check out this article: https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&title=读写锁&amp;邮戳锁"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&name=读写锁&amp;邮戳锁&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/&t=读写锁&amp;邮戳锁"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

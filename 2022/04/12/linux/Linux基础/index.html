@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Linux入门Linux的应用领域 个人桌面领域的应用  服务器领域： linux在服务器领域的应用是最强的。linux免费、稳定、高效等特点在这里得到了很好的体现，尤其在一些高端领域尤为广泛（c&#x2F;c++&#x2F;php&#x2F;java&#x2F;python&#x2F;go）。  嵌入式领域： linux运行稳定、对网络的良好支持性、低成本，且可以根据需要进行软件裁剪，内核最小可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux入门到实践">
+<meta property="og:url" content="https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="Linux入门Linux的应用领域 个人桌面领域的应用  服务器领域： linux在服务器领域的应用是最强的。linux免费、稳定、高效等特点在这里得到了很好的体现，尤其在一些高端领域尤为广泛（c&#x2F;c++&#x2F;php&#x2F;java&#x2F;python&#x2F;go）。  嵌入式领域： linux运行稳定、对网络的良好支持性、低成本，且可以根据需要进行软件裁剪，内核最小可">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406104729963.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406104804599.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406104859580.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406161548896.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406205033038.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191219104939654.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d3d19oZWxsb3dvcmxkX2NvbQ==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411184427338.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411185151773.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411185719206.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411185633522.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411185751325.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411190212430.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411193223824.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411202858790.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220412123115655.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220412124530630.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220412184732403.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220412174655933.png">
+<meta property="article:published_time" content="2022-04-12T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-28T08:25:17.453Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406104729963.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Linux入门到实践</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/04/17/%E5%90%8E%E7%AB%AF/JavaWeb/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/04/03/%E5%90%8E%E7%AB%AF/JDBC/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&text=Linux入门到实践"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&is_video=false&description=Linux入门到实践"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux入门到实践&body=Check out this article: https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&name=Linux入门到实践&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&t=Linux入门到实践"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux%E5%85%A5%E9%97%A8"><span class="toc-number">1.</span> <span class="toc-text">Linux入门</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E7%9A%84%E5%BA%94%E7%94%A8%E9%A2%86%E5%9F%9F"><span class="toc-number">1.1.</span> <span class="toc-text">Linux的应用领域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.2.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E4%B8%8EUnix"><span class="toc-number">1.3.</span> <span class="toc-text">Linux与Unix</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85VM%E5%92%8CCenOS"><span class="toc-number">1.4.</span> <span class="toc-text">安装VM和CenOS</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-number">1.4.1.</span> <span class="toc-text">网络连接的三种方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%85%8B%E9%9A%86"><span class="toc-number">1.4.2.</span> <span class="toc-text">虚拟机克隆</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%BF%AB%E7%85%A7"><span class="toc-number">1.4.3.</span> <span class="toc-text">虚拟机快照</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%92%8C%E5%88%A0%E9%99%A4"><span class="toc-number">1.4.4.</span> <span class="toc-text">虚拟机迁移和删除</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vmtools"><span class="toc-number">1.5.</span> <span class="toc-text">vmtools</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E5%85%B1%E4%BA%AB%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="toc-number">1.5.1.</span> <span class="toc-text">设置共享文件夹</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">目录结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">2.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-number">2.2.</span> <span class="toc-text">具体的目录结构</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux%E5%AE%9E%E6%93%8D"><span class="toc-number"></span> <span class="toc-text">Linux实操</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95%E5%88%B0Linux%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">1.</span> <span class="toc-text">远程登录到Linux服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93"><span class="toc-number">1.1.</span> <span class="toc-text">远程文件传输</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vi%E5%92%8CVim%E7%BC%96%E8%BE%91%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">Vi和Vim编辑器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-1"><span class="toc-number">2.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vi%E5%92%8Cvim%E5%B8%B8%E7%94%A8%E7%9A%84%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.2.</span> <span class="toc-text">vi和vim常用的三种模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E6%9C%BA%E3%80%81%E9%87%8D%E5%90%AF%E5%92%8C%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E6%B3%A8%E9%94%80"><span class="toc-number">3.</span> <span class="toc-text">关机、重启和用户登录注销</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E6%9C%BA-%E9%87%8D%E5%90%AF%E5%91%BD%E4%BB%A4"><span class="toc-number">3.1.</span> <span class="toc-text">关机&amp;重启命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E5%92%8C%E6%B3%A8%E9%94%80"><span class="toc-number">3.2.</span> <span class="toc-text">用户登录和注销</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86"><span class="toc-number">4.</span> <span class="toc-text">用户管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-2"><span class="toc-number">4.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7"><span class="toc-number">4.2.</span> <span class="toc-text">用户</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7"><span class="toc-number">4.2.1.</span> <span class="toc-text">添加用户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%87%E5%AE%9A-%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81"><span class="toc-number">4.2.2.</span> <span class="toc-text">指定&#x2F;修改密码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E7%94%A8%E6%88%B7"><span class="toc-number">4.2.3.</span> <span class="toc-text">删除用户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%8C%87%E4%BB%A4"><span class="toc-number">4.2.4.</span> <span class="toc-text">查询用户信息指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%87%E6%8D%A2%E7%94%A8%E6%88%B7"><span class="toc-number">4.2.5.</span> <span class="toc-text">切换用户</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%BB%84"><span class="toc-number">4.3.</span> <span class="toc-text">用户组</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B0%E5%A2%9E%E7%BB%84"><span class="toc-number">4.3.1.</span> <span class="toc-text">新增组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E7%BB%84"><span class="toc-number">4.3.2.</span> <span class="toc-text">删除组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E7%BB%84"><span class="toc-number">4.3.3.</span> <span class="toc-text">修改组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E5%92%8C%E7%BB%84%E7%9B%B8%E5%85%B3%E6%96%87%E4%BB%B6"><span class="toc-number">4.4.</span> <span class="toc-text">用户和组相关文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">5.</span> <span class="toc-text">实用指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%BA%A7%E5%88%AB"><span class="toc-number">5.1.</span> <span class="toc-text">运行级别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%BE%E5%9B%9Eroot%E5%AF%86%E7%A0%81"><span class="toc-number">5.2.</span> <span class="toc-text">找回root密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%AE%E5%8A%A9%E6%8C%87%E4%BB%A4"><span class="toc-number">5.3.</span> <span class="toc-text">帮助指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95%E7%B1%BB"><span class="toc-number">5.4.</span> <span class="toc-text">文件目录类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#pwd"><span class="toc-number">5.4.0.1.</span> <span class="toc-text">pwd</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ls"><span class="toc-number">5.4.0.2.</span> <span class="toc-text">ls</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cd"><span class="toc-number">5.4.0.3.</span> <span class="toc-text">cd</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#mkdir"><span class="toc-number">5.4.0.4.</span> <span class="toc-text">mkdir</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rmdir"><span class="toc-number">5.4.0.5.</span> <span class="toc-text">rmdir</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#touch"><span class="toc-number">5.4.0.6.</span> <span class="toc-text">touch</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cp"><span class="toc-number">5.4.0.7.</span> <span class="toc-text">cp</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rm"><span class="toc-number">5.4.0.8.</span> <span class="toc-text">rm</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#mv"><span class="toc-number">5.4.0.9.</span> <span class="toc-text">mv</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cat"><span class="toc-number">5.4.0.10.</span> <span class="toc-text">cat</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#more"><span class="toc-number">5.4.0.11.</span> <span class="toc-text">more</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#less"><span class="toc-number">5.4.0.12.</span> <span class="toc-text">less</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#echo"><span class="toc-number">5.4.0.13.</span> <span class="toc-text">echo</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#head"><span class="toc-number">5.4.0.14.</span> <span class="toc-text">head</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tail"><span class="toc-number">5.4.0.15.</span> <span class="toc-text">tail</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">5.4.0.16.</span> <span class="toc-text">.&gt; &gt;&gt;</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ln"><span class="toc-number">5.4.0.17.</span> <span class="toc-text">ln</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#history"><span class="toc-number">5.4.0.18.</span> <span class="toc-text">history</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E6%97%A5%E6%9C%9F%E7%B1%BB"><span class="toc-number">5.5.</span> <span class="toc-text">时间日期类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#date"><span class="toc-number">5.5.0.1.</span> <span class="toc-text">date</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cal"><span class="toc-number">5.5.0.2.</span> <span class="toc-text">cal</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%9C%E7%B4%A2%E6%9F%A5%E6%89%BE%E7%B1%BB"><span class="toc-number">5.6.</span> <span class="toc-text">搜索查找类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#find"><span class="toc-number">5.6.0.1.</span> <span class="toc-text">find</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#locate"><span class="toc-number">5.6.0.2.</span> <span class="toc-text">locate</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#which"><span class="toc-number">5.6.0.3.</span> <span class="toc-text">which</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#grep"><span class="toc-number">5.6.0.4.</span> <span class="toc-text">grep |</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%8B%E7%BC%A9%E5%92%8C%E8%A7%A3%E5%8E%8B"><span class="toc-number">5.7.</span> <span class="toc-text">压缩和解压</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#gzip"><span class="toc-number">5.7.0.1.</span> <span class="toc-text">gzip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#gunzip"><span class="toc-number">5.7.0.2.</span> <span class="toc-text">gunzip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#zip"><span class="toc-number">5.7.0.3.</span> <span class="toc-text">zip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#unzip"><span class="toc-number">5.7.0.4.</span> <span class="toc-text">unzip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tar"><span class="toc-number">5.7.0.5.</span> <span class="toc-text">tar</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%84%E7%AE%A1%E7%90%86%E5%92%8C%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86"><span class="toc-number">6.</span> <span class="toc-text">组管理和权限管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6-%E7%9B%AE%E5%BD%95%E6%89%80%E6%9C%89%E8%80%85"><span class="toc-number">6.1.</span> <span class="toc-text">文件&#x2F;目录所有者</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6-%E7%9B%AE%E5%BD%95%E6%89%80%E6%9C%89%E8%80%85"><span class="toc-number">6.1.1.</span> <span class="toc-text">修改文件&#x2F;目录所有者</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6-%E7%9B%AE%E5%BD%95%E6%89%80%E5%9C%A8%E7%BB%84"><span class="toc-number">6.2.</span> <span class="toc-text">文件&#x2F;目录所在组</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%94%B9%E5%8F%98%E7%94%A8%E6%88%B7%E6%89%80%E5%9C%A8%E7%BB%84"><span class="toc-number">6.2.1.</span> <span class="toc-text">改变用户所在组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E5%AE%83%E7%BB%84"><span class="toc-number">6.3.</span> <span class="toc-text">其它组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86"><span class="toc-number">6.4.</span> <span class="toc-text">权限管理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E6%9D%83%E9%99%90"><span class="toc-number">6.4.1.</span> <span class="toc-text">修改权限</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6"><span class="toc-number">7.</span> <span class="toc-text">定时任务调度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#crond%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6"><span class="toc-number">7.1.</span> <span class="toc-text">crond任务调度</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0-1"><span class="toc-number">7.1.1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="toc-number">7.1.2.</span> <span class="toc-text">基本语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E7%BB%86%E8%8A%82%E8%AF%B4%E6%98%8E"><span class="toc-number">7.1.3.</span> <span class="toc-text">参数细节说明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E6%8C%87%E4%BB%A4"><span class="toc-number">7.1.4.</span> <span class="toc-text">相关指令</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#at%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="toc-number">7.2.</span> <span class="toc-text">at定时任务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-3"><span class="toc-number">7.2.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#at%E5%91%BD%E4%BB%A4%E6%A0%BC%E5%BC%8F"><span class="toc-number">7.2.2.</span> <span class="toc-text">at命令格式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="toc-number">7.2.2.1.</span> <span class="toc-text">选项：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E5%AE%9A%E4%B9%89%EF%BC%9A"><span class="toc-number">7.2.2.2.</span> <span class="toc-text">时间定义：</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%E5%92%8C%E6%8C%82%E8%BD%BD"><span class="toc-number">8.</span> <span class="toc-text">磁盘分区和挂载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E5%88%86%E5%8C%BA"><span class="toc-number">8.1.</span> <span class="toc-text">Linux分区</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D"><span class="toc-number">8.1.1.</span> <span class="toc-text">原理介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A1%AC%E7%9B%98%E8%AF%B4%E6%98%8E"><span class="toc-number">8.1.2.</span> <span class="toc-text">硬盘说明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E8%AE%BE%E5%A4%87%E6%8C%82%E8%BD%BD%E6%83%85%E5%86%B5"><span class="toc-number">8.1.3.</span> <span class="toc-text">查看所有设备挂载情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%A2%9E%E5%8A%A0%E7%A3%81%E7%9B%98%E6%AD%A5%E9%AA%A4"><span class="toc-number">8.1.4.</span> <span class="toc-text">虚拟机增加磁盘步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E6%83%85%E5%86%B5%E6%9F%A5%E8%AF%A2"><span class="toc-number">8.1.5.</span> <span class="toc-text">磁盘情况查询</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E7%B3%BB%E7%BB%9F%E6%95%B4%E4%BD%93%E7%A3%81%E7%9B%98%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5"><span class="toc-number">8.1.5.1.</span> <span class="toc-text">查询系统整体磁盘使用情况</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95%E7%9A%84%E7%A3%81%E7%9B%98%E5%8D%A0%E7%94%A8%E6%83%85%E5%86%B5"><span class="toc-number">8.1.5.2.</span> <span class="toc-text">查询指定目录的磁盘占用情况</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E6%83%85%E5%86%B5%E5%AE%9E%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">8.1.6.</span> <span class="toc-text">磁盘情况实用指令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE"><span class="toc-number">9.</span> <span class="toc-text">网络配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86"><span class="toc-number">9.1.</span> <span class="toc-text">Linux网络配置原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E7%BD%91%E7%BB%9CIP%E5%92%8C%E7%BD%91%E5%85%B3"><span class="toc-number">9.2.</span> <span class="toc-text">查看网络IP和网关</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E7%BD%91%E5%85%B3"><span class="toc-number">9.2.1.</span> <span class="toc-text">查看网关</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Bwindow%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%9A%84VMnet8%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE"><span class="toc-number">9.2.2.</span> <span class="toc-text">查看window环境下的VMnet8网络配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Blinux%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-number">9.2.3.</span> <span class="toc-text">查看linux的配置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ping-%E6%B5%8B%E8%AF%95%E4%B8%BB%E6%9C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E7%BD%91%E7%BB%9C%E8%BF%9E%E9%80%9A%E6%80%A7"><span class="toc-number">9.3.</span> <span class="toc-text">ping 测试主机之间的网络连通性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E7%BD%91%E7%BB%9C%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="toc-number">9.4.</span> <span class="toc-text">Linux网络环境配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E8%8E%B7%E5%8F%96"><span class="toc-number">9.4.1.</span> <span class="toc-text">自动获取</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%87%E5%AE%9AIP"><span class="toc-number">9.4.2.</span> <span class="toc-text">指定IP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E4%B8%BB%E6%9C%BA%E5%90%8D%E5%92%8Chosts%E6%98%A0%E5%B0%84"><span class="toc-number">9.5.</span> <span class="toc-text">设置主机名和hosts映射</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E4%B8%BB%E6%9C%BA%E5%90%8D"><span class="toc-number">9.5.1.</span> <span class="toc-text">设置主机名</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AEhosts%E6%98%A0%E5%B0%84"><span class="toc-number">9.5.2.</span> <span class="toc-text">设置hosts映射</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E6%9C%BA%E5%90%8D%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%EF%BC%88Hosts%E3%80%81DNS%EF%BC%89"><span class="toc-number">9.5.3.</span> <span class="toc-text">主机名解析过程（Hosts、DNS）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Hosts"><span class="toc-number">9.5.3.1.</span> <span class="toc-text">Hosts</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DNS"><span class="toc-number">9.5.3.2.</span> <span class="toc-text">DNS</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DNS%E5%9F%9F%E5%90%8D%E5%8A%AB%E6%8C%81"><span class="toc-number">9.5.4.</span> <span class="toc-text">DNS域名劫持</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86"><span class="toc-number">10.</span> <span class="toc-text">进程管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-4"><span class="toc-number">10.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%BE%E7%A4%BA%E7%B3%BB%E7%BB%9F%E6%89%A7%E8%A1%8C%E7%9A%84%E8%BF%9B%E7%A8%8B"><span class="toc-number">10.2.</span> <span class="toc-text">显示系统执行的进程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-5"><span class="toc-number">10.2.1.</span> <span class="toc-text">基本介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ps-aux"><span class="toc-number">10.2.1.1.</span> <span class="toc-text">ps -aux</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%88%B6%E5%AD%90%E8%BF%9B%E7%A8%8B"><span class="toc-number">10.2.2.</span> <span class="toc-text">父子进程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ps-ef"><span class="toc-number">10.2.2.1.</span> <span class="toc-text">ps -ef</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%88%E6%AD%A2%E8%BF%9B%E7%A8%8B"><span class="toc-number">10.3.</span> <span class="toc-text">终止进程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#kill"><span class="toc-number">10.3.0.1.</span> <span class="toc-text">kill</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E6%A0%91"><span class="toc-number">10.4.</span> <span class="toc-text">查看进程树</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pstree"><span class="toc-number">10.4.1.</span> <span class="toc-text">pstree</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="toc-number">10.5.</span> <span class="toc-text">服务管理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">10.5.1.</span> <span class="toc-text">介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#service"><span class="toc-number">10.5.1.1.</span> <span class="toc-text">service</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%BF%90%E8%A1%8C%E7%BA%A7%E5%88%AB"><span class="toc-number">10.5.2.</span> <span class="toc-text">服务的运行级别</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#chkconfig"><span class="toc-number">10.5.2.1.</span> <span class="toc-text">chkconfig</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#systemctl"><span class="toc-number">10.5.2.2.</span> <span class="toc-text">systemctl</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AE%A1%E7%90%86%E6%8C%87%E4%BB%A4"><span class="toc-number">10.5.2.2.1.</span> <span class="toc-text">管理指令</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%87%AA%E5%90%AF%E5%8A%A8%E7%8A%B6%E6%80%81"><span class="toc-number">10.5.2.2.2.</span> <span class="toc-text">设置服务的自启动状态</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%93%E5%BC%80%E6%88%96%E5%85%B3%E9%97%AD%E6%8C%87%E5%AE%9A%E7%AB%AF%E5%8F%A3"><span class="toc-number">10.5.3.</span> <span class="toc-text">打开或关闭指定端口</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#firewall"><span class="toc-number">10.5.3.1.</span> <span class="toc-text">firewall</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E7%9B%91%E6%8E%A7%E8%BF%9B%E7%A8%8B"><span class="toc-number">10.6.</span> <span class="toc-text">动态监控进程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#top"><span class="toc-number">10.6.0.1.</span> <span class="toc-text">top</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E8%A1%8C%EF%BC%9A%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3"><span class="toc-number">10.6.0.2.</span> <span class="toc-text">第二行：进程相关</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E8%A1%8C%EF%BC%9A%E5%90%8Cmpstat%E5%91%BD%E4%BB%A4"><span class="toc-number">10.6.0.3.</span> <span class="toc-text">第三行：同mpstat命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%A1%AC%E4%B8%AD%E6%96%AD%E5%92%8C%E8%BD%AF%E4%B8%AD%E6%96%AD%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">10.6.0.4.</span> <span class="toc-text">硬中断和软中断的区别</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E8%A1%8C%EF%BC%9A%E5%90%8Cfree%E5%91%BD%E4%BB%A4"><span class="toc-number">10.6.0.5.</span> <span class="toc-text">第四行：同free命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%91%E6%8E%A7%E7%BD%91%E7%BB%9C%E7%8A%B6%E6%80%81"><span class="toc-number">10.7.</span> <span class="toc-text">监控网络状态</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E7%B3%BB%E7%BB%9F%E7%BD%91%E7%BB%9C%E6%83%85%E5%86%B5"><span class="toc-number">10.7.1.</span> <span class="toc-text">查看系统网络情况</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#netstat"><span class="toc-number">10.7.1.1.</span> <span class="toc-text">netstat</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A3%80%E6%B5%8B%E4%B8%BB%E6%9C%BA%E8%BF%9E%E6%8E%A5"><span class="toc-number">10.7.2.</span> <span class="toc-text">检测主机连接</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ping"><span class="toc-number">10.7.2.1.</span> <span class="toc-text">ping</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RPM%E4%B8%8EYUM"><span class="toc-number">11.</span> <span class="toc-text">RPM与YUM</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rpm"><span class="toc-number">11.1.</span> <span class="toc-text">rpm</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2"><span class="toc-number">11.1.1.</span> <span class="toc-text">查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%B8%E8%BD%BD"><span class="toc-number">11.1.2.</span> <span class="toc-text">卸载</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-number">11.1.3.</span> <span class="toc-text">安装</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yum"><span class="toc-number">11.2.</span> <span class="toc-text">yum</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Linux入门到实践
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-04-12T08:51:33.000Z" class="dt-published" itemprop="datePublished">2022-04-12</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Linux/">Linux</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Linux/" rel="tag">Linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="Linux入门"><a href="#Linux入门" class="headerlink" title="Linux入门"></a>Linux入门</h2><h3 id="Linux的应用领域"><a href="#Linux的应用领域" class="headerlink" title="Linux的应用领域"></a>Linux的应用领域</h3><ol>
+<li><p>个人桌面领域的应用</p>
+</li>
+<li><p><strong>服务器领域</strong>：</p>
+<p>linux在服务器领域的应用是最强的。linux免费、稳定、高效等特点在这里得到了很好的体现，尤其在一些高端领域尤为广泛（c&#x2F;c++&#x2F;php&#x2F;java&#x2F;python&#x2F;go）。</p>
+</li>
+<li><p>嵌入式领域：</p>
+<p>linux运行稳定、对网络的良好支持性、低成本，且可以根据需要进行软件裁剪，内核最小可以达到几百KB等特点，使其近些年来在嵌入式领域的应用得到非常大的提高。</p>
+</li>
+</ol>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>linux是一个开源、免费的<strong>操作系统</strong>，其稳定性、安全性、处理多并发已经得到业界的认可，目前很多企业级的项目都会部署到Linux&#x2F;Unix系统上。</p>
+<p>Linux之父：Linus Torvalds  Git创作者、世界著名黑客</p>
+<p>Linux主要的<strong>发行版</strong>：Ubuntu（乌班图）、RedHat（红帽）、CentOS、Debain（蝶变）、Fedora、SuSE、OpenSUSE。</p>
+<h3 id="Linux与Unix"><a href="#Linux与Unix" class="headerlink" title="Linux与Unix"></a>Linux与Unix</h3><p>Unix来源</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406104729963.png"></p>
+<p>Linux来源</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406104804599.png"></p>
+<p>Linux与Unix的关系</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406104859580.png"></p>
+<h3 id="安装VM和CenOS"><a href="#安装VM和CenOS" class="headerlink" title="安装VM和CenOS"></a>安装VM和CenOS</h3><p>安装VMware</p>
+<p><a target="_blank" rel="noopener" href="https://www.vmware.com/products/workstation-pro/workstation-pro-evaluation.html">下载 VMware Workstation Pro</a></p>
+<p>许可证密钥：</p>
+<p>ZF3R0-FHED2-M80TY-8QYGC-NPKYF<br>YF390-0HF8P-M81RQ-2DXQE-M2UT6<br>ZF71R-DMX85-08DQY-8YMNC-PPHV8</p>
+<p>前面的如果已经失效，用下面的</p>
+<p>FA1M0-89YE3-081TQ-AFNX9-NKUC0</p>
+<p>CentOS7.6下载<a target="_blank" rel="noopener" href="https://vault.centos.org/7.6.1810/isos/x86_64/">Index of &#x2F;7.6.1810&#x2F;isos&#x2F;x86_64 (centos.org)</a></p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406161548896.png"></p>
+<h4 id="网络连接的三种方式"><a href="#网络连接的三种方式" class="headerlink" title="网络连接的三种方式"></a>网络连接的三种方式</h4><ol>
+<li>桥接模式：在本机的环境中占用一个ip地址，如果本机的环境有多个设备，可能会造成ip不够用的情况</li>
+<li>NAT模式：网络地址转换模式。借用本机的ip与外界发生联系，虚拟系统可以与外部系统通讯，不造成IP冲突。就是把主机当场虚拟机对外的路由，只不过虚拟机只能当客户机对外发起请求，不能作为服务器接受外面的请求，因为外面不知道虚拟机的ip。</li>
+<li>主机模式：不与外界发生联系，为一个独立的系统</li>
+</ol>
+<h4 id="虚拟机克隆"><a href="#虚拟机克隆" class="headerlink" title="虚拟机克隆"></a>虚拟机克隆</h4><p>用来构建多个虚拟机以实现集群</p>
+<ul>
+<li>1、直接拷贝一份安装好的虚拟机文件</li>
+<li>2、使用vmware的克隆操作</li>
+</ul>
+<p>注意：克隆时需要先关闭Linux系统。</p>
+<h4 id="虚拟机快照"><a href="#虚拟机快照" class="headerlink" title="虚拟机快照"></a>虚拟机快照</h4><p>如果你在使用虚拟机系统的时候（Linux），你想回到原先的某一个状态，也就是说你担心可能有些误操作造成系统异常，需要回到原先某个正常运行的状态，vmware也提供了这样的功能，就叫快照管理。</p>
+<h4 id="虚拟机迁移和删除"><a href="#虚拟机迁移和删除" class="headerlink" title="虚拟机迁移和删除"></a>虚拟机迁移和删除</h4><p>虚拟系统安装好了，它的本质就是文件（放在文件夹的），因此虚拟系统的迁移很方便，你可以把安装好的虚拟系统这个文件夹整体<strong>拷贝或者剪切</strong>到另外位置使用。删除也很简单，用vmware进行移除，再点击菜单-&gt;从磁盘删除即可，或者直接手动删除虚拟系统对应的文件夹即可。</p>
+<h3 id="vmtools"><a href="#vmtools" class="headerlink" title="vmtools"></a>vmtools</h3><p>介绍：</p>
+<ol>
+<li>vmtools安装后，可以让我们在windows下更好的管理vm虚拟机。</li>
+<li>可以设置windows和centos的共享文件夹</li>
+</ol>
+<p>安装步骤：</p>
+<ol>
+<li><p>进入cenos</p>
+</li>
+<li><p>点击vm菜单的-&gt;<strong>install vmware tools</strong></p>
+</li>
+<li><p>centos会出现一个vm的安装包，xx.tar.gz</p>
+</li>
+<li><p>拷贝到&#x2F;opt</p>
+</li>
+<li><p>使用解压命令tar，得到一个安装文件，cd&#x2F;opt（进入到opt目录）</p>
+<p><strong>tar -zxvf xx.tar.gz</strong></p>
+</li>
+<li><p>进入该vm解压的目录，&#x2F;opt目录下 <strong>cd vmware……</strong></p>
+</li>
+<li><p>安装  <strong>.&#x2F;vmware-instal.pl</strong></p>
+</li>
+<li><p>全部使用默认设置即可，就可以安装成功</p>
+</li>
+<li><p>注意：安装vmtools需要有<strong>gcc</strong>，使用gcc -v查看</p>
+</li>
+</ol>
+<h4 id="设置共享文件夹"><a href="#设置共享文件夹" class="headerlink" title="设置共享文件夹"></a>设置共享文件夹</h4><p>具体步骤：</p>
+<p>菜单-&gt;vm-&gt;setting，设置选项为always enable，这样就可以读写了</p>
+<p>共享文件夹在centos的 <strong>&#x2F;mnt&#x2F;hgfs&#x2F;</strong> 下</p>
+<p>注意：在实际开发中，文件的上传下载是需要使用远程方式完成的。</p>
+<h2 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h2><h3 id="基本介绍"><a href="#基本介绍" class="headerlink" title="基本介绍"></a>基本介绍</h3><ol>
+<li>linux的文件系统是采用级层式的树状目录结构，在此结构中的最上层是根目录”&#x2F;“，然后在此目录下再创建其他的目录。</li>
+<li><strong>在Linux世界里，一切皆文件</strong>（Linux系统会把硬件也映射为文件）</li>
+</ol>
+<h3 id="具体的目录结构"><a href="#具体的目录结构" class="headerlink" title="具体的目录结构"></a>具体的目录结构</h3><ul>
+<li><p><strong>&#x2F;bin</strong> [常用] （&#x2F;user&#x2F;bin、&#x2F;user&#x2F;local&#x2F;bin）</p>
+<p>是Binary的缩写，这个目录存放着最经常使用的命令</p>
+</li>
+<li><p>&#x2F;sbin（&#x2F;user&#x2F;sbin、&#x2F;user&#x2F;local&#x2F;sbin）</p>
+<p>s就是Super User的意思，这里存放的是系统管理员使用的系统管理程序。</p>
+</li>
+<li><p><strong>&#x2F;home</strong>[常用]</p>
+<p>存放普通用户的主目录，在Linux中每个用户都有一个自己的目录，一半该用户名是以用户的账号命名</p>
+</li>
+<li><p><strong>&#x2F;root</strong>[常用]</p>
+<p>该目录为系统管理员，也称作超级权限者的用户主目录</p>
+</li>
+<li><p>&#x2F;lib</p>
+<p>系统开机所需要的最基本的动态连接共享库，其作用类似与Windows里的DLL文件。几乎所有的应用程序都需要用到这些共享库</p>
+</li>
+<li><p>&#x2F;lost+found</p>
+<p>这个目录一般情况下是空的，当系统非法关机后，这里就存放了一些文件</p>
+</li>
+<li><p><strong>&#x2F;etc</strong>[常用]</p>
+<p>所有的系统管理所需要的配置文件和子目录，比如安装mysql数据库  my.conf</p>
+</li>
+<li><p><strong>&#x2F;usr</strong>[常用]</p>
+<p>这是一个非常重要的目录，用户的很多应用程序和文件都放在这个目录下，类似于Windows下的program files目录</p>
+</li>
+<li><p><strong>&#x2F;boot</strong>[常用]</p>
+<p>存放的是启动Linux时使用的一些核心文件，包括一些连接文件和镜像文件</p>
+</li>
+<li><p>&#x2F;proc[不能动]</p>
+<p>这个目录是一个虚拟的目录，它时系统内存的映射，访问这个目录来获取系统信息</p>
+</li>
+<li><p>&#x2F;srv[不能动]</p>
+<p>service缩写，该目录一些服务启动之后需要提取的数据</p>
+</li>
+<li><p>&#x2F;sys[不能动]</p>
+<p>这是linux2.6内核的一个很大的变化。该目录下安装了2.6内核中新出现的一个文件系统sysfs</p>
+</li>
+<li><p>&#x2F;tmp</p>
+<p>这个目录是用来存放一些临时文件的</p>
+</li>
+<li><p>&#x2F;dev</p>
+<p>类似于windows的设备管理器，把所有的硬件用文件的形式存储</p>
+</li>
+<li><p><strong>&#x2F;mnt</strong>[常用]</p>
+<p>系统提供该目录是为了让用户临时挂载别的文件系统的，我们可以将外部的存储挂在在&#x2F;mnt&#x2F;上，然后进入该目录就可以查看里面的内容了。</p>
+</li>
+<li><p>&#x2F;opt </p>
+<p>这是给主机额外安装软件所存放的目录。如安装Oracle数据库就可放在该目录下。默认为空</p>
+</li>
+<li><p><strong>&#x2F;user&#x2F;local</strong>[常用]</p>
+<p>这是给另一个主机额外安装软件所安装的目录。一般是通过编译源码方式安装的程序</p>
+</li>
+<li><p><strong>&#x2F;var</strong>[常用]</p>
+<p>这个目录中存放着在不断扩充着的东西，习惯将经常被修改的目录放在这个目录下。包括各种日志文件。</p>
+</li>
+<li><p>&#x2F;selinux[security-enhanced linux]</p>
+<p>SELinux是一种安全子系统，它能控制程序只能访问特定文件，有三种工作模式，可以自行设置。</p>
+</li>
+</ul>
+<h1 id="Linux实操"><a href="#Linux实操" class="headerlink" title="Linux实操"></a>Linux实操</h1><h2 id="远程登录到Linux服务器"><a href="#远程登录到Linux服务器" class="headerlink" title="远程登录到Linux服务器"></a>远程登录到Linux服务器</h2><p>为什么需要远程登录Linux</p>
+<ol>
+<li>linux服务器是开发小组共享</li>
+<li>正式上线的项目是运行在公网</li>
+<li>因此程序员需要远程登录到Linux进行项目管理或者开发</li>
+</ol>
+<p>远程登录客户端有Xshell，Xftp，我们学习使用Xshell和Xftp</p>
+<p>下载：<a target="_blank" rel="noopener" href="https://www.xshell.com/zh/free-for-home-school/">家庭&#x2F;学校免费 - NetSarang Website (xshell.com)</a></p>
+<p>远程登录Linux-Xshell</p>
+<ul>
+<li>介绍</li>
+</ul>
+<p>Xshell是目前最好的远程登录到Linux操作的软件，流畅的速度并且完美解决了中文乱码的问题，是目前程序员首选的软件。</p>
+<p>Xshell是一个强大的安全终端莫你软件，它支持SSH1，SSH2，以及Microsoft Windows平台的TELNET协议。</p>
+<p>Xshell可以在Windows界面下用来访问远端不同系统下的服务器，从而比较好的达到远程控制终端的目的</p>
+<p>查看Linux公网IP</p>
+<p>指令： ifconfig</p>
+<p>找到ens33(网卡)对应的inet</p>
+<p>测试远程机器和linux主机玩过是否通畅</p>
+<p>windows下cmd指令：ping Linux主机公网IP</p>
+<h3 id="远程文件传输"><a href="#远程文件传输" class="headerlink" title="远程文件传输"></a>远程文件传输</h3><p>远程上传文件下载-Xftp</p>
+<ul>
+<li>介绍</li>
+</ul>
+<p>是一个基于windows平台的功能强大的SFTP、FTP文件传输协议。使用了Xftp以后，windows用户能安全地在UNIX&#x2F;Linux和Windows PC之间传输文件</p>
+<p>若连接后出现中文乱码，设置连接属性中的编码为UTF-8</p>
+<h2 id="Vi和Vim编辑器"><a href="#Vi和Vim编辑器" class="headerlink" title="Vi和Vim编辑器"></a>Vi和Vim编辑器</h2><h3 id="基本介绍-1"><a href="#基本介绍-1" class="headerlink" title="基本介绍"></a>基本介绍</h3><p>Linux系统会内置 vi 文本编辑器</p>
+<p>Vim具有程序编辑的能力，可以看做是Vi的增强版本，可以主动的以字体颜色辨别语法的正确性，方便程序设计。代码补完、编译及错误跳转等方便编程的功能特别丰富，在程序员中被广泛使用。</p>
+<h3 id="vi和vim常用的三种模式"><a href="#vi和vim常用的三种模式" class="headerlink" title="vi和vim常用的三种模式"></a>vi和vim常用的三种模式</h3><ul>
+<li><p>正常模式</p>
+<p>以vim打开一个档案就直接进入一般模式了（这是默认的模式）。在这个模式中，你可以使用[上下左右]按键来移动光标，你可以使用[删除字符]或[删除整行]来处理档案内容，也可以使用[赋值、粘贴]来处理你的文件数据。</p>
+</li>
+<li><p>插入模式</p>
+<p>按下i、I、o、O、a、A、r、R等任何一个字母后才会进入编辑模式，一般来说按i即可</p>
+</li>
+<li><p>命令行模式</p>
+<p>输入esc，再输入 :  。在这个模式1当中，可以提供你相关指令，完成读取、粗闹闹、替换、离开vim、显示行号等的动作则是在此模式中达成的。</p>
+</li>
+</ul>
+<p>各种模式的切换</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220406205033038.png"></p>
+<p>Vim常用快捷键：</p>
+<ul>
+<li>拷贝当前行【yy】，拷贝当前行向下的5行【5yy】，粘贴【p】</li>
+<li>删除当前行【dd】，删除当前行向下的5行【5dd】</li>
+<li>a在文件中查找某个单词（命令行下）【&#x2F;关键字】+[回车]查找，输入【n】查找下一个</li>
+<li>设置文件的行号（命令行下）【:set nu】，取消文件的行号【:set nonu】</li>
+<li>编辑 &#x2F;etc&#x2F;profile文件，（一般模式下）使用快捷键到该文档的最末行【G】和最首行【gg】</li>
+<li>撤销动作（一般模式下）【u】</li>
+<li>将光标移动到20行（一般模式下）【20】+ [shift+g]</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/20191219104939654.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d3d19oZWxsb3dvcmxkX2NvbQ==,size_16,color_FFFFFF,t_70"></p>
+<h2 id="关机、重启和用户登录注销"><a href="#关机、重启和用户登录注销" class="headerlink" title="关机、重启和用户登录注销"></a>关机、重启和用户登录注销</h2><h3 id="关机-重启命令"><a href="#关机-重启命令" class="headerlink" title="关机&amp;重启命令"></a>关机&amp;重启命令</h3><ul>
+<li><strong>shutdown -h now</strong>     (“h”-&gt;”halt   停止”)立刻进行关机</li>
+<li><strong>shutdown -h    1</strong>         “hello,1 分钟后会关机了”</li>
+<li><strong>shutdown</strong>                   默认一分钟后关机</li>
+<li><strong>shutdown -r now</strong>       (“r”-&gt;”reboot 重启”)现在重新启动计算机</li>
+<li><strong>halt</strong>                               关机，作用和上面一样</li>
+<li><strong>reboot</strong>                          现在重新启动计算机</li>
+<li><strong>sync</strong>                              (“synchronize   同步”)把内存的数据同步到磁盘</li>
+</ul>
+<p>注意</p>
+<ol>
+<li>不管是重启系统还是关闭系统，首先要运行sync命令，把内存中的数据写到磁盘中。</li>
+<li>目前的 shutdown&#x2F;reboot&#x2F;halt 等命令均已经在关机前进行了sync，但小心驶得万年船。</li>
+</ol>
+<h3 id="用户登录和注销"><a href="#用户登录和注销" class="headerlink" title="用户登录和注销"></a>用户登录和注销</h3><p>基本介绍</p>
+<ol>
+<li>登录时尽量少用root账号登录，因为它是系统管理员，最大的权限，避免操作失误，可以利用普通账户登录，登录后再用“ <strong>su - 用户名</strong>”命令来切换成系统管理员身份</li>
+<li>在提示符下输入<strong>logout</strong>即可注销用户</li>
+</ol>
+<p>注意：logout注销指令在图形运行级别无效，在运行级别3下有效。</p>
+<h2 id="用户管理"><a href="#用户管理" class="headerlink" title="用户管理"></a>用户管理</h2><h3 id="基本介绍-2"><a href="#基本介绍-2" class="headerlink" title="基本介绍"></a>基本介绍</h3><p>Linux系统是一个多用户多任务的操作系统，任何一个要使用系统资源的用户，都必须首先向系统管理员申请一个账户，然后以这个账户的身份进入系统。</p>
+<h3 id="用户"><a href="#用户" class="headerlink" title="用户"></a>用户</h3><h4 id="添加用户"><a href="#添加用户" class="headerlink" title="添加用户"></a>添加用户</h4><ul>
+<li><strong>useradd 用户名</strong>     添加一个用户(例如：tom) ，默认该用户的家目录在&#x2F;home&#x2F;tom</li>
+<li><strong>useradd -d 用户名</strong>  （”d”-&gt;”directory”）给新创建的用户指定家目录</li>
+</ul>
+<p>当用户创建成功后，会自动的创建和用户同名的家目录（默认）。</p>
+<h4 id="指定-修改密码"><a href="#指定-修改密码" class="headerlink" title="指定&#x2F;修改密码"></a>指定&#x2F;修改密码</h4><ul>
+<li><strong>password 用户名</strong>   给指定的用户设置密码</li>
+<li><strong>pwd</strong>                         （print word directory）显示当前用户所在的目录</li>
+</ul>
+<h4 id="删除用户"><a href="#删除用户" class="headerlink" title="删除用户"></a>删除用户</h4><ul>
+<li><strong>userdel 用户名</strong>    删除该用户，但是保留对应的家目录（home）</li>
+<li><strong>userdel -r 用户名</strong> 删除用户以及用户主目录（删除其对应的家目录）</li>
+</ul>
+<p>一般情况下建议保留家目录。</p>
+<h4 id="查询用户信息指令"><a href="#查询用户信息指令" class="headerlink" title="查询用户信息指令"></a>查询用户信息指令</h4><ul>
+<li>**id 用户名 **                 返回uid（userid）、gid（groupid）、组</li>
+</ul>
+<p>当用户不存在时，返回 无此用户。</p>
+<h4 id="切换用户"><a href="#切换用户" class="headerlink" title="切换用户"></a>切换用户</h4><p>介绍</p>
+<p>在操作Linux中，如果当前用户的权限不够，可以通过 su - 指令，切换到高权限用户，比如root。</p>
+<ul>
+<li><strong>su - 切换用户名</strong>    （swich user）</li>
+</ul>
+<ol>
+<li>从权限高的用户切换到权限低的用户，不需要输入密码，反之需要。</li>
+<li>当需要返回到原来用户时，使用 <strong>exit</strong> &#x2F; <strong>logout</strong> 指令</li>
+</ol>
+<p>查看当前用户&#x2F;登录用户</p>
+<ul>
+<li><strong>who am i</strong>            查看最开始登录到Linux主机的用户</li>
+<li><strong>whoami</strong>              查看当前用户</li>
+</ul>
+<h3 id="用户组"><a href="#用户组" class="headerlink" title="用户组"></a>用户组</h3><p>介绍</p>
+<p>类似于角色，系统可以对有共性的多个用户进行同一的管理。</p>
+<h4 id="新增组"><a href="#新增组" class="headerlink" title="新增组"></a>新增组</h4><ul>
+<li><strong>groupadd 组名</strong>     					 新增组</li>
+</ul>
+<h4 id="删除组"><a href="#删除组" class="headerlink" title="删除组"></a>删除组</h4><ul>
+<li><strong>groupdel 组名</strong>                           删除组</li>
+</ul>
+<h4 id="修改组"><a href="#修改组" class="headerlink" title="修改组"></a>修改组</h4><ul>
+<li><strong>useradd -g 用户组 用户名</strong>        （”g”-&gt;”group”）增加用户时直接放入指定的组</li>
+<li><strong>usermod -g 用户组 用户名</strong>         把指定的用户的组改为指定的组</li>
+</ul>
+<h3 id="用户和组相关文件"><a href="#用户和组相关文件" class="headerlink" title="用户和组相关文件"></a>用户和组相关文件</h3><ul>
+<li><strong>&#x2F;etc&#x2F;passwd</strong>    		用户（user）的配置文件，记录用户的各种信息。<ul>
+<li>每行的含义：<strong>用户名:口令:用户标识号(uid):组标识号(gid):注释性描述:主目录(家目录)</strong></li>
+</ul>
+</li>
+<li><strong>&#x2F;etc&#x2F;shadow</strong>                口令的配置文件<ul>
+<li>每行的含义：<strong>登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:标志</strong></li>
+</ul>
+</li>
+<li><strong>&#x2F;etc&#x2F;group</strong>                    组(group)的配置文件，记录Linux包含的组的信息<ul>
+<li>每行的含义：<strong>组名:口令:组标识号:组内用户列表</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="实用指令"><a href="#实用指令" class="headerlink" title="实用指令"></a>实用指令</h2><h3 id="运行级别"><a href="#运行级别" class="headerlink" title="运行级别"></a>运行级别</h3><p>运行级别说明：</p>
+<p>0：关机</p>
+<p>1：单用户（找回丢失密码）</p>
+<p>2：多用户状态没有网络服务</p>
+<p><strong>3：多用户状态有网络服务</strong></p>
+<p>4：系统未使用保留给用户</p>
+<p><strong>5：图形界面</strong></p>
+<p>6：系统重启</p>
+<ul>
+<li><strong>init 级别</strong>       切换不同的运行级别[0123456]</li>
+</ul>
+<p>在CentOS7以前，&#x2F;etc&#x2F;inittab文件中</p>
+<p>之后进行了简化，如下：</p>
+<p><strong>multi-user.target</strong>：analogous to runlevel 3</p>
+<p><strong>graphical.target</strong>：analogous to level 5</p>
+<p>#To view current default target,run</p>
+<ul>
+<li><strong>systemctl get-default</strong>                                  查看当前系统默认级别</li>
+</ul>
+<p>#To set a default target,run</p>
+<ul>
+<li><strong>systemctl set-default TARGET.target</strong>       设置系统默认级别为指定的级别</li>
+</ul>
+<h3 id="找回root密码"><a href="#找回root密码" class="headerlink" title="找回root密码"></a>找回root密码</h3><ol>
+<li>启动系统，进入开机界面，在界面中迅速按下”e”进入编辑界面</li>
+<li>进入编辑界面，使用键盘上的上下键把光标网下移动，找到以”<strong>Linux16</strong>“开头内容所在的行数，在行的最后面输入 <strong>init&#x3D;&#x2F;bin&#x2F;sh</strong></li>
+<li>接着，输入完成后，直接按快捷键：<strong>Ctrl+x</strong> 进入<strong>单用户模式</strong></li>
+<li>接着，在光标闪烁的位置中输入： <strong>mount -o remount,rw &#x2F;</strong>   (注意：各个单词键有空格)，完成后按家农安的回车键(Enter)</li>
+<li>在新的一行最后面输入： <strong>passwd</strong>  ，完成后按键盘的回车键(Enter)，输入密码，然后再次确认密码即可。密码修改完成后，会显示 passwd……的样式，说明密码修改成功</li>
+<li>接着，在鼠标闪烁的位置中（最后一行中）输入：<strong>touch &#x2F;.autorelabel</strong>  ，（注意：touch与&#x2F;之间有一个空格），完成后按键盘的回车键（Enter）</li>
+<li>继续在光标闪烁的位置中，输入：<strong>exex &#x2F;sbin&#x2F;init</strong>  ，（注意：exec与&#x2F;之间有一个空格），完成后按键盘的回车键(Enter)，等待系统自动修改密码，完成后系统会自动重启，新的密码生效了</li>
+</ol>
+<h3 id="帮助指令"><a href="#帮助指令" class="headerlink" title="帮助指令"></a>帮助指令</h3><p>man  获得帮助信息</p>
+<ul>
+<li>man [命令或配置文件]          获得帮助信息</li>
+</ul>
+<p>例如：查看ls命令的帮助信息     man ls</p>
+<p>在linux下，隐藏文件是以  <strong>.</strong> 开头，选项可以组合使用，比如 ls -al，ls -al &#x2F;root</p>
+<p>help指令</p>
+<ul>
+<li>help [命令]                获得shell内置命令的帮助信息</li>
+</ul>
+<p>例如：查看cd命令的帮助信息： help cd</p>
+<p>直接百度</p>
+<h3 id="文件目录类"><a href="#文件目录类" class="headerlink" title="文件目录类"></a>文件目录类</h3><h5 id="pwd"><a href="#pwd" class="headerlink" title="pwd"></a>pwd</h5><ul>
+<li><strong>pwd</strong>                （print work directory） 显示当前工作目录的绝对路径</li>
+</ul>
+<h5 id="ls"><a href="#ls" class="headerlink" title="ls"></a>ls</h5><ul>
+<li><p><strong>ls [选项] [目录或是文件]</strong>                 （list）</p>
+<p>常用选项</p>
+<ul>
+<li><strong>-a</strong> ：显示当前目录所有的文件和目录，包括隐藏的</li>
+<li><strong>-l</strong> ：以列表的方式显示信息</li>
+<li><strong>-h</strong>：（human）按照适合人阅读的方式显示</li>
+</ul>
+</li>
+</ul>
+<h5 id="cd"><a href="#cd" class="headerlink" title="cd"></a>cd</h5><ul>
+<li><strong>cd [参数]</strong>          切换到指定目录（可定位<strong>绝对路径</strong>或<strong>相对路径</strong>）<ul>
+<li><strong>cd ~</strong>            回到自己的家目录</li>
+<li><strong>cd ..</strong>             回到当前目录的上一级目录</li>
+</ul>
+</li>
+</ul>
+<h5 id="mkdir"><a href="#mkdir" class="headerlink" title="mkdir"></a>mkdir</h5><ul>
+<li><strong>mkdir [选项] 要创建的目录</strong>               （make directory）创建目录<ul>
+<li><strong>-p</strong> ：创建多级目录</li>
+</ul>
+</li>
+</ul>
+<h5 id="rmdir"><a href="#rmdir" class="headerlink" title="rmdir"></a>rmdir</h5><ul>
+<li><p><strong>rmdir [选项] 要删除的空目录</strong>               (remove directory)删除空目录</p>
+<ul>
+<li><strong>rm -rf</strong>  要删除的目录                      （recurse force）强制删除非空目录</li>
+</ul>
+</li>
+</ul>
+<h5 id="touch"><a href="#touch" class="headerlink" title="touch"></a>touch</h5><ul>
+<li><strong>touch 文件名称</strong>                                      创建空文件</li>
+</ul>
+<h5 id="cp"><a href="#cp" class="headerlink" title="cp"></a>cp</h5><ul>
+<li><p><strong>cp [选项]  source dest</strong></p>
+<ul>
+<li><p><strong>-r</strong> ：递归复制整个文件夹</p>
+<p>例子：1、将&#x2F;home&#x2F;hello.txt拷贝到&#x2F;home&#x2F;bbb目录下：</p>
+<p>​			cp hello.txt &#x2F;home&#x2F;bbb</p>
+<p>​			2、递归复制整个文件夹，将&#x2F;home&#x2F;bbb整个目录，拷贝到&#x2F;opt</p>
+<p>​			cp -r &#x2F;home&#x2F;bbb &#x2F;opt</p>
+</li>
+<li><p>强制覆盖不提示的方法：\cp -r  &#x2F;home&#x2F;bbb &#x2F;opt</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="rm"><a href="#rm" class="headerlink" title="rm"></a>rm</h5><ul>
+<li><p><strong>rm [选项] 要删除的文件或目录</strong>           （remove）移除文件或目录</p>
+<ul>
+<li><p><strong>-r</strong> ：递归删除整个文件夹</p>
+</li>
+<li><p><strong>-f</strong> ：强制删除不提示</p>
+<p>例子：1、将&#x2F;home&#x2F;hello.txt删除</p>
+<p>​			rm &#x2F;home&#x2F;hello.txt</p>
+<p>​			2、递归删除整个文件夹.home&#x2F;bbb</p>
+<p>​			<strong>rm -rf</strong> &#x2F;home&#x2F;bbb（删除整个文件夹，不提示）</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="mv"><a href="#mv" class="headerlink" title="mv"></a>mv</h5><ul>
+<li><p><strong>mv [old] [new]</strong>                        移动文件与目录或重命名</p>
+<ul>
+<li><p>mv oldFileName newFileName    			                          （要求在同一文件夹下）重命名</p>
+</li>
+<li><p>mv &#x2F;temp&#x2F;movefile &#x2F;targetFolder                                         移动文件</p>
+</li>
+<li><p>mv &#x2F;temp&#x2F;movefile &#x2F;targetFolder&#x2F;newFileName                移动文件并重命名</p>
+<p>例子：1、将&#x2F;home&#x2F;cat.txt文件重命名为pig.txt                     mv cat.txt pig.txt</p>
+<p>​			2、将&#x2F;home&#x2F;pig.txt文件移动到&#x2F;root目录下			   mv &#x2F;home&#x2F;pig.txt &#x2F;root</p>
+<p>​			3、移动整个目录，比如将&#x2F;opt&#x2F;bbb移动到&#x2F;home下  mv &#x2F;opt&#x2F;bbb &#x2F;home&#x2F;</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="cat"><a href="#cat" class="headerlink" title="cat"></a>cat</h5><ul>
+<li><p><strong>cat [选项] 要查看的文件</strong>             查看文件内容（只读）</p>
+<ul>
+<li><p><strong>-n</strong>     显示行号</p>
+<p>例： cat -n &#x2F;etc&#x2F;profile</p>
+</li>
+<li><p>cat只能浏览文件，而不能修改文件，为了浏览方便，一般会带上<strong>管道命令</strong> <strong>| more</strong></p>
+</li>
+<li><p>cat -n &#x2F;etc&#x2F;profile | more [进行交互]</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="more"><a href="#more" class="headerlink" title="more"></a>more</h5><ul>
+<li><strong>more 要查看的文件</strong><ul>
+<li>more指令是一个基于VI编辑器的文本过滤器，它以全屏幕的方式按页显示文本文件的内容。more指令中内置了若干快捷键（交互的指令）：<ul>
+<li><strong>空白键（space）</strong>               向下翻一页</li>
+<li><strong>Enter</strong>                                   向下翻一行</li>
+<li><strong>q</strong>                                           立刻离开more，不再显示该文件内容</li>
+<li><strong>Ctrl + F</strong>                                 向下滚动一屏</li>
+<li><strong>Ctrl + B</strong>                                 返回上一屏</li>
+<li><strong>&#x3D;</strong>                                            输出当前行的行号</li>
+<li><strong>:f</strong>                                            输出文件名和当前行的行号</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="less"><a href="#less" class="headerlink" title="less"></a>less</h5><ul>
+<li><strong>less 要查看的文件</strong>                              分屏查看文件内容<ul>
+<li>less指令用来分屏查看文件内容，它的功能与more指令类似，但是比more指令更加强大，支持各种显示终端。less指令在显示文件内容是，并不是一次将整个文件加载之后蔡先生，而是根据显示需要加载内容（懒汉式），对于显示大型文件具有较高的效率。less内置了若干快捷键：<ul>
+<li><strong>空白键</strong>                                   向下翻动一页</li>
+<li><strong>[pagedown]</strong>                         向下翻动一页</li>
+<li><strong>[pageup]</strong>                               向上翻动一页</li>
+<li><strong>&#x2F;字串</strong>                                      向下搜寻[字串]的功能；n：向下查找；N：向上查找</li>
+<li><strong>?字串</strong>                                      向上搜寻[字串]的功能；n：向上查找；N：向下查找</li>
+<li><strong>q</strong>                                             离开less这个程序</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="echo"><a href="#echo" class="headerlink" title="echo"></a>echo</h5><ul>
+<li><p><strong>echo [选项] [输出内容]</strong>                       输出内容到控制台</p>
+<ul>
+<li><p>例子：1、使用echo指令输出环境变量：    echo $HOSTNAME</p>
+<p>​            2、使用echo指令输出hello world    echo “hello world”</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="head"><a href="#head" class="headerlink" title="head"></a>head</h5><ul>
+<li><p><strong>head [选项] 文件</strong>              显示文件的开头部分，默认情况下显示文件的前10行</p>
+<ul>
+<li><p>head 文件   								  查看文件头10行内容</p>
+</li>
+<li><p>head -n 5 文件                             查看文件的前5行内容，5可以是任意行数</p>
+<p>例子：查看&#x2F;etc&#x2F;profile的前5行代码：       head -n 5 &#x2F;etc&#x2F;profile</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="tail"><a href="#tail" class="headerlink" title="tail"></a>tail</h5><ul>
+<li><p><strong>tail [选项] 文件</strong>                   输出文件中尾部的内容，默认情况下tail指令显示文件尾10内容</p>
+<ul>
+<li><p>tail 文件                        查看文件为10行内容</p>
+</li>
+<li><p>tail -n 5 文件                查看文件尾5行内容，5可以是任意行数</p>
+</li>
+<li><p>tail -f 文件                    实时追踪该文档的所有更新</p>
+<p>例子：1、查看&#x2F;etc&#x2F;profile的尾5行代码：        tail -n 5 &#x2F;etc&#x2F;profile</p>
+<p>​			2、实时监控 mydate.txt：  tail -f &#x2F;home&#x2F;mydate.txt</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id=""><a href="#" class="headerlink" title=".&gt; &gt;&gt;"></a>.&gt; &gt;&gt;</h5><ul>
+<li><strong>输出重定向&gt;和&gt;&gt;追加</strong><ul>
+<li>ls -l &gt; 文件                     将列表的内容写入文件（覆盖）</li>
+<li>ls -al &gt;&gt; 文件                 将列表的内容追加到文件的末尾</li>
+<li>cat 文件1 &gt; 文件2          将文件1的内容覆盖到文件2</li>
+<li>echo “内容” &gt;&gt; 文件       将内容追加到文件末尾</li>
+</ul>
+</li>
+</ul>
+<h5 id="ln"><a href="#ln" class="headerlink" title="ln"></a>ln</h5><ul>
+<li><p><strong>ln -s [原文件或目录] [软链接名]</strong>                 给原文件创建一个软链接</p>
+<p>例子：1、在&#x2F;home目录下创建一个软连接myroot，连接到&#x2F;root目录： ln -s &#x2F;root &#x2F;home&#x2F;myroot</p>
+<p>​            2、删除软连接myroot：      rm &#x2F;home&#x2F;myroot</p>
+<ul>
+<li>当我们使用pwd指令查看目录时，仍然看到的时软链接所在目录</li>
+</ul>
+</li>
+</ul>
+<h5 id="history"><a href="#history" class="headerlink" title="history"></a>history</h5><ul>
+<li><p><strong>history</strong>                        查看已经指向过的历史命令，也可以执行历史指令</p>
+<p>例子：1、显示所有的历史命令：                     history</p>
+<p>​            2、显示最近使用过的10个指令：         history 10</p>
+<p>​			3、执行历史编号为5的指令：               !5</p>
+</li>
+</ul>
+<h3 id="时间日期类"><a href="#时间日期类" class="headerlink" title="时间日期类"></a>时间日期类</h3><h5 id="date"><a href="#date" class="headerlink" title="date"></a>date</h5><ul>
+<li><p><strong>date指令</strong>  显示当前日期</p>
+<ul>
+<li><p><strong>date</strong>														显示当前时间</p>
+</li>
+<li><p><strong>date +%Y</strong>                                                显示当前年份</p>
+</li>
+<li><p><strong>date +%m</strong>                                              显示当前月份</p>
+</li>
+<li><p><strong>date +%d</strong>                                                显示当前是哪一天</p>
+</li>
+<li><p><strong>date “+%Y-%m-%d %H:%M:%S”</strong>          显示年月日时分秒</p>
+<p>例子：1、显示当前时间信息：			   date</p>
+<p>​            2、显示当前时间年月日：           date “+%Y-%m-%d”</p>
+<p>​            3、显示当前时间年月日时分秒：date “+%Y-%m-%d %H:%M:%S”</p>
+</li>
+</ul>
+</li>
+<li><p>date指令  设置日期</p>
+<ul>
+<li><p><strong>date -s 字符串时间</strong></p>
+<p>例子：设置系统当前时间为2020-11-03 20:00:00：date &#x3D;s “2020-11-03 20:00:00”</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="cal"><a href="#cal" class="headerlink" title="cal"></a>cal</h5><ul>
+<li><p>cal指令      查看日期</p>
+<ul>
+<li><p>cal [选项] [[[日] 月] 年]          不加选项，显示本月日历</p>
+<p>例子：1、显示当前日历：cal</p>
+<p>​			2、显示2022年日历：cal 2022</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="搜索查找类"><a href="#搜索查找类" class="headerlink" title="搜索查找类"></a>搜索查找类</h3><h5 id="find"><a href="#find" class="headerlink" title="find"></a>find</h5><ul>
+<li><p><strong>find [搜索范围] [选项]</strong>                从指定的目录向下递归地遍历其各个子目录，将满足条件的文件或者目录显示在终端</p>
+<ul>
+<li><p>**-name [查询方式]**：按照指定的文件名查找模式查找文件</p>
+</li>
+<li><p>**-user [用户名]**：查找属于指定用户名所有文件</p>
+</li>
+<li><p>**-size [文件大小]**：按照指定的文件大小查找文件</p>
+<ul>
+<li><p><strong>+n</strong> 大于</p>
+</li>
+<li><p><strong>-n</strong> 小于</p>
+</li>
+<li><p><strong>n</strong> 等于</p>
+<p>单位：<strong>k  M  G</strong></p>
+</li>
+</ul>
+<p>例子：1、按文件名查找&#x2F;home目录下的hello.txt文件：find &#x2F;home -name hello.txt</p>
+<p>​			2、按拥有者查找&#x2F;opt目录下，用户名为root的文件：find &#x2F;opt -user root</p>
+<p>​			3、查找整个linux系统下大于200M的文件：find &#x2F; -size +200M</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="locate"><a href="#locate" class="headerlink" title="locate"></a>locate</h5><ul>
+<li><p><strong>locate [搜索文件]</strong>          定位文件路径</p>
+<ul>
+<li><p>locate指令可以快速定位文件路径，locate指令利用事先建立的系统中所有文件名称及路径的locate数据库实现快速定位给定的文件。locate指令无需遍历整个文件系统，查询速度比较快。为了保证查询结果的准确度，管理员必须定期更新locate时刻。</p>
+</li>
+<li><p>由于locate指令基于数据库进行查询，所以第一次运行前，必须使用<strong>updatedb</strong>指令创建locate数据库。</p>
+<p>例子：使用locate指令快速定位hello.txt文件所在目录</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="which"><a href="#which" class="headerlink" title="which"></a>which</h5><ul>
+<li><strong>which [指令]</strong>                    查看某个指令的路径</li>
+</ul>
+<h5 id="grep"><a href="#grep" class="headerlink" title="grep |"></a>grep |</h5><ul>
+<li><p><strong>grep指令和管道符号 |</strong></p>
+<ul>
+<li><p>grep过滤查找；管道符 “|” 表示将前一个命令的处理结果输出传递给后面的命令处理。</p>
+</li>
+<li><p><strong>grep [选项] 查找内容 原文件</strong></p>
+<ul>
+<li><strong>-n</strong>：显示匹配行及行号</li>
+<li><strong>-i</strong>：忽略字母大小写</li>
+</ul>
+<p>例子：在hello.txt文件中查找”yes”所在行，并显示行号</p>
+<p>1、cat &#x2F;home&#x2F;hello.txt | grep -n “yes”</p>
+<p>2、grep -n “yes” &#x2F;home&#x2F;hello.txt</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="压缩和解压"><a href="#压缩和解压" class="headerlink" title="压缩和解压"></a>压缩和解压</h3><h5 id="gzip"><a href="#gzip" class="headerlink" title="gzip"></a>gzip</h5><ul>
+<li><strong>gzip 文件</strong>                  压缩文件，只能将文件压缩为*.gz文件</li>
+</ul>
+<h5 id="gunzip"><a href="#gunzip" class="headerlink" title="gunzip"></a>gunzip</h5><ul>
+<li><p><strong>gunzip 文件.gz</strong>         解压缩文件</p>
+<p>例子：1、将&#x2F;home下的hello.txt文件进行压缩：           gzip &#x2F;home&#x2F;hello.txt</p>
+<p>​			2、将&#x2F;home下的hello.txt.gz文件进行解压缩：  gunzip &#x2F;home&#x2F;hello&#x2F;txt&#x2F;gz</p>
+</li>
+</ul>
+<h5 id="zip"><a href="#zip" class="headerlink" title="zip"></a>zip</h5><ul>
+<li><strong>zip [选项] XXX.zip  将要压缩的内容</strong>                             压缩文件和目录的命令<ul>
+<li><strong>-r</strong>：递归压缩，即压缩目录</li>
+</ul>
+</li>
+</ul>
+<h5 id="unzip"><a href="#unzip" class="headerlink" title="unzip"></a>unzip</h5><ul>
+<li><p><strong>unzip [选项] XXX.zip</strong>                                                     解压缩文件</p>
+<ul>
+<li>**-d&lt; 目录 &gt;**：指定解压缩后文件的存放目录</li>
+</ul>
+<p>例子：1、将&#x2F;home下的所有文件&#x2F;文件夹进行压缩成myhome.zip：zip -r myhome.zip &#x2F;home&#x2F;</p>
+<p>​			2、将myhome.zip解压到&#x2F;opt&#x2F;tmp目录下：unzip -d &#x2F;opt&#x2F;tmp &#x2F;home&#x2F;myhome.zip</p>
+</li>
+</ul>
+<h5 id="tar"><a href="#tar" class="headerlink" title="tar"></a>tar</h5><ul>
+<li><p><strong>tar [选项] XXX.tar.gz 打包的内容</strong>                       打包目录，压缩后的文件格式为.tar.gz</p>
+<ul>
+<li><p><strong>-c</strong>：产生.tar打包文件</p>
+</li>
+<li><p><strong>-v</strong>：显示详细信息</p>
+</li>
+<li><p><strong>-f</strong>：指定压缩后的文件名</p>
+</li>
+<li><p><strong>-z</strong>：打包同时压缩</p>
+</li>
+<li><p><strong>-x</strong>：解包.tar文件</p>
+<p>例子：1、压缩多个文件，将&#x2F;home&#x2F;pig.txt和&#x2F;home&#x2F;cat.txt压缩成pc.tar.gz:</p>
+<p>​					tar -zcvf pc.tar.gz &#x2F;home&#x2F;pig.txt &#x2F;home&#x2F;cat.txt</p>
+<p>​			2、将&#x2F;home的文件夹压缩成myhome.tar.gz：</p>
+<p>​					tar -zcvf myhome.tar.gz &#x2F;home&#x2F;</p>
+<p>​			3、将pc.tar.gz解压到当前目录：</p>
+<p>​					tar -zxvf pc.tar.gz</p>
+<p>​			4、将myhome.tar.gz解压到&#x2F;opt&#x2F;tmp2目录下：</p>
+<p>​					tar -zxvf &#x2F;home&#x2F;myhome.tar.gz -C &#x2F;opt&#x2F;tmp2</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="组管理和权限管理"><a href="#组管理和权限管理" class="headerlink" title="组管理和权限管理"></a>组管理和权限管理</h2><p>基本介绍</p>
+<p>在linux中的每个用户必须属于一个组，不能独立于组外。在linux中每个文件有所有者、所在组、其他组的概念。</p>
+<h3 id="文件-目录所有者"><a href="#文件-目录所有者" class="headerlink" title="文件&#x2F;目录所有者"></a>文件&#x2F;目录所有者</h3><h4 id="修改文件-目录所有者"><a href="#修改文件-目录所有者" class="headerlink" title="修改文件&#x2F;目录所有者"></a>修改文件&#x2F;目录所有者</h4><ul>
+<li><p><code>ls -ahl </code>					    查看文件的所有者和所在组</p>
+</li>
+<li><p><code>chown 用户名 文件/目录名</code>     （<strong>ch</strong>ange <strong>own</strong>er）修改文件&#x2F;目录所有者</p>
+</li>
+<li><p><code>chown 用户名:组名 文件/目录</code>      修改文件&#x2F;目录的所有者和所在组</p>
+</li>
+<li><p><code>chown -R 用户名 目录</code>                 修改该目录下所有文件和目录的所有者</p>
+</li>
+</ul>
+<h3 id="文件-目录所在组"><a href="#文件-目录所在组" class="headerlink" title="文件&#x2F;目录所在组"></a>文件&#x2F;目录所在组</h3><p>当某个用户创建了一个文件后，这个文件的所在组默认就是该用户所在的组。</p>
+<h4 id="改变用户所在组"><a href="#改变用户所在组" class="headerlink" title="改变用户所在组"></a>改变用户所在组</h4><ul>
+<li><code>useradd -g 组名 用户名</code>  添加一个用户并将其所在组设置为给定的组</li>
+<li><code>chgrp 组名 文件/目录名</code>                                 (<strong>ch</strong>ange <strong>gr</strong>ou<strong>p</strong>)修改文件&#x2F;目录所在组</li>
+<li><code>chgrp -R 组名 目录名</code>                                 修改目录下所有文件和组的所在组</li>
+</ul>
+<h3 id="其它组"><a href="#其它组" class="headerlink" title="其它组"></a>其它组</h3><p>除文件的所有者和所在组的用户外，系统的其他用户都是文件的其他组。</p>
+<ul>
+<li><code>usermod -g 新组名 用户名</code>          </li>
+<li><code>usermod -d 目录名 用户名</code>              改变该用户登录的初始目录。（用户需要有进入到新目录的权限）</li>
+</ul>
+<h3 id="权限管理"><a href="#权限管理" class="headerlink" title="权限管理"></a>权限管理</h3><p>0-9位说明：</p>
+<ol>
+<li><code>0</code> 确定文件类型<ul>
+<li><code>l</code>      链接，相当于windows的快捷方式</li>
+<li><code>d</code>     目录，相当于windows的文件夹</li>
+<li><code>c</code>      字符设备文件，鼠标，键盘</li>
+<li><code>b</code>      块设备，如硬盘</li>
+<li><code>-</code>     普通文件</li>
+</ul>
+</li>
+<li><code>1-3</code>确定所有者(该文件的所有者)拥有该文件的权限      —User</li>
+<li><code>4-6</code>确定所属组(同用户组的用户)拥有该文件的权限       —Group</li>
+<li><code>7-9</code>确定其他用户拥有该文件的权限                                 —Other</li>
+</ol>
+<p>rwx权限</p>
+<ul>
+<li>rwx作用到文件<ul>
+<li>r代表可读：可读取，查看</li>
+<li>w代表可写：可修改，但不代表可删除(删除文件意味着修改目录，所以必须要有对该文件所在目录有写权限)</li>
+<li>x代表可执行：可以被执行</li>
+</ul>
+</li>
+<li>rwx作用到目录<ul>
+<li>r代表可读：可以读取，ls查看目录内容</li>
+<li>w代表可写：可以修改，对目录内创建+删除+重命名目录</li>
+<li>x代表可执行：可以进入该目录</li>
+</ul>
+</li>
+</ul>
+<p>案例：</p>
+<p>drwxr-xr-x. 18 root root 4.0K 4月   9 23:53 .config</p>
+<p>数字表示权限：r&#x3D;4,w&#x3D;2,x&#x3D;1，即rwx&#x3D;7</p>
+<ul>
+<li>18   文件：硬链接数   目录：子目录数</li>
+<li>root         用户</li>
+<li>root          组</li>
+<li>4.0K         文件大小（字节），若是文件夹，显示4096字节（4.0K）</li>
+<li>4月   9 23:53  最后修改日期</li>
+<li>.config        文件名或目录名</li>
+</ul>
+<h4 id="修改权限"><a href="#修改权限" class="headerlink" title="修改权限"></a>修改权限</h4><p>通过chmod指令，可以修改文件或者目录的权限</p>
+<ol>
+<li><p>+、-、&#x3D;变更权限</p>
+<p><code>u</code>:所有者、<code>g</code>:所在组、<code>o</code>:其他人、<code>a</code>:所有人（ugo）</p>
+<p><code>+</code>:增加权限、<code>-</code>除去权限、<code>=</code>设置权限</p>
+<ul>
+<li><code>chmod u=rwx,g=rx,o=x</code> 文件&#x2F;目录名</li>
+<li><code>chmod o+w</code> 文件目录名</li>
+<li><code>chmod a-x </code>文件目录名</li>
+</ul>
+</li>
+<li><p>通过数字变更权限</p>
+<p>r&#x3D;4、w&#x3D;2、x&#x3D;1        rwx&#x3D;7</p>
+<ul>
+<li><p><code>chmod u=rwx,g=rx,o=x</code> 文件&#x2F;目录名   相当于</p>
+<p><code>chmod 751 </code>文件&#x2F;目录名</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="定时任务调度"><a href="#定时任务调度" class="headerlink" title="定时任务调度"></a>定时任务调度</h2><h3 id="crond任务调度"><a href="#crond任务调度" class="headerlink" title="crond任务调度"></a>crond任务调度</h3><h4 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a>概述</h4><p>任务调度：是指系统在某个时间执行的特定的命令或程序</p>
+<p> 任务调度分类：</p>
+<ol>
+<li>系统工作：有些重要的工作必须周而复始地执行，如病毒扫描</li>
+<li>个别用户工作：个别用户可能希望执行某些程序，比如对mysql数据库的备份</li>
+</ol>
+<h4 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h4><ul>
+<li><p>crontab [选项]</p>
+<p>常用选项</p>
+<ul>
+<li>-e         编辑crontab定时任务</li>
+<li>-l          查询crontab任务</li>
+<li>-r          删除当前用户所有的crontab任务</li>
+</ul>
+</li>
+</ul>
+<p>例子：设置任务调度文件 &#x2F;etc&#x2F;crontab</p>
+<p>设置个人任务调度。执行crontab -e命令。接着输入任务到调度文件</p>
+<p>如：* &#x2F;1 * * * * ls -l &#x2F;etc&#x2F; &gt; &#x2F;tmp&#x2F;to.txt</p>
+<p>意思是每小时的每分钟执行 ls -l &#x2F;etc&#x2F; &gt; &#x2F;tmp&#x2F;to.txt 命令                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </p>
+<h4 id="参数细节说明"><a href="#参数细节说明" class="headerlink" title="参数细节说明"></a>参数细节说明</h4><p><code>*</code></p>
+<ul>
+<li><p>第一个*        一小时当中的第几分钟   0-59</p>
+</li>
+<li><p>第二个*        一天当中的第几小时      0-24</p>
+</li>
+<li><p>第三个*        一个月当中的第几天       1-31</p>
+</li>
+<li><p>第四个*         一年当中的第几个月     1-12</p>
+</li>
+<li><p>第五个*        一周当中的星期几           0-7（0和7都表示星期日）</p>
+</li>
+</ul>
+<p><code>,</code></p>
+<ul>
+<li>代表不连续的时间。比如”0 8,12,16 * * * “代表每天的8:00、12:00、16:00都执行一次命令</li>
+</ul>
+<p><code>-</code></p>
+<ul>
+<li>代表连续的时间范围。比如”0 5 * * 1-6”代表周一到周六的5:00执行命令</li>
+</ul>
+<p><code>*/n</code></p>
+<ul>
+<li>代表每个多久执行一次。比如”*&#x2F;10 * * * *”代表每隔10分钟执行一次命令</li>
+</ul>
+<p>应用实例：</p>
+<ol>
+<li><p>每隔一分钟，就将当前的日期信息追加到&#x2F;tmp&#x2F;mydate中</p>
+<p>crontab -e</p>
+<p>*\1 * * * * date &gt;&gt; &#x2F;tmp&#x2F;mydate</p>
+</li>
+<li><p>每隔一分钟，将当前日期和日历都追加到&#x2F;home&#x2F;mycal文件中</p>
+</li>
+</ol>
+<p>​		vim &#x2F;home&#x2F;my.sh写书内容date &gt;&gt; &#x2F;home&#x2F;mycal 和cal &gt;&gt; &#x2F;home&#x2F;mycal</p>
+<p>​		给my.sh增加执行权限：chmod u+x &#x2F;home&#x2F;my.sh</p>
+<p>​		contab -e增加*\1 * * * * &#x2F;home&#x2F;my.sh</p>
+<p>   3.每天凌晨2:00将mysql数据库testdb备份到文件中。</p>
+<p>​		crontab -e</p>
+<p>​		0 2 * * * mysqldump -u root -p password testdb &gt; &#x2F;home&#x2F;db.bak</p>
+<h4 id="相关指令"><a href="#相关指令" class="headerlink" title="相关指令"></a>相关指令</h4><ul>
+<li><code>crontab -r</code> 终止任务调度</li>
+<li><code>crontab -l</code> 列出当前有哪些任务调度</li>
+<li><code>service crond restart</code> 重启任务调度</li>
+</ul>
+<h3 id="at定时任务"><a href="#at定时任务" class="headerlink" title="at定时任务"></a>at定时任务</h3><h4 id="基本介绍-3"><a href="#基本介绍-3" class="headerlink" title="基本介绍"></a>基本介绍</h4><p>at命令是<strong>一次性</strong>定时计划任务，at的守护进程atd会以后台模式运行，检查作业队列来运行。</p>
+<p>默认情况下，atd守护进程每60秒检查作业队列，有作业时，会检查作业运行时间，如果时间与当前时间匹配，则运行此作业。</p>
+<p>at命令是一次性定时计划任务，执行完一个任务后不在执行此任务了。</p>
+<p>在使用at命令时，<strong>一定要保证atd进程的启动</strong>，可以使用相关指令来查看：</p>
+<p>​	<code>ps -ef | grep atd</code>检测atd是否运行</p>
+<h4 id="at命令格式"><a href="#at命令格式" class="headerlink" title="at命令格式"></a>at命令格式</h4><ul>
+<li><p><code>at [选项] [时间]</code>         Ctrl+D结束at命令的输入</p>
+<h5 id="选项："><a href="#选项：" class="headerlink" title="选项："></a>选项：</h5><ul>
+<li><code>-m</code>               (mail)当指定的任务被完成后，将给用户发送邮件，即使没有标准输出。</li>
+<li><code>-I</code>                   atq的别名</li>
+<li><code>-d</code>                   atrm的别名</li>
+<li><code>-v</code>                   显示任务将被执行的时间</li>
+<li><code>-c</code>                   打印任务的内容到标准输出</li>
+<li><code>-V</code>                    显示版本信息</li>
+<li><code>-q &lt;队列&gt;</code>       使用指定的队列</li>
+<li><code>-f &lt;文件&gt;</code>        从指定文件读入任务而不是从标准输入读入</li>
+<li><code>-t &lt;时间参数&gt;</code>  以时间参数的形式提交要运行的任务</li>
+</ul>
+<h5 id="时间定义："><a href="#时间定义：" class="headerlink" title="时间定义："></a>时间定义：</h5><ul>
+<li>接受在当天的hh:mm(小时:分钟)式的时间指定。假如该时间已过去，那么在第二天执行。例如:04:00</li>
+<li>使用midnight、noon、teatime等比较模糊的词语</li>
+<li>采用12小时计时制，即在时间后面加上AM或PM来说明是上午还是下午。例如:12pm</li>
+<li>指定命令执行的具体日期，格式为month day(月 日)或mm&#x2F;dd&#x2F;yy（月&#x2F;日&#x2F;年）或dd.mm.yy(日.月.年)，指定的日期必须跟在指定时间的后面。例如：04:00 2021-03-1.</li>
+<li>使用相对计时法。格式为now + count time-units<ul>
+<li>now 当前时间。</li>
+<li>count 时间的数量。</li>
+<li>time-units 时间单位，如minutes、hours、days、weeks。</li>
+<li>today、tomorrow</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>atq </code>           查看系统中没有执行的工作任务</p>
+</li>
+<li><p><code>atrm 编号</code>            删除以及设置对的任务</p>
+</li>
+</ul>
+<h2 id="磁盘分区和挂载"><a href="#磁盘分区和挂载" class="headerlink" title="磁盘分区和挂载"></a>磁盘分区和挂载</h2><h3 id="Linux分区"><a href="#Linux分区" class="headerlink" title="Linux分区"></a>Linux分区</h3><h4 id="原理介绍"><a href="#原理介绍" class="headerlink" title="原理介绍"></a>原理介绍</h4><ol>
+<li>Linux无论有几个分区，分给哪一目录使用，它归根结底就只有一个根目录，一个独立且唯一的文件结构，Linux中每个分区都是用来组成整个文件系统的一部分。</li>
+<li>Linux采用了一种叫<strong>载入</strong>的处理方法，它的整个文件系统中包含了一整套的文件目录，且将一个分区和一个目录联系起来。这时要载入的一个分区将使它的存储空间在一个目录下获得。</li>
+</ol>
+<h4 id="硬盘说明"><a href="#硬盘说明" class="headerlink" title="硬盘说明"></a>硬盘说明</h4><p>Linux硬盘分IDE硬盘和SCSI硬盘，目前基本上是SCSI硬盘。</p>
+<ol>
+<li>对于IDE硬盘，驱动器标识符为<code>hdx~</code>,其中<code>hd</code>表明分区所在设备的类型，这里是指IDE硬盘。<code>x</code>为盘号(a为基本盘、b为基本从属盘、c为辅助主盘、d为辅助从属盘)，<code>~</code>代表分区，前四个分区用数字1到4表示，它们是主分区或扩展分区，从5开始就是逻辑分区。例如：hda3表示第一个IDE硬盘上的第三个主分区或扩展分区。</li>
+<li>对于SCSI硬盘则表示为<code>sdx~</code>，SCSI硬盘是用sd来表示分区所在设备的类型，其余则和IDE硬盘的表示方法一样。</li>
+</ol>
+<h4 id="查看所有设备挂载情况"><a href="#查看所有设备挂载情况" class="headerlink" title="查看所有设备挂载情况"></a>查看所有设备挂载情况</h4><ul>
+<li><code>lsblk</code></li>
+<li><code>lsblk -f</code></li>
+</ul>
+<h4 id="虚拟机增加磁盘步骤"><a href="#虚拟机增加磁盘步骤" class="headerlink" title="虚拟机增加磁盘步骤"></a>虚拟机增加磁盘步骤</h4><ol>
+<li><p>在虚拟机菜单选择设置，<strong>添加硬盘</strong>，中间只在选择磁盘大小的地方需要修改，完成后<strong>重启系统</strong>。</p>
+</li>
+<li><p><strong>分区</strong>命令:<code>fdisk /dev/sdb</code></p>
+<ul>
+<li><p><code>m</code>      显示命令列表</p>
+</li>
+<li><p><code>p </code>      显示磁盘分区，同fdisk -l</p>
+</li>
+<li><p><code>n </code>      新增分区</p>
+</li>
+<li><p><code>d   </code>      删除分区</p>
+</li>
+<li><p><code>w</code>      写入并退出</p>
+</li>
+<li><p><code>q    </code>      退出</p>
+<p>开始分区后输入n新增分区，然后p，分区类型为主分区两次回车默认剩余全部空间。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>格式化磁盘</strong>：<code>mkfs -t ext4 /dev/sdb1</code>       ext4是文件类型</p>
+</li>
+<li><p><strong>挂载</strong>：<code>mount 设备名称 挂载目录</code>     将一个分区与一个目录联系起来</p>
+<p><strong>卸载</strong>：<code>umount 设备名称/挂载目录</code> </p>
+<p>​	注意：用命令行挂载重启后会失效</p>
+</li>
+<li><p><strong>永久挂载</strong>：通过修改&#x2F;etc&#x2F;fstab实现挂载。添加完成后，执行<code>mount -a</code>即刻生效</p>
+</li>
+</ol>
+<h4 id="磁盘情况查询"><a href="#磁盘情况查询" class="headerlink" title="磁盘情况查询"></a>磁盘情况查询</h4><h5 id="查询系统整体磁盘使用情况"><a href="#查询系统整体磁盘使用情况" class="headerlink" title="查询系统整体磁盘使用情况"></a>查询系统整体磁盘使用情况</h5><ul>
+<li><code>df -h</code></li>
+</ul>
+<h5 id="查询指定目录的磁盘占用情况"><a href="#查询指定目录的磁盘占用情况" class="headerlink" title="查询指定目录的磁盘占用情况"></a>查询指定目录的磁盘占用情况</h5><ul>
+<li><p><code>du -h 目录名</code> 查询指定目录的磁盘占用情况，默认为当前目录</p>
+<p>选项</p>
+<ul>
+<li><code>-s</code> 指定目录占用大小汇总</li>
+<li><code>-h</code> 带计量单位</li>
+<li><code>-a</code> 含文件</li>
+<li><code>--max-depth=1 </code>子目录深度</li>
+<li><code>-c</code> 列出明细的同时，增加汇总值</li>
+</ul>
+</li>
+</ul>
+<h4 id="磁盘情况实用指令"><a href="#磁盘情况实用指令" class="headerlink" title="磁盘情况实用指令"></a>磁盘情况实用指令</h4><ul>
+<li><p>统计文件夹下文件的个数</p>
+<p><code>ls -l 目录名 | grep &quot;^-&quot; | wc -l</code></p>
+</li>
+<li><p>统计文件夹下目录的个数</p>
+<p><code>ls -l 目录名 | grep &quot;^d&quot; | wc -l</code></p>
+</li>
+<li><p>统计文件夹下文件的个数,包括子文件夹</p>
+<p><code>ls -lR 目录名 | grep &quot;^-&quot; | wc -l</code></p>
+</li>
+<li><p>统计文件夹下目录的个数,包括子文件夹</p>
+<p><code>ls -lR 目录名 | grep &quot;^d&quot; | wc -l</code></p>
+</li>
+<li><p>以树状形式显示目录结构tree（若没有tree，则使用<code>yum install tree</code> 安装）</p>
+<p><code>tree 目录名</code></p>
+</li>
+</ul>
+<h2 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h2><h3 id="Linux网络配置原理"><a href="#Linux网络配置原理" class="headerlink" title="Linux网络配置原理"></a>Linux网络配置原理</h3><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411184427338.png"></p>
+<h3 id="查看网络IP和网关"><a href="#查看网络IP和网关" class="headerlink" title="查看网络IP和网关"></a>查看网络IP和网关</h3><h4 id="查看网关"><a href="#查看网关" class="headerlink" title="查看网关"></a>查看网关</h4><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411185151773.png"></p>
+<h4 id="查看window环境下的VMnet8网络配置"><a href="#查看window环境下的VMnet8网络配置" class="headerlink" title="查看window环境下的VMnet8网络配置"></a>查看window环境下的VMnet8网络配置</h4><p><code>ipconfig</code></p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411185719206.png"></p>
+<p>或者</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411185633522.png"></p>
+<h4 id="查看linux的配置"><a href="#查看linux的配置" class="headerlink" title="查看linux的配置"></a>查看linux的配置</h4><p><code>ifconfig</code></p>
+<p>ens33为设备名</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411185751325.png"></p>
+<h3 id="ping-测试主机之间的网络连通性"><a href="#ping-测试主机之间的网络连通性" class="headerlink" title="ping 测试主机之间的网络连通性"></a>ping 测试主机之间的网络连通性</h3><p><code>ping 目的主机</code>      测试当前服务器是否可以连接目的主机</p>
+<p>如 <code>ping www.baidu.com</code></p>
+<h3 id="Linux网络环境配置"><a href="#Linux网络环境配置" class="headerlink" title="Linux网络环境配置"></a>Linux网络环境配置</h3><h4 id="自动获取"><a href="#自动获取" class="headerlink" title="自动获取"></a>自动获取</h4><p>登陆后，通过界面的来设置自动获取IP</p>
+<p>特点：linux启动后会自动获取IP</p>
+<p>缺点：每次自动获取的ip地址可能不一样</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411190212430.png"></p>
+<h4 id="指定IP"><a href="#指定IP" class="headerlink" title="指定IP"></a>指定IP</h4><p>直接修改配置文件来指定IP，并可以连接到外网。</p>
+<p>编辑 vim &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-ens33</p>
+<p>要求：将IP地址配置为静态的，比如：ip地址为192.168.135.135</p>
+<p>文件内容如下：</p>
+<p>TYPE&#x3D;”Ethernet”<br>PROXY_METHOD&#x3D;”none”<br>BROWSER_ONLY&#x3D;”no”<br><strong>BOOTPROTO&#x3D;”dhcp”</strong>                                                       #dhcp代表自动分配<br>DEFROUTE&#x3D;”yes”<br>IPV4_FAILURE_FATAL&#x3D;”no”<br>IPV6INIT&#x3D;”yes”<br>IPV6_AUTOCONF&#x3D;”yes”<br>IPV6_DEFROUTE&#x3D;”yes”<br>IPV6_FAILURE_FATAL&#x3D;”no”<br>IPV6_ADDR_GEN_MODE&#x3D;”stable-privacy”<br>NAME&#x3D;”<strong>ens33</strong>“<br>UUID&#x3D;”132f1f71-be6d-4720-a298-3a345244d67a”<br>DEVICE&#x3D;”ens33”<br><strong>ONBOOT&#x3D;”yes”</strong>                                                                  #yes代表自动分配<br>ZONE&#x3D;</p>
+<p>修改处：</p>
+<p><strong>BOOTPROTO&#x3D;”dhcp”</strong>      &#x3D;&gt;<strong>BOOTPROTO&#x3D;”static”</strong>         #改成静态分配</p>
+<p>​	新增：</p>
+<p><strong>IPADDR</strong>&#x3D;192.168.135.135                                  #IP地址</p>
+<p><strong>GATEWAY</strong>&#x3D;192.168.135                                   #网关</p>
+<p><strong>DNS1</strong>&#x3D;192.168.135.2                                            #域名解析器</p>
+<p>在虚拟网络编辑器中修改子网IP和网关的网段，使其与Linux服务器的IP地址处于同一个网段</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411193223824.png"></p>
+<p>重启网络服务<code>service network restart</code></p>
+<p>或重启系统<code>reboot</code>生效</p>
+<h3 id="设置主机名和hosts映射"><a href="#设置主机名和hosts映射" class="headerlink" title="设置主机名和hosts映射"></a>设置主机名和hosts映射</h3><h4 id="设置主机名"><a href="#设置主机名" class="headerlink" title="设置主机名"></a>设置主机名</h4><p>为了方便记忆，可以给linux系统设置主机名，也可以根据需要修改主机名</p>
+<p><code>hostname</code>   查看主机名</p>
+<p>修改文件在 &#x2F;etc&#x2F;hostname指定</p>
+<p>修改后，重启生效</p>
+<h4 id="设置hosts映射"><a href="#设置hosts映射" class="headerlink" title="设置hosts映射"></a>设置hosts映射</h4><p>在windows中：</p>
+<p>​	在C:\Windows\System32\drivers\etc\hosts 文件指定即可</p>
+<p>格式： <code>目标ip地址  目标主机名</code>  </p>
+<p>例如     <code>192.168.135.135 yumoyumo</code></p>
+<p>在linux中：</p>
+<p>​	在&#x2F;etc&#x2F;hosts文件指定</p>
+<p>格式： <code>目标ip地址  目标主机名</code>  </p>
+<p>例如	<code>192.168.135.1 LAPTOP-NFK7B01H</code></p>
+<p>之前的<code>ping ip地址</code>便可以替换成<code>ping 主机名</code></p>
+<h4 id="主机名解析过程（Hosts、DNS）"><a href="#主机名解析过程（Hosts、DNS）" class="headerlink" title="主机名解析过程（Hosts、DNS）"></a>主机名解析过程（Hosts、DNS）</h4><h5 id="Hosts"><a href="#Hosts" class="headerlink" title="Hosts"></a>Hosts</h5><p>一个文本文件，用来记录IP和Hostname(主机名)的映射关系</p>
+<h5 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h5><p>DNS，即 Domain Name System的缩写，翻译过来就是域名系统</p>
+<p>是互联网上作为域名和IP地址相互映射的一个分布式数据库，有一组服务器。</p>
+<p>DNS的作用是把网络地址（域名，以一个字符串的形式）对应到真实的计算机能够识别的网络地址（IP地址），以便计算机能够进一步通信，传递网址和内容等。</p>
+<p>应用实例：用户在浏览器输入了<a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a></p>
+<ol>
+<li>浏览器先检查<strong>浏览器缓存</strong>中有没有该域名解析IP地址，若有则先调用这个IP完成解析；若没有，就检查<strong>DNS解析器缓存</strong>。若有则返回IP完成解析。这两个缓存可以理解为<strong>本地解析器缓存</strong>。</li>
+<li>一般来说，当电脑第一次成功访问某一网站后，在一定时间内，<strong>浏览器</strong>或<strong>操作系统</strong>会缓存他的IP地址（DNS解析记录），如在cmd窗口中输入<ul>
+<li><code>ipconfig /displydns</code>             <strong>DNS域名解析缓存</strong></li>
+<li><code>ipconfig /flushdns</code>               手动清理dns缓存</li>
+</ul>
+</li>
+<li>如果本地解析器缓存没有找到对应映射，则检查系统中<strong>hosts文件</strong>中有没有配置对应的域名IP映射，若有，则完成解析并返回。</li>
+<li>如果<strong>本地DNS解析器缓存</strong>和<strong>hosts文件</strong>中均没有找到对应的IP，则到<strong>域名服务DNS</strong>进行解析域。</li>
+</ol>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220411202858790.png"></p>
+<h4 id="DNS域名劫持"><a href="#DNS域名劫持" class="headerlink" title="DNS域名劫持"></a>DNS域名劫持</h4><p>DNS（域名系统）劫持又叫域名劫持，指攻击者利用其他攻击手段（如修改hosts映射关系），篡改了某个域名的解析结果，使得指向该域名的IP变成了另一个IP，导致对相应网址的访问被劫持到另一个不可达的或者假冒的网址，从而实现非法窃取用户信息或者破坏正常网络服务的目的。。</p>
+<p>由于域名劫持往往只能在特定的被劫持的网络范围内进行，所以在此范围外的域名服务器（DNS）能够返回正常的IP地址，高级用户可以在网络设置把DNS指向这些正常的域名服务器以实现对网址的正常访问。所以域名劫持通常相伴的措施——封锁正常DNS的IP。如果知道该域名的真实IP地址，则可以直接用此IP代替域名后进行访问。比如访问百度域名，可以把访问改为202.108.22.5，从而绕开域名劫持 。</p>
+<h2 id="进程管理"><a href="#进程管理" class="headerlink" title="进程管理"></a>进程管理</h2><h3 id="基本介绍-4"><a href="#基本介绍-4" class="headerlink" title="基本介绍"></a>基本介绍</h3><p>在Linux中，每个执行的程序都称为一个进程。每一个进程都分配一个ID号（pid，进程号）。</p>
+<p>每个进程都可能以两种方式存在的，即前台和后台。前台进程就是用户目前的屏幕上可以进行操作的。后台进程则是实际在操作，但在屏幕上无法看到的进程，通常使用后台方式执行。</p>
+<p>一般系统的服务都是以后台进程的方式存在，而且都会常驻在系统中，直到关机才结束。</p>
+<h3 id="显示系统执行的进程"><a href="#显示系统执行的进程" class="headerlink" title="显示系统执行的进程"></a>显示系统执行的进程</h3><h4 id="基本介绍-5"><a href="#基本介绍-5" class="headerlink" title="基本介绍"></a>基本介绍</h4><p>ps命令是用来查看目前系统中有哪些进程正在执行，以及它们的执行状况。</p>
+<h5 id="ps-aux"><a href="#ps-aux" class="headerlink" title="ps -aux"></a>ps -aux</h5><p><code>ps [选项]</code></p>
+<ul>
+<li><p><code>-a </code>显示当前终端的所有进程信息</p>
+</li>
+<li><p><code>-u </code>以用户的格式显示进程信息</p>
+</li>
+<li><p><code>-x </code>显示后台进程运行的参数</p>
+<p><code>ps -aux</code></p>
+</li>
+</ul>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220412123115655.png"></p>
+<p>详解：</p>
+<ul>
+<li>USER                 用户名称</li>
+<li>PID                    进程号</li>
+<li>%CPU                进程占用CPU的百分比</li>
+<li>%MEM               进程占用物理内存的百分比</li>
+<li>VSZ                     进程占用的虚拟内存大小(单位:KB)</li>
+<li>RSS                     进程占用的物理内存大小(单位:KB)</li>
+<li>TTY                     终端名称，缩写 </li>
+<li>STAT                   进程状态。<ul>
+<li>S-    		 睡眠</li>
+<li>s-             表示该进程是会话的先导进程</li>
+<li>N-            表示进程拥有比普通优先级更低的优先级</li>
+<li>R-             正在运行</li>
+<li>D-             短期等待</li>
+<li>Z-             僵死进程</li>
+<li>T-             被跟踪或被停止等</li>
+</ul>
+</li>
+<li>STAETED                进程的启动时间</li>
+<li>TIME                       CPU时间，即进程使用CPU的总时间</li>
+<li>COMMAND             启动进程所用的命令和参数，如果过长会被截断显示。</li>
+</ul>
+<h4 id="父子进程"><a href="#父子进程" class="headerlink" title="父子进程"></a>父子进程</h4><h5 id="ps-ef"><a href="#ps-ef" class="headerlink" title="ps -ef"></a>ps -ef</h5><p><code>ps [选项]</code></p>
+<ul>
+<li><p><code>-e    </code>         显示所有进程</p>
+</li>
+<li><p><code>-f    </code>         全格式</p>
+<p><code>ps -ef</code></p>
+</li>
+</ul>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220412124530630.png"></p>
+<ul>
+<li>UID                     用户ID</li>
+<li>PID                      进程ID</li>
+<li>PPID                    父进程ID</li>
+<li>C                          CPU用于计算执行优先级的因子。数值越大，表面进程是CPU密集型运算，执行优先级会降低；数值越小，表明进程是I&#x2F;O密集型运算，执行优先级会提高。</li>
+<li>STIME                   进程启动的时间</li>
+<li>TTY                        完整的终端名称</li>
+<li>TIME                      CPU时间</li>
+<li>CMD                      启动进程所用的命令和参数</li>
+</ul>
+<p>注意：ps -ef和ps- aux为两种不同的显示风格</p>
+<h3 id="终止进程"><a href="#终止进程" class="headerlink" title="终止进程"></a>终止进程</h3><p>介绍：</p>
+<p>若是某个进程执行一般需要停止时，或是已经消耗了很大的系统资源时，此时可以考虑停止该进程，使用kill命令来完成此项任务。</p>
+<h5 id="kill"><a href="#kill" class="headerlink" title="kill"></a>kill</h5><ul>
+<li><code>kill [选项]  进程号/名</code>               通过进程号杀死&#x2F;终止进程<ul>
+<li><code>-9   </code>    强迫进程立即停止</li>
+</ul>
+</li>
+<li><code>killall  进程名 </code>                      通过进程名杀死&#x2F;终止进程，支持通配符，可同时杀死该进程下的所有子进程。</li>
+</ul>
+<p>例子：</p>
+<ol>
+<li><p>踢掉某个非法用户</p>
+<p><code>ps -ef | grep sshd</code>        查看远程连接的用户进程id</p>
+<p><code>kill 该用户pid</code></p>
+</li>
+<li><p>终止远程登录服务sshd</p>
+<p><code>kill sshd对应的进程号</code></p>
+<p>重启sshd服务</p>
+<p><code>/bin/systemctl start sshd.service</code></p>
+</li>
+<li><p>终止多个gedit </p>
+<p><code>killall gedit</code></p>
+</li>
+<li><p>强制杀死一个终端</p>
+<p><code>kill -9 bash对应的进程号</code></p>
+</li>
+</ol>
+<h3 id="查看进程树"><a href="#查看进程树" class="headerlink" title="查看进程树"></a>查看进程树</h3><h4 id="pstree"><a href="#pstree" class="headerlink" title="pstree"></a>pstree</h4><ul>
+<li><code>pstree [选项]</code>      查看进程树<ul>
+<li><code>-p</code>            显示进程的PID</li>
+<li><code>-u </code>            显示进程的所属用户</li>
+</ul>
+</li>
+</ul>
+<h3 id="服务管理"><a href="#服务管理" class="headerlink" title="服务管理"></a>服务管理</h3><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>服务(service)本质就是进程，但是是运行在后台的，通常都会监听某个端口，等待其他程序的请求。比如(musqld、sshd、防火墙等)，因此我们有称服务为<strong>守护进程</strong>。</p>
+<h5 id="service"><a href="#service" class="headerlink" title="service"></a>service</h5><ul>
+<li><code>service 服务名 [start|stop|restart|reload|status]</code>  启动&#x2F;中止&#x2F;重启&#x2F;重载&#x2F;查看服务</li>
+</ul>
+<p>注意：在CentOS7.0后很多服务不再使用service，而是systemctl</p>
+<p>查看服务名：</p>
+<ol>
+<li><code>setup</code></li>
+<li><code>ls -l /etc/init.d</code></li>
+</ol>
+<p>例子：使用service指令 查看&#x2F;关闭&#x2F;启动 network服务</p>
+<p><code>service network status/stop/start</code></p>
+<h4 id="服务的运行级别"><a href="#服务的运行级别" class="headerlink" title="服务的运行级别"></a>服务的运行级别</h4><p>Linux系统有七种运行级别，常用的是级别3和5</p>
+<p>0：系统停机状态，系统默认运行级别不能设为0，否则不能正常启动。</p>
+<p>1：单用户工作状态，root权限，用于系统维护，禁止远程登陆。</p>
+<p>2：多用户状态（没有NFS），不支持网络</p>
+<p><strong>3：完全的多用户状态（有NFS），五姐妹，登陆后进入控制台命令行模式</strong>。</p>
+<p>4：系统未使用，保留。</p>
+<p><strong>5：X11控制台，登陆后进入图形GUI模式</strong>。</p>
+<p>6：系统正常关闭并重启，默认运行级别不能设为6，否则不能正常启动。</p>
+<ul>
+<li><strong>init 级别</strong>       切换不同的运行级别[0123456]</li>
+</ul>
+<p>在CentOS7以前是在&#x2F;etc&#x2F;inittab文件中</p>
+<p>之后进行了简化，如下：</p>
+<p><strong>multi-user.target</strong>：analogous to runlevel 3</p>
+<p><strong>graphical.target</strong>：analogous to level 5</p>
+<p>#To view current default target,run</p>
+<ul>
+<li><strong>systemctl get-default</strong>                                  查看当前系统默认级别</li>
+</ul>
+<p>#To set a default target,run</p>
+<ul>
+<li><strong>systemctl set-default TARGET.target</strong>       设置系统默认级别为指定的级别</li>
+</ul>
+<h5 id="chkconfig"><a href="#chkconfig" class="headerlink" title="chkconfig"></a>chkconfig</h5><p>介绍</p>
+<p>通过chkconfig命令可以给服务的各个运行级别设置自 启动&#x2F;关闭</p>
+<p>chkconfig指令可管理的服务在 &#x2F;etc&#x2F;init.d 查看</p>
+<p>注意：在CentOS7.0后，很多服务使用systemctl管理。</p>
+<ul>
+<li><code>chkconfig --list [| grep xxx]</code> 查看所有服务</li>
+<li><code>chkconfig 服务名 --list [| grep xxx]</code> 查看某一个服务</li>
+<li><code>chkconfig --level 5 服务名 on/off</code>        设置某一运行级别下的某一服务的自启动&#x2F;关闭</li>
+</ul>
+<p>chkconfig重新设置服务后自启动或关闭，需要重启生效。</p>
+<h5 id="systemctl"><a href="#systemctl" class="headerlink" title="systemctl"></a>systemctl</h5><h6 id="管理指令"><a href="#管理指令" class="headerlink" title="管理指令"></a>管理指令</h6><ul>
+<li><code>system [start|stop|restart|status] 服务名</code>  开启&#x2F;关闭&#x2F;重启&#x2F;查看 服务</li>
+</ul>
+<p>systemctl指令管理的服务在 <strong>&#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system</strong> 查看，<code>d</code>代表<code>damon</code><strong>守护进程</strong></p>
+<h6 id="设置服务的自启动状态"><a href="#设置服务的自启动状态" class="headerlink" title="设置服务的自启动状态"></a>设置服务的自启动状态</h6><ul>
+<li><code>systemctl list-unit-files [| grep 服务名]</code> 查看服务开机启动状态</li>
+<li><code>systemctl enable 服务名</code>              设置服务开机启动</li>
+<li><code>systemctl disable 服务名</code>              关闭服务开机启动</li>
+<li><code>systemctl is-enable 服务名</code>              查询某个服务是否是自启动的</li>
+</ul>
+<p>例子：查看当前防火墙的状况，关闭防火墙和重启防火墙：</p>
+<p>systemctl status firewalld</p>
+<p>systemctl stop firewalld</p>
+<p>systemctl restart firewalld</p>
+<p>查看目前有哪些端口处于监听状态：**<code>netstat -anp | more</code>**</p>
+<p>注意：</p>
+<ol>
+<li>关闭或启用防火墙后立即生效(在cmd使用telnet测试111端口)</li>
+<li><code>system [start|stop|restart|status] 服务名</code> 只是临时生效，重启后回归原配置</li>
+<li>使用<code>systemctl [enable|disable] 服务名</code> 设置某个服务自启动或关闭永久生效</li>
+</ol>
+<h4 id="打开或关闭指定端口"><a href="#打开或关闭指定端口" class="headerlink" title="打开或关闭指定端口"></a>打开或关闭指定端口</h4><p>在真正的生产环境，往往需要将防火墙打开，但如果打开防火墙，外部请求数据包就不能跟服务器监听端口通讯。这时需要打开指定端口。</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220412184732403.png"></p>
+<h5 id="firewall"><a href="#firewall" class="headerlink" title="firewall"></a>firewall</h5><ul>
+<li><code>firewall-cmd --permanent --add-port=端口号/协议</code>                     打开端口</li>
+<li><code>firewall-cmd --permanent --remove-port=端口号/协议</code>               关闭端口</li>
+<li><code>firewall-cmd --reload</code>                                                                       重新载入</li>
+<li><code>firewall-cmd --query-port=端口号/协议</code>                                          查询端口是否开放</li>
+</ul>
+<p>**<code>netstat -anp | more</code>**查看端口协议</p>
+<h3 id="动态监控进程"><a href="#动态监控进程" class="headerlink" title="动态监控进程"></a>动态监控进程</h3><h5 id="top"><a href="#top" class="headerlink" title="top"></a>top</h5><p>top与ps命令很相似，它们都用来显示正在执行的进程。top与ps的最大不同之处在于top在执行一段时间内可以更新正在运行的进程（动态更新）。</p>
+<ul>
+<li><p><code>top [选项]</code></p>
+<p>选项</p>
+<ul>
+<li><code>-d 秒数</code>            指定top命令每隔几秒更新，默认3秒。</li>
+<li><code>-i</code>                     使top不显示任何闲置或僵死进程</li>
+<li><code>-p</code>                      通过指定监控进程ID来仅仅监控某个进程的状态</li>
+</ul>
+<p>交互操作</p>
+<ul>
+<li>P        以CPU使用率排序</li>
+<li>M       以内存的使用率排序</li>
+<li>N        以PID排序</li>
+<li>q         退出top</li>
+<li>u         指定要监控的用户</li>
+<li>s          改变更新时间间隔(秒)</li>
+<li>k           输入进程id，结束此进程</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220412174655933.png"></p>
+<p>解读：</p>
+<p>第一行：同uptime命令</p>
+<ul>
+<li>system time:系统当前时间15:29:53</li>
+<li>system uptime:系统运行时间645天2小时25分</li>
+<li>users:当前登入系统的用户数4</li>
+<li>load average:过去的1分钟，5分钟，15分钟系统的负载情况(<a target="_blank" rel="noopener" href="https://bingoex.github.io/2015/07/31/proc-loadavg/">详情点击</a>)。</li>
+</ul>
+<h5 id="第二行：进程相关"><a href="#第二行：进程相关" class="headerlink" title="第二行：进程相关"></a>第二行：进程相关</h5><ul>
+<li>221: 进程总数。</li>
+<li>1:运行进程数目。正在运行和等待运行的进程（运行态和就绪态）。</li>
+<li>220: 阻塞进程数目。（等待IO或者调用sleep函数）</li>
+<li>0:停止状态进程数目。（收到STOP信号后获得停止状态，收到CONT信号，失去STOP状态；ctrl+z发送STOP信号）。</li>
+<li>0:僵尸进程数目。（子进程已死，但没有被父进程回收）</li>
+</ul>
+<h5 id="第三行：同mpstat命令"><a href="#第三行：同mpstat命令" class="headerlink" title="第三行：同mpstat命令"></a>第三行：同mpstat命令</h5><ul>
+<li>usr:用户空间CPU使用占比</li>
+<li>sys:内核空间CPU使用占比</li>
+<li>nice:低优先级进程使用CPU占比（nice值大于0的进程）</li>
+<li>idle:CPU空闲时间占比</li>
+<li>io wait:CPU等待IO占比</li>
+<li>irq&#x2F;hi:CPU处理硬中断占比</li>
+<li>soft&#x2F;si:CPU处理软中断占比</li>
+<li>guest与steal与虚拟机有关。</li>
+</ul>
+<h5 id="硬中断和软中断的区别"><a href="#硬中断和软中断的区别" class="headerlink" title="硬中断和软中断的区别"></a>硬中断和软中断的区别</h5><ul>
+<li>软中断是执行中断指令产生的，而硬中断是由外设引发的。</li>
+<li>硬中断的中断号是由中断控制器提供的，软中断的中断号由指令直接指出，无需使用中断控制器。</li>
+<li>硬中断是可屏蔽的，软中断不可屏蔽。</li>
+<li>硬中断处理程序要确保它能快速地完成任务，这样程序执行时才不会等待较长时间，称为上半部。</li>
+<li>软中断处理硬中断未完成的工作，是一种推后执行的机制，属于下半部</li>
+</ul>
+<h5 id="第四行：同free命令"><a href="#第四行：同free命令" class="headerlink" title="第四行：同free命令"></a>第四行：同free命令</h5><p><strong>进程信息标题</strong></p>
+<ul>
+<li>PID: 进程标识符</li>
+<li>USER: 进程拥有者</li>
+<li>PR: 进程优先权 [数越小，进程优先级越高]</li>
+<li>NI: NICE Value [PR &#x3D; PR + NI，因此，NI为负数，PR小，优先级高；NI可以手动调整]</li>
+<li>VIRT: 进程虚拟内存大小 [进程总得寻址空间大小]</li>
+<li>RES: 进程实际占用物理内存大小</li>
+<li>SHR: 共享内存大小</li>
+<li>S: 进程状态(D&#x3D;不可中断的睡眠状态,R&#x3D;运行,S&#x3D;睡眠,T&#x3D;跟踪&#x2F;停止,Z&#x3D;僵尸进程)</li>
+<li>CPU: 进程CPU占用率</li>
+<li>MEM: 进程内存占用率</li>
+<li>TIME+: 进程运行占用的CPU时间</li>
+<li>COMMAND: 启动进程的命令</li>
+<li>DATA: 是进程栈、堆申请的总空间。</li>
+</ul>
+<p>RES进程实际占用物理内存大小，与%MEM强相关。</p>
+<p>SHR其他进程共享的内存空间。比如，依赖一个C公共库，那么整个库的地址空间被加入VIRT，而被载入内存的公共库函数被算入RES与SHR。</p>
+<h3 id="监控网络状态"><a href="#监控网络状态" class="headerlink" title="监控网络状态"></a>监控网络状态</h3><h4 id="查看系统网络情况"><a href="#查看系统网络情况" class="headerlink" title="查看系统网络情况"></a>查看系统网络情况</h4><h5 id="netstat"><a href="#netstat" class="headerlink" title="netstat"></a>netstat</h5><ul>
+<li><code>netstat [选项]</code><ul>
+<li><code>-an</code> 按一定顺序排列输出</li>
+<li><code>-p</code> 显示哪个进程在调用</li>
+</ul>
+</li>
+</ul>
+<h4 id="检测主机连接"><a href="#检测主机连接" class="headerlink" title="检测主机连接"></a>检测主机连接</h4><h5 id="ping"><a href="#ping" class="headerlink" title="ping"></a>ping</h5><ul>
+<li><code>ping ip地址</code>    检测远程主机是否正常，或是两部主机间的网线或网卡故障</li>
+</ul>
+<h2 id="RPM与YUM"><a href="#RPM与YUM" class="headerlink" title="RPM与YUM"></a>RPM与YUM</h2><h3 id="rpm"><a href="#rpm" class="headerlink" title="rpm"></a>rpm</h3><p>rpm用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中。它生成具有.RPM扩展名的文件。RPM时RedHat Package Manager（RedHat软件包管理工具）的缩写，类似windows的setup.exe，这一文件格式名字虽然打上了RedHat的标志，但理念时通用的。</p>
+<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><ul>
+<li><p><code>rpm [选项] [RPM包名]</code></p>
+<p>选项</p>
+<ul>
+<li><code>-a</code>                       查询所有安装的包</li>
+<li><code>-f   </code>                    查询拥有文件&lt; file &gt;的包</li>
+<li><code>-i   </code>                    展示包信息，包括名字、版本以及描述</li>
+<li><code>-R       </code>               列出该包所依赖的别的包</li>
+<li><code>-l </code>                      列出该包的文件</li>
+<li><code>-q     </code>                查询软件包</li>
+</ul>
+</li>
+</ul>
+<h4 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h4><ul>
+<li><code>rpm -e RPM包名     </code>                              卸载指定的包<ul>
+<li><code>rpm -e --nodeps RPM包名</code>           无视包依赖关系强制删除</li>
+</ul>
+</li>
+</ul>
+<p>如果其他软件包依赖于要卸载的包，卸载时会产生错误信息。</p>
+<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><ul>
+<li><code>rpm -ivh RPM包全路径名称</code><ul>
+<li><code>i   </code>    instal          安装</li>
+<li><code>v  </code>     verbose     提示</li>
+<li><code>h    </code>   hash          进度条</li>
+</ul>
+</li>
+</ul>
+<h3 id="yum"><a href="#yum" class="headerlink" title="yum"></a>yum</h3><p>yum是一个Shell前端软件包管理器。基于RPM包管理，能够从指定的服务器自动下载RPM包并安装，可以自动处理依赖性关系，并且一次安装所有依赖的软件包。</p>
+<ul>
+<li><code>yum list | grep xxx</code>           查询yum服务器是否有需要安装的软件</li>
+<li><code>yum install xxx  </code>                          下载安装</li>
+</ul>
+<p>例子：使用yum安装firefox</p>
+<ol>
+<li>rpm -e firefox</li>
+<li>yum list | grep firefox</li>
+<li>yum install firefox</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux%E5%85%A5%E9%97%A8"><span class="toc-number">1.</span> <span class="toc-text">Linux入门</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E7%9A%84%E5%BA%94%E7%94%A8%E9%A2%86%E5%9F%9F"><span class="toc-number">1.1.</span> <span class="toc-text">Linux的应用领域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.2.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E4%B8%8EUnix"><span class="toc-number">1.3.</span> <span class="toc-text">Linux与Unix</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85VM%E5%92%8CCenOS"><span class="toc-number">1.4.</span> <span class="toc-text">安装VM和CenOS</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-number">1.4.1.</span> <span class="toc-text">网络连接的三种方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%85%8B%E9%9A%86"><span class="toc-number">1.4.2.</span> <span class="toc-text">虚拟机克隆</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%BF%AB%E7%85%A7"><span class="toc-number">1.4.3.</span> <span class="toc-text">虚拟机快照</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BF%81%E7%A7%BB%E5%92%8C%E5%88%A0%E9%99%A4"><span class="toc-number">1.4.4.</span> <span class="toc-text">虚拟机迁移和删除</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vmtools"><span class="toc-number">1.5.</span> <span class="toc-text">vmtools</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E5%85%B1%E4%BA%AB%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="toc-number">1.5.1.</span> <span class="toc-text">设置共享文件夹</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">目录结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">2.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-number">2.2.</span> <span class="toc-text">具体的目录结构</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux%E5%AE%9E%E6%93%8D"><span class="toc-number"></span> <span class="toc-text">Linux实操</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95%E5%88%B0Linux%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">1.</span> <span class="toc-text">远程登录到Linux服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93"><span class="toc-number">1.1.</span> <span class="toc-text">远程文件传输</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vi%E5%92%8CVim%E7%BC%96%E8%BE%91%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">Vi和Vim编辑器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-1"><span class="toc-number">2.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vi%E5%92%8Cvim%E5%B8%B8%E7%94%A8%E7%9A%84%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.2.</span> <span class="toc-text">vi和vim常用的三种模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E6%9C%BA%E3%80%81%E9%87%8D%E5%90%AF%E5%92%8C%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E6%B3%A8%E9%94%80"><span class="toc-number">3.</span> <span class="toc-text">关机、重启和用户登录注销</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E6%9C%BA-%E9%87%8D%E5%90%AF%E5%91%BD%E4%BB%A4"><span class="toc-number">3.1.</span> <span class="toc-text">关机&amp;重启命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E5%92%8C%E6%B3%A8%E9%94%80"><span class="toc-number">3.2.</span> <span class="toc-text">用户登录和注销</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86"><span class="toc-number">4.</span> <span class="toc-text">用户管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-2"><span class="toc-number">4.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7"><span class="toc-number">4.2.</span> <span class="toc-text">用户</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7"><span class="toc-number">4.2.1.</span> <span class="toc-text">添加用户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%87%E5%AE%9A-%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81"><span class="toc-number">4.2.2.</span> <span class="toc-text">指定&#x2F;修改密码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E7%94%A8%E6%88%B7"><span class="toc-number">4.2.3.</span> <span class="toc-text">删除用户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%8C%87%E4%BB%A4"><span class="toc-number">4.2.4.</span> <span class="toc-text">查询用户信息指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%87%E6%8D%A2%E7%94%A8%E6%88%B7"><span class="toc-number">4.2.5.</span> <span class="toc-text">切换用户</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%BB%84"><span class="toc-number">4.3.</span> <span class="toc-text">用户组</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B0%E5%A2%9E%E7%BB%84"><span class="toc-number">4.3.1.</span> <span class="toc-text">新增组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E7%BB%84"><span class="toc-number">4.3.2.</span> <span class="toc-text">删除组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E7%BB%84"><span class="toc-number">4.3.3.</span> <span class="toc-text">修改组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E5%92%8C%E7%BB%84%E7%9B%B8%E5%85%B3%E6%96%87%E4%BB%B6"><span class="toc-number">4.4.</span> <span class="toc-text">用户和组相关文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">5.</span> <span class="toc-text">实用指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%BA%A7%E5%88%AB"><span class="toc-number">5.1.</span> <span class="toc-text">运行级别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%BE%E5%9B%9Eroot%E5%AF%86%E7%A0%81"><span class="toc-number">5.2.</span> <span class="toc-text">找回root密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%AE%E5%8A%A9%E6%8C%87%E4%BB%A4"><span class="toc-number">5.3.</span> <span class="toc-text">帮助指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95%E7%B1%BB"><span class="toc-number">5.4.</span> <span class="toc-text">文件目录类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#pwd"><span class="toc-number">5.4.0.1.</span> <span class="toc-text">pwd</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ls"><span class="toc-number">5.4.0.2.</span> <span class="toc-text">ls</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cd"><span class="toc-number">5.4.0.3.</span> <span class="toc-text">cd</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#mkdir"><span class="toc-number">5.4.0.4.</span> <span class="toc-text">mkdir</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rmdir"><span class="toc-number">5.4.0.5.</span> <span class="toc-text">rmdir</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#touch"><span class="toc-number">5.4.0.6.</span> <span class="toc-text">touch</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cp"><span class="toc-number">5.4.0.7.</span> <span class="toc-text">cp</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#rm"><span class="toc-number">5.4.0.8.</span> <span class="toc-text">rm</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#mv"><span class="toc-number">5.4.0.9.</span> <span class="toc-text">mv</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cat"><span class="toc-number">5.4.0.10.</span> <span class="toc-text">cat</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#more"><span class="toc-number">5.4.0.11.</span> <span class="toc-text">more</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#less"><span class="toc-number">5.4.0.12.</span> <span class="toc-text">less</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#echo"><span class="toc-number">5.4.0.13.</span> <span class="toc-text">echo</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#head"><span class="toc-number">5.4.0.14.</span> <span class="toc-text">head</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tail"><span class="toc-number">5.4.0.15.</span> <span class="toc-text">tail</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">5.4.0.16.</span> <span class="toc-text">.&gt; &gt;&gt;</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ln"><span class="toc-number">5.4.0.17.</span> <span class="toc-text">ln</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#history"><span class="toc-number">5.4.0.18.</span> <span class="toc-text">history</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E6%97%A5%E6%9C%9F%E7%B1%BB"><span class="toc-number">5.5.</span> <span class="toc-text">时间日期类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#date"><span class="toc-number">5.5.0.1.</span> <span class="toc-text">date</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cal"><span class="toc-number">5.5.0.2.</span> <span class="toc-text">cal</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%9C%E7%B4%A2%E6%9F%A5%E6%89%BE%E7%B1%BB"><span class="toc-number">5.6.</span> <span class="toc-text">搜索查找类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#find"><span class="toc-number">5.6.0.1.</span> <span class="toc-text">find</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#locate"><span class="toc-number">5.6.0.2.</span> <span class="toc-text">locate</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#which"><span class="toc-number">5.6.0.3.</span> <span class="toc-text">which</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#grep"><span class="toc-number">5.6.0.4.</span> <span class="toc-text">grep |</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%8B%E7%BC%A9%E5%92%8C%E8%A7%A3%E5%8E%8B"><span class="toc-number">5.7.</span> <span class="toc-text">压缩和解压</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#gzip"><span class="toc-number">5.7.0.1.</span> <span class="toc-text">gzip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#gunzip"><span class="toc-number">5.7.0.2.</span> <span class="toc-text">gunzip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#zip"><span class="toc-number">5.7.0.3.</span> <span class="toc-text">zip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#unzip"><span class="toc-number">5.7.0.4.</span> <span class="toc-text">unzip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#tar"><span class="toc-number">5.7.0.5.</span> <span class="toc-text">tar</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%84%E7%AE%A1%E7%90%86%E5%92%8C%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86"><span class="toc-number">6.</span> <span class="toc-text">组管理和权限管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6-%E7%9B%AE%E5%BD%95%E6%89%80%E6%9C%89%E8%80%85"><span class="toc-number">6.1.</span> <span class="toc-text">文件&#x2F;目录所有者</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6-%E7%9B%AE%E5%BD%95%E6%89%80%E6%9C%89%E8%80%85"><span class="toc-number">6.1.1.</span> <span class="toc-text">修改文件&#x2F;目录所有者</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6-%E7%9B%AE%E5%BD%95%E6%89%80%E5%9C%A8%E7%BB%84"><span class="toc-number">6.2.</span> <span class="toc-text">文件&#x2F;目录所在组</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%94%B9%E5%8F%98%E7%94%A8%E6%88%B7%E6%89%80%E5%9C%A8%E7%BB%84"><span class="toc-number">6.2.1.</span> <span class="toc-text">改变用户所在组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E5%AE%83%E7%BB%84"><span class="toc-number">6.3.</span> <span class="toc-text">其它组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86"><span class="toc-number">6.4.</span> <span class="toc-text">权限管理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E6%9D%83%E9%99%90"><span class="toc-number">6.4.1.</span> <span class="toc-text">修改权限</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6"><span class="toc-number">7.</span> <span class="toc-text">定时任务调度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#crond%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6"><span class="toc-number">7.1.</span> <span class="toc-text">crond任务调度</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0-1"><span class="toc-number">7.1.1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="toc-number">7.1.2.</span> <span class="toc-text">基本语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E7%BB%86%E8%8A%82%E8%AF%B4%E6%98%8E"><span class="toc-number">7.1.3.</span> <span class="toc-text">参数细节说明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E6%8C%87%E4%BB%A4"><span class="toc-number">7.1.4.</span> <span class="toc-text">相关指令</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#at%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="toc-number">7.2.</span> <span class="toc-text">at定时任务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-3"><span class="toc-number">7.2.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#at%E5%91%BD%E4%BB%A4%E6%A0%BC%E5%BC%8F"><span class="toc-number">7.2.2.</span> <span class="toc-text">at命令格式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%80%89%E9%A1%B9%EF%BC%9A"><span class="toc-number">7.2.2.1.</span> <span class="toc-text">选项：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E5%AE%9A%E4%B9%89%EF%BC%9A"><span class="toc-number">7.2.2.2.</span> <span class="toc-text">时间定义：</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%E5%92%8C%E6%8C%82%E8%BD%BD"><span class="toc-number">8.</span> <span class="toc-text">磁盘分区和挂载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E5%88%86%E5%8C%BA"><span class="toc-number">8.1.</span> <span class="toc-text">Linux分区</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D"><span class="toc-number">8.1.1.</span> <span class="toc-text">原理介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A1%AC%E7%9B%98%E8%AF%B4%E6%98%8E"><span class="toc-number">8.1.2.</span> <span class="toc-text">硬盘说明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E8%AE%BE%E5%A4%87%E6%8C%82%E8%BD%BD%E6%83%85%E5%86%B5"><span class="toc-number">8.1.3.</span> <span class="toc-text">查看所有设备挂载情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%A2%9E%E5%8A%A0%E7%A3%81%E7%9B%98%E6%AD%A5%E9%AA%A4"><span class="toc-number">8.1.4.</span> <span class="toc-text">虚拟机增加磁盘步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E6%83%85%E5%86%B5%E6%9F%A5%E8%AF%A2"><span class="toc-number">8.1.5.</span> <span class="toc-text">磁盘情况查询</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E7%B3%BB%E7%BB%9F%E6%95%B4%E4%BD%93%E7%A3%81%E7%9B%98%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5"><span class="toc-number">8.1.5.1.</span> <span class="toc-text">查询系统整体磁盘使用情况</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95%E7%9A%84%E7%A3%81%E7%9B%98%E5%8D%A0%E7%94%A8%E6%83%85%E5%86%B5"><span class="toc-number">8.1.5.2.</span> <span class="toc-text">查询指定目录的磁盘占用情况</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A3%81%E7%9B%98%E6%83%85%E5%86%B5%E5%AE%9E%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">8.1.6.</span> <span class="toc-text">磁盘情况实用指令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE"><span class="toc-number">9.</span> <span class="toc-text">网络配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86"><span class="toc-number">9.1.</span> <span class="toc-text">Linux网络配置原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E7%BD%91%E7%BB%9CIP%E5%92%8C%E7%BD%91%E5%85%B3"><span class="toc-number">9.2.</span> <span class="toc-text">查看网络IP和网关</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E7%BD%91%E5%85%B3"><span class="toc-number">9.2.1.</span> <span class="toc-text">查看网关</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Bwindow%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%9A%84VMnet8%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE"><span class="toc-number">9.2.2.</span> <span class="toc-text">查看window环境下的VMnet8网络配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Blinux%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-number">9.2.3.</span> <span class="toc-text">查看linux的配置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ping-%E6%B5%8B%E8%AF%95%E4%B8%BB%E6%9C%BA%E4%B9%8B%E9%97%B4%E7%9A%84%E7%BD%91%E7%BB%9C%E8%BF%9E%E9%80%9A%E6%80%A7"><span class="toc-number">9.3.</span> <span class="toc-text">ping 测试主机之间的网络连通性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E7%BD%91%E7%BB%9C%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="toc-number">9.4.</span> <span class="toc-text">Linux网络环境配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E8%8E%B7%E5%8F%96"><span class="toc-number">9.4.1.</span> <span class="toc-text">自动获取</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%87%E5%AE%9AIP"><span class="toc-number">9.4.2.</span> <span class="toc-text">指定IP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E4%B8%BB%E6%9C%BA%E5%90%8D%E5%92%8Chosts%E6%98%A0%E5%B0%84"><span class="toc-number">9.5.</span> <span class="toc-text">设置主机名和hosts映射</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E4%B8%BB%E6%9C%BA%E5%90%8D"><span class="toc-number">9.5.1.</span> <span class="toc-text">设置主机名</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AEhosts%E6%98%A0%E5%B0%84"><span class="toc-number">9.5.2.</span> <span class="toc-text">设置hosts映射</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E6%9C%BA%E5%90%8D%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%EF%BC%88Hosts%E3%80%81DNS%EF%BC%89"><span class="toc-number">9.5.3.</span> <span class="toc-text">主机名解析过程（Hosts、DNS）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Hosts"><span class="toc-number">9.5.3.1.</span> <span class="toc-text">Hosts</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#DNS"><span class="toc-number">9.5.3.2.</span> <span class="toc-text">DNS</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DNS%E5%9F%9F%E5%90%8D%E5%8A%AB%E6%8C%81"><span class="toc-number">9.5.4.</span> <span class="toc-text">DNS域名劫持</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86"><span class="toc-number">10.</span> <span class="toc-text">进程管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-4"><span class="toc-number">10.1.</span> <span class="toc-text">基本介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%BE%E7%A4%BA%E7%B3%BB%E7%BB%9F%E6%89%A7%E8%A1%8C%E7%9A%84%E8%BF%9B%E7%A8%8B"><span class="toc-number">10.2.</span> <span class="toc-text">显示系统执行的进程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D-5"><span class="toc-number">10.2.1.</span> <span class="toc-text">基本介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ps-aux"><span class="toc-number">10.2.1.1.</span> <span class="toc-text">ps -aux</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%88%B6%E5%AD%90%E8%BF%9B%E7%A8%8B"><span class="toc-number">10.2.2.</span> <span class="toc-text">父子进程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ps-ef"><span class="toc-number">10.2.2.1.</span> <span class="toc-text">ps -ef</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%88%E6%AD%A2%E8%BF%9B%E7%A8%8B"><span class="toc-number">10.3.</span> <span class="toc-text">终止进程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#kill"><span class="toc-number">10.3.0.1.</span> <span class="toc-text">kill</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E6%A0%91"><span class="toc-number">10.4.</span> <span class="toc-text">查看进程树</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pstree"><span class="toc-number">10.4.1.</span> <span class="toc-text">pstree</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="toc-number">10.5.</span> <span class="toc-text">服务管理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">10.5.1.</span> <span class="toc-text">介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#service"><span class="toc-number">10.5.1.1.</span> <span class="toc-text">service</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%BF%90%E8%A1%8C%E7%BA%A7%E5%88%AB"><span class="toc-number">10.5.2.</span> <span class="toc-text">服务的运行级别</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#chkconfig"><span class="toc-number">10.5.2.1.</span> <span class="toc-text">chkconfig</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#systemctl"><span class="toc-number">10.5.2.2.</span> <span class="toc-text">systemctl</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%AE%A1%E7%90%86%E6%8C%87%E4%BB%A4"><span class="toc-number">10.5.2.2.1.</span> <span class="toc-text">管理指令</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%87%AA%E5%90%AF%E5%8A%A8%E7%8A%B6%E6%80%81"><span class="toc-number">10.5.2.2.2.</span> <span class="toc-text">设置服务的自启动状态</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%93%E5%BC%80%E6%88%96%E5%85%B3%E9%97%AD%E6%8C%87%E5%AE%9A%E7%AB%AF%E5%8F%A3"><span class="toc-number">10.5.3.</span> <span class="toc-text">打开或关闭指定端口</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#firewall"><span class="toc-number">10.5.3.1.</span> <span class="toc-text">firewall</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E7%9B%91%E6%8E%A7%E8%BF%9B%E7%A8%8B"><span class="toc-number">10.6.</span> <span class="toc-text">动态监控进程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#top"><span class="toc-number">10.6.0.1.</span> <span class="toc-text">top</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E8%A1%8C%EF%BC%9A%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3"><span class="toc-number">10.6.0.2.</span> <span class="toc-text">第二行：进程相关</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E8%A1%8C%EF%BC%9A%E5%90%8Cmpstat%E5%91%BD%E4%BB%A4"><span class="toc-number">10.6.0.3.</span> <span class="toc-text">第三行：同mpstat命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%A1%AC%E4%B8%AD%E6%96%AD%E5%92%8C%E8%BD%AF%E4%B8%AD%E6%96%AD%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">10.6.0.4.</span> <span class="toc-text">硬中断和软中断的区别</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E8%A1%8C%EF%BC%9A%E5%90%8Cfree%E5%91%BD%E4%BB%A4"><span class="toc-number">10.6.0.5.</span> <span class="toc-text">第四行：同free命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%91%E6%8E%A7%E7%BD%91%E7%BB%9C%E7%8A%B6%E6%80%81"><span class="toc-number">10.7.</span> <span class="toc-text">监控网络状态</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E7%B3%BB%E7%BB%9F%E7%BD%91%E7%BB%9C%E6%83%85%E5%86%B5"><span class="toc-number">10.7.1.</span> <span class="toc-text">查看系统网络情况</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#netstat"><span class="toc-number">10.7.1.1.</span> <span class="toc-text">netstat</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A3%80%E6%B5%8B%E4%B8%BB%E6%9C%BA%E8%BF%9E%E6%8E%A5"><span class="toc-number">10.7.2.</span> <span class="toc-text">检测主机连接</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#ping"><span class="toc-number">10.7.2.1.</span> <span class="toc-text">ping</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RPM%E4%B8%8EYUM"><span class="toc-number">11.</span> <span class="toc-text">RPM与YUM</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rpm"><span class="toc-number">11.1.</span> <span class="toc-text">rpm</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2"><span class="toc-number">11.1.1.</span> <span class="toc-text">查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%B8%E8%BD%BD"><span class="toc-number">11.1.2.</span> <span class="toc-text">卸载</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-number">11.1.3.</span> <span class="toc-text">安装</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yum"><span class="toc-number">11.2.</span> <span class="toc-text">yum</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&text=Linux入门到实践"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&is_video=false&description=Linux入门到实践"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux入门到实践&body=Check out this article: https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&title=Linux入门到实践"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&name=Linux入门到实践&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/04/12/linux/Linux%E5%9F%BA%E7%A1%80/&t=Linux入门到实践"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

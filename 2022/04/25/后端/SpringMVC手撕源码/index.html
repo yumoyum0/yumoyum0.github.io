@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="SpringMVC常用组件 DispatcherServlet：前端控制器，不需要工程师开发，由框架提供  作用：统一处理请求和响应，整个流程控制的中心，由它调用其它组件处理用户的请求  HandlerMapping：处理器映射器，不需要工程师开发，由框架提供  作用：根据请求的url、method等信息查找对应的Handler，即控制器方法。 具体体现为@RequestMapping。  Han">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringMVC手撕源码">
+<meta property="og:url" content="https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="SpringMVC常用组件 DispatcherServlet：前端控制器，不需要工程师开发，由框架提供  作用：统一处理请求和响应，整个流程控制的中心，由它调用其它组件处理用户的请求  HandlerMapping：处理器映射器，不需要工程师开发，由框架提供  作用：根据请求的url、method等信息查找对应的Handler，即控制器方法。 具体体现为@RequestMapping。  Han">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/dbcd3ac4636cbd10c7dbb0b851818ecf.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425191613351.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425192034126.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425193356839.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425194307644.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425195232462.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425200417739.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425201609943.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425201130435.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425201856862.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425202330125.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425203412701.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425203706592.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425203957137.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425205003723.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425205822009.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425211140603.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425211648823.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425212004036.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425212146508.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425212312342.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425213139284.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425213258648.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425213716357.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425213930476.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425214221487.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425214937219.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425215040174-1.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425215057847.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425215530433.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425215818720.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425220111732.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425220321763.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425220706059.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425220926558.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425221023029.png">
+<meta property="og:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425221208198.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/584a1aa83611354bbd93ea8457459659.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/a37e15c07f070cfac014ab7b44f55876.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/9519da76739af3d582c5957713b25c06.png">
+<meta property="article:published_time" content="2022-04-25T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-29T05:55:12.019Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="SpringMVC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.yumoyumo.top/wp-content/uploads/2022/04/dbcd3ac4636cbd10c7dbb0b851818ecf.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>SpringMVC手撕源码</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/04/19/%E5%90%8E%E7%AB%AF/Spring/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&text=SpringMVC手撕源码"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&is_video=false&description=SpringMVC手撕源码"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=SpringMVC手撕源码&body=Check out this article: https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&name=SpringMVC手撕源码&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&t=SpringMVC手撕源码"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SpringMVC%E5%B8%B8%E7%94%A8%E7%BB%84%E4%BB%B6"><span class="toc-number">1.</span> <span class="toc-text">SpringMVC常用组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DispatcherServlet%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">DispatcherServlet初始化过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81Servlet"><span class="toc-number">2.1.</span> <span class="toc-text">1、Servlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81GenericServlet"><span class="toc-number">2.2.</span> <span class="toc-text">2、GenericServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81HttpServlet"><span class="toc-number">2.3.</span> <span class="toc-text">3、HttpServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81HttpServletBean"><span class="toc-number">2.4.</span> <span class="toc-text">4、HttpServletBean</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E8%AE%BE%E7%BD%AEbean-properties"><span class="toc-number">2.4.1.</span> <span class="toc-text">1、设置bean properties</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E8%B0%83%E7%94%A8initServletBean"><span class="toc-number">2.4.2.</span> <span class="toc-text">2、调用initServletBean</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81FrameworkServlet"><span class="toc-number">2.5.</span> <span class="toc-text">5、FrameworkServlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96WebApplicationContext"><span class="toc-number">2.5.1.</span> <span class="toc-text">初始化WebApplicationContext</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5%E5%B7%B2%E6%9C%89"><span class="toc-number">2.5.1.1.</span> <span class="toc-text">检查已有</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA"><span class="toc-number">2.5.1.2.</span> <span class="toc-text">创建</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%B7%E6%96%B0"><span class="toc-number">2.5.2.</span> <span class="toc-text">刷新</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6%E3%80%81DispatcherServlet"><span class="toc-number">2.6.</span> <span class="toc-text">6、DispatcherServlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E7%AD%96%E7%95%A5"><span class="toc-number">2.6.1.</span> <span class="toc-text">初始化策略</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DispatcherServlet%E8%B0%83%E7%94%A8%E7%BB%84%E4%BB%B6%E5%A4%84%E7%90%86%E8%AF%B7%E6%B1%82"><span class="toc-number">3.</span> <span class="toc-text">DispatcherServlet调用组件处理请求</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81Servlet-1"><span class="toc-number">3.1.</span> <span class="toc-text">1、Servlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81GenericServlet-1"><span class="toc-number">3.2.</span> <span class="toc-text">2、GenericServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81HttpServlet-1"><span class="toc-number">3.3.</span> <span class="toc-text">3、HttpServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81FrameworkServlet"><span class="toc-number">3.4.</span> <span class="toc-text">4、FrameworkServlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#processRequest"><span class="toc-number">3.4.1.</span> <span class="toc-text">processRequest</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#doservice"><span class="toc-number">3.4.2.</span> <span class="toc-text">doservice</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81DispatcherServlet"><span class="toc-number">3.5.</span> <span class="toc-text">5、DispatcherServlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#doservice-1"><span class="toc-number">3.5.1.</span> <span class="toc-text">doservice</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BF%9D%E7%95%99%E5%BF%AB%E7%85%A7"><span class="toc-number">3.5.1.1.</span> <span class="toc-text">保留快照</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E8%AF%B7%E6%B1%82%E5%B1%9E%E6%80%A7"><span class="toc-number">3.5.1.2.</span> <span class="toc-text">设置请求属性</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B7%B3%E8%BD%AC%E7%AE%A1%E7%90%86"><span class="toc-number">3.5.1.3.</span> <span class="toc-text">跳转管理</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E8%AF%B7%E6%B1%82%E8%B7%AF%E5%BE%84"><span class="toc-number">3.5.1.4.</span> <span class="toc-text">解析请求路径</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A7%94%E6%89%98doDispatch%E8%B0%83%E5%BA%A6"><span class="toc-number">3.5.1.5.</span> <span class="toc-text">委托doDispatch调度</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#doDispatch"><span class="toc-number">3.5.2.</span> <span class="toc-text">doDispatch</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90"><span class="toc-number">3.5.2.1.</span> <span class="toc-text">文件解析</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E5%A4%84%E7%90%86%E5%99%A8%E6%89%A7%E8%A1%8C%E9%93%BE"><span class="toc-number">3.5.2.2.</span> <span class="toc-text">获取处理器执行链</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E5%A4%84%E7%90%86%E5%99%A8%E9%80%82%E9%85%8D%E5%99%A8"><span class="toc-number">3.5.2.3.</span> <span class="toc-text">获取处理器适配器</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E6%9C%80%E5%90%8E%E4%BF%AE%E6%94%B9%E7%9A%84%E8%AF%B7%E6%B1%82%E5%A4%B4"><span class="toc-number">3.5.2.4.</span> <span class="toc-text">处理最后修改的请求头</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8preHandle"><span class="toc-number">3.5.2.5.</span> <span class="toc-text">拦截器preHandle</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B0%83%E7%94%A8%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-number">3.5.2.6.</span> <span class="toc-text">调用处理器</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8postHandle"><span class="toc-number">3.5.2.7.</span> <span class="toc-text">拦截器postHandle</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E8%B0%83%E5%BA%A6%E7%BB%93%E6%9E%9C"><span class="toc-number">3.5.2.8.</span> <span class="toc-text">处理调度结果</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#processDispatchResult"><span class="toc-number">3.5.3.</span> <span class="toc-text">processDispatchResult</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%94%99%E8%AF%AF%E8%A7%86%E5%9B%BE"><span class="toc-number">3.5.3.1.</span> <span class="toc-text">错误视图</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B8%B2%E6%9F%93%E8%A7%86%E5%9B%BE"><span class="toc-number">3.5.3.2.</span> <span class="toc-text">渲染视图</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8afterCompletion"><span class="toc-number">3.5.3.3.</span> <span class="toc-text">拦截器afterCompletion</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SpringMVC%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">SpringMVC的执行流程</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        SpringMVC手撕源码
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-04-25T08:51:33.000Z" class="dt-published" itemprop="datePublished">2022-04-25</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Java/" rel="tag">Java</a>, <a class="p-category" href="/tags/Spring/" rel="tag">Spring</a>, <a class="p-category" href="/tags/SpringMVC/" rel="tag">SpringMVC</a>, <a class="p-category" href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag">后端</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="SpringMVC常用组件"><a href="#SpringMVC常用组件" class="headerlink" title="SpringMVC常用组件"></a>SpringMVC常用组件</h2><ul>
+<li>DispatcherServlet：<strong>前端控制器</strong>，不需要工程师开发，由框架提供</li>
+</ul>
+<p>作用：统一处理请求和响应，整个流程控制的中心，由它调用其它组件处理用户的请求</p>
+<ul>
+<li>HandlerMapping：<strong>处理器映射器</strong>，不需要工程师开发，由框架提供</li>
+</ul>
+<p>作用：根据请求的url、method等信息查找对应的Handler，即控制器方法。</p>
+<p>具体体现为@RequestMapping。</p>
+<ul>
+<li>Handler：<strong>处理器</strong>，也就是<strong>控制器</strong>Controller，需要工程师开发</li>
+</ul>
+<p>作用：在DispatcherServlet的控制下Handler对具体的用户请求进行处理</p>
+<ul>
+<li>HandlerAdapter：<strong>处理器适配器</strong>，不需要工程师开发，由框架提供</li>
+</ul>
+<p>作用：通过HandlerAdapter对处理器（控制器方法）进行执行，会进行参数解析，返回值内容协商。</p>
+<ul>
+<li>ViewResolver：<strong>视图解析器</strong>，不需要工程师开发，由框架提供</li>
+</ul>
+<p>作用：进行视图解析，得到相应的视图，例如：ThymeleafView、InternalResourceView、RedirectView。根据不同的视图名称，使用不同的视图解析器进行页面渲染。</p>
+<ul>
+<li>View：<strong>视图</strong></li>
+</ul>
+<p>作用：将模型数据通过页面展示给用户</p>
+<h2 id="DispatcherServlet初始化过程"><a href="#DispatcherServlet初始化过程" class="headerlink" title="DispatcherServlet初始化过程"></a>DispatcherServlet初始化过程</h2><p>DispatcherServlet 本质上是一个 Servlet，所以天然的遵循 Servlet 的生命周期。所以宏观上是 Servlet 生命周期来进行调度。</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/dbcd3ac4636cbd10c7dbb0b851818ecf.png"></p>
+<h3 id="1、Servlet"><a href="#1、Servlet" class="headerlink" title="1、Servlet"></a>1、Servlet</h3><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425191613351.png"></p>
+<p>Servlet接口为Web的核心，其中规定了Servlet的生命周期，即init（初始化）、Service（服务）、destroy（销毁）。这里的init方法将交给Servlet接口的实现类去实现。</p>
+<h3 id="2、GenericServlet"><a href="#2、GenericServlet" class="headerlink" title="2、GenericServlet"></a>2、GenericServlet</h3><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425192034126.png"></p>
+<p>GenericServlet作为Servlet接口的实现类，封装并实现了部分功能，其中对init、service、destroy三大核心方法采取由子类实现的办法。特别的是，GenericServlet对init方法进行了二次封装，引入了ServletConfig，以便在初始化servlet时进行相关的配置。</p>
+<h3 id="3、HttpServlet"><a href="#3、HttpServlet" class="headerlink" title="3、HttpServlet"></a>3、HttpServlet</h3><p>到底如何进行init方法？</p>
+<p>让HttpServlet来告诉你吧：</p>
+<p>HttpServlet：不知道喵</p>
+<p>啊这，它说它不知道</p>
+<p>因为在HttpServlet中并没有重写init方法，所以具体的实现又交给其子类去实现了。</p>
+<h3 id="4、HttpServletBean"><a href="#4、HttpServletBean" class="headerlink" title="4、HttpServletBean"></a>4、HttpServletBean</h3><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425193356839.png"></p>
+<p>正所谓正官摆烂，副官实干。init方法便是由HttpServlet类的子类HttpServletBean来具体实现的。</p>
+<p>在这里init方法主要进行了两个步骤：</p>
+<h4 id="1、设置bean-properties"><a href="#1、设置bean-properties" class="headerlink" title="1、设置bean properties"></a>1、设置bean properties</h4><p>获取初始化参数（init parameters）和初始化配置（ServletConfig）并封装到PropertyValues对象中。</p>
+<p>若该PropertyValues对象不为空，则进行一系列操作将bean properties设置到servlet中。</p>
+<h4 id="2、调用initServletBean"><a href="#2、调用initServletBean" class="headerlink" title="2、调用initServletBean"></a>2、调用initServletBean</h4><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425194307644.png"></p>
+<p>可以看到在HttpServletBean类中，该方法并没有给出具体实现，而是将其交给子类。</p>
+<p>子类可以重写该方法来进行初始化，所有的该servlet的bean properties属性都将在这个方法被调用之前设置好。</p>
+<p>那么现在就应该在追查是谁来实现了initServletBean方法</p>
+<h3 id="5、FrameworkServlet"><a href="#5、FrameworkServlet" class="headerlink" title="5、FrameworkServlet"></a>5、FrameworkServlet</h3><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425195232462.png"></p>
+<p>Framework意为框架，在该类中实现类大量框架所需的方法，其中便包含initServletBean方法</p>
+<p>在该方法中最主要的一步，便是创建servlet的<strong>WebApplicationContext</strong>。</p>
+<h4 id="初始化WebApplicationContext"><a href="#初始化WebApplicationContext" class="headerlink" title="初始化WebApplicationContext"></a>初始化WebApplicationContext</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> WebApplicationContext <span class="title function_">initWebApplicationContext</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">WebApplicationContext</span> <span class="variable">rootContext</span> <span class="operator">=</span></span><br><span class="line">        WebApplicationContextUtils.getWebApplicationContext(getServletContext());</span><br><span class="line">    <span class="type">WebApplicationContext</span> <span class="variable">wac</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.webApplicationContext != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// A context instance was injected at construction time -&gt; use it</span></span><br><span class="line">        wac = <span class="built_in">this</span>.webApplicationContext;</span><br><span class="line">        <span class="keyword">if</span> (wac <span class="keyword">instanceof</span> ConfigurableWebApplicationContext) &#123;</span><br><span class="line">            <span class="type">ConfigurableWebApplicationContext</span> <span class="variable">cwac</span> <span class="operator">=</span> (ConfigurableWebApplicationContext) wac;</span><br><span class="line">            <span class="keyword">if</span> (!cwac.isActive()) &#123;</span><br><span class="line">                <span class="comment">// The context has not yet been refreshed -&gt; provide services such as</span></span><br><span class="line">                <span class="comment">// setting the parent context, setting the application context id, etc</span></span><br><span class="line">                <span class="keyword">if</span> (cwac.getParent() == <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// The context instance was injected without an explicit parent -&gt; set</span></span><br><span class="line">                    <span class="comment">// the root application context (if any; may be null) as the parent</span></span><br><span class="line">                    cwac.setParent(rootContext);</span><br><span class="line">                &#125;</span><br><span class="line">                configureAndRefreshWebApplicationContext(cwac);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (wac == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// No context instance was injected at construction time -&gt; see if one</span></span><br><span class="line">        <span class="comment">// has been registered in the servlet context. If one exists, it is assumed</span></span><br><span class="line">        <span class="comment">// that the parent context (if any) has already been set and that the</span></span><br><span class="line">        <span class="comment">// user has performed any initialization such as setting the context id</span></span><br><span class="line">        wac = findWebApplicationContext();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (wac == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// No context instance is defined for this servlet -&gt; create a local one</span></span><br><span class="line">        <span class="comment">// 创建WebApplicationContext</span></span><br><span class="line">        wac = createWebApplicationContext(rootContext);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">this</span>.refreshEventReceived) &#123;</span><br><span class="line">        <span class="comment">// Either the context is not a ConfigurableApplicationContext with refresh</span></span><br><span class="line">        <span class="comment">// support or the context injected at construction time had already been</span></span><br><span class="line">        <span class="comment">// refreshed -&gt; trigger initial onRefresh manually here.</span></span><br><span class="line">        <span class="keyword">synchronized</span> (<span class="built_in">this</span>.onRefreshMonitor) &#123;</span><br><span class="line">            <span class="comment">// 刷新WebApplicationContext</span></span><br><span class="line">            onRefresh(wac);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.publishContext) &#123;</span><br><span class="line">        <span class="comment">// Publish the context as a servlet context attribute.</span></span><br><span class="line">        <span class="comment">// 将IOC容器在应用域共享</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">attrName</span> <span class="operator">=</span> getServletContextAttributeName();</span><br><span class="line">        getServletContext().setAttribute(attrName, wac);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> wac;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>针对该方法各部分功能分解如下：</p>
+<h5 id="检查已有"><a href="#检查已有" class="headerlink" title="检查已有"></a>检查已有</h5><p>若WebApplicationContext<strong>已存在</strong>，则将rootContext设置为其的父容器。在这里，<strong>父容器</strong>rootContext就是<strong>Spring</strong>的IOC容器，而<strong>子容器</strong>WebApplicationContext就是<strong>SpringMVC</strong>的IOC容器。</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425200417739.png"></p>
+<p>若WebApplicationContext<strong>不存在</strong>，则调用**<code>findWebApplicationContext</code>**方法寻找到底有没有WebApplicationContext。</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425201609943.png"></p>
+<h5 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h5><p>然后调用**<code>createWebApplicationContext</code>**方法创建一个新的WebApplicationContext</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425201130435.png"></p>
+<p>在该方法中，首先通过反射创建IOC容器对象，接着设置该WebApplicationContext的环境及其父容器。</p>
+<p>最后调用**<code>configureAndRefreshWebApplicationContext</code>**方法刷新其配置</p>
+<h4 id="刷新"><a href="#刷新" class="headerlink" title="刷新"></a>刷新</h4><p>调用**<code>onRefresh</code>**方法，手动触发初始化刷新。</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425201856862.png"></p>
+<p>在该类中的onRefresh方法为模板方法，需要其子类去具体实现</p>
+<h3 id="6、DispatcherServlet"><a href="#6、DispatcherServlet" class="headerlink" title="6、DispatcherServlet"></a>6、DispatcherServlet</h3><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425202330125.png"></p>
+<p>在DispatcherServlet类的onRefresh方法中可见，它将具体的实现交给**<code>initStrategies</code>**初始化策略方法。</p>
+<h4 id="初始化策略"><a href="#初始化策略" class="headerlink" title="初始化策略"></a>初始化策略</h4><p>初始化策略，即初始化DispatcherServlet的各个组件</p>
+<p>MultipartResolver文件上传解析器</p>
+<p>LocaleResolver本地解析器</p>
+<p>ThemeResolver主题解析器</p>
+<p>HandlerMappings处理器映射器</p>
+<p>HandlerAdapters处理器适配器</p>
+<p>HandlerExceptionResolvers处理器异常解析器</p>
+<p>RequestToViewNameTranslator请求到视图名转换器</p>
+<p>ViewResolvers视图解析器</p>
+<p>FlashMapManager转发及重定向管理器</p>
+<p>至此，核心前端控制器DispatcherServlet的初始化完成。</p>
+<h2 id="DispatcherServlet调用组件处理请求"><a href="#DispatcherServlet调用组件处理请求" class="headerlink" title="DispatcherServlet调用组件处理请求"></a>DispatcherServlet调用组件处理请求</h2><p>上面的DispatcherServlet初始化过程本质就是其最顶端Servlet接口的<strong>init</strong>方法的层层封装及调用。</p>
+<p>而这里的DispatcherServlet调用组件处理请求过程则是Servlet接口的<strong>service</strong>方法的层层调用</p>
+<h3 id="1、Servlet-1"><a href="#1、Servlet-1" class="headerlink" title="1、Servlet"></a>1、Servlet</h3><p>回到最开始的Servlet接口，并持续向下跟踪</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425203412701.png"></p>
+<h3 id="2、GenericServlet-1"><a href="#2、GenericServlet-1" class="headerlink" title="2、GenericServlet"></a>2、GenericServlet</h3><p>该类中的service方法依然没有具体实现，则交给其子类处理</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425203706592.png"></p>
+<h3 id="3、HttpServlet-1"><a href="#3、HttpServlet-1" class="headerlink" title="3、HttpServlet"></a>3、HttpServlet</h3><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425203957137.png"></p>
+<p>首先该方法接收参数ServletRequest req, ServletResponse res</p>
+<p>并将它们转换成对应的HttpServletRequest和HttpServletResponse</p>
+<p>最后<strong>转发</strong>给该类的另一个专门处理http请求和响应的service方法进行处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">service</span><span class="params">(HttpServletRequest req, HttpServletResponse resp)</span></span><br><span class="line">        <span class="keyword">throws</span> ServletException, IOException</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">method</span> <span class="operator">=</span> req.getMethod();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (method.equals(METHOD_GET)) &#123;</span><br><span class="line">            <span class="type">long</span> <span class="variable">lastModified</span> <span class="operator">=</span> getLastModified(req);</span><br><span class="line">            <span class="keyword">if</span> (lastModified == -<span class="number">1</span>) &#123;</span><br><span class="line">                <span class="comment">// servlet doesn&#x27;t support if-modified-since, no reason</span></span><br><span class="line">                <span class="comment">// to go through further expensive logic</span></span><br><span class="line">                doGet(req, resp);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">long</span> <span class="variable">ifModifiedSince</span> <span class="operator">=</span> req.getDateHeader(HEADER_IFMODSINCE);</span><br><span class="line">                <span class="keyword">if</span> (ifModifiedSince &lt; lastModified) &#123;</span><br><span class="line">                    <span class="comment">// If the servlet mod time is later, call doGet()</span></span><br><span class="line">                    <span class="comment">// Round down to the nearest second for a proper compare</span></span><br><span class="line">                    <span class="comment">// A ifModifiedSince of -1 will always be less</span></span><br><span class="line">                    maybeSetLastModified(resp, lastModified);</span><br><span class="line">                    doGet(req, resp);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(METHOD_HEAD)) &#123;</span><br><span class="line">            <span class="type">long</span> <span class="variable">lastModified</span> <span class="operator">=</span> getLastModified(req);</span><br><span class="line">            maybeSetLastModified(resp, lastModified);</span><br><span class="line">            doHead(req, resp);</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(METHOD_POST)) &#123;</span><br><span class="line">            doPost(req, resp);</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(METHOD_PUT)) &#123;</span><br><span class="line">            doPut(req, resp);</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(METHOD_DELETE)) &#123;</span><br><span class="line">            doDelete(req, resp);</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(METHOD_OPTIONS)) &#123;</span><br><span class="line">            doOptions(req,resp);</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(METHOD_TRACE)) &#123;</span><br><span class="line">            doTrace(req,resp);</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">//</span></span><br><span class="line">            <span class="comment">// Note that this means NO servlet supports whatever</span></span><br><span class="line">            <span class="comment">// method was requested, anywhere on this server.</span></span><br><span class="line">            <span class="comment">//</span></span><br><span class="line"></span><br><span class="line">            <span class="type">String</span> <span class="variable">errMsg</span> <span class="operator">=</span> lStrings.getString(<span class="string">&quot;http.method_not_implemented&quot;</span>);</span><br><span class="line">            Object[] errArgs = <span class="keyword">new</span> <span class="title class_">Object</span>[<span class="number">1</span>];</span><br><span class="line">            errArgs[<span class="number">0</span>] = method;</span><br><span class="line">            errMsg = MessageFormat.format(errMsg, errArgs);</span><br><span class="line">            </span><br><span class="line">            resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, errMsg);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>该service首先得到具体的请求方法，并通过判断来调用与之对应的doXxx方法。</p>
+<h3 id="4、FrameworkServlet"><a href="#4、FrameworkServlet" class="headerlink" title="4、FrameworkServlet"></a>4、FrameworkServlet</h3><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425205003723.png"></p>
+<p>FrameworkServlet类<strong>重写</strong>了HttpServlet的service方法以及doXxx方法。</p>
+<p>在FrameworkServlet类中的service方法调用父类的service方法，而父类的service方法又会根据请求方法来调用子类FrameworkServlet重写的doXXX方法。</p>
+<p>而在FrameworkServlet类中的doXxx方法中，基本都调用了该类的**<code>processRequest</code>**方法</p>
+<h4 id="processRequest"><a href="#processRequest" class="headerlink" title="processRequest"></a>processRequest</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">processRequest</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span></span><br><span class="line">    <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">long</span> <span class="variable">startTime</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">    <span class="type">Throwable</span> <span class="variable">failureCause</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">LocaleContext</span> <span class="variable">previousLocaleContext</span> <span class="operator">=</span> LocaleContextHolder.getLocaleContext();</span><br><span class="line">    <span class="type">LocaleContext</span> <span class="variable">localeContext</span> <span class="operator">=</span> buildLocaleContext(request);</span><br><span class="line"></span><br><span class="line">    <span class="type">RequestAttributes</span> <span class="variable">previousAttributes</span> <span class="operator">=</span> RequestContextHolder.getRequestAttributes();</span><br><span class="line">    <span class="type">ServletRequestAttributes</span> <span class="variable">requestAttributes</span> <span class="operator">=</span> buildRequestAttributes(request, response, previousAttributes);</span><br><span class="line"></span><br><span class="line">    <span class="type">WebAsyncManager</span> <span class="variable">asyncManager</span> <span class="operator">=</span> WebAsyncUtils.getAsyncManager(request);</span><br><span class="line">    asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), <span class="keyword">new</span> <span class="title class_">RequestBindingInterceptor</span>());</span><br><span class="line"></span><br><span class="line">    initContextHolders(request, localeContext, requestAttributes);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="comment">// 执行服务，doService()是一个抽象方法，在DispatcherServlet中进行了重写</span></span><br><span class="line">        doService(request, response);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (ServletException | IOException ex) &#123;</span><br><span class="line">        failureCause = ex;</span><br><span class="line">        <span class="keyword">throw</span> ex;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">        failureCause = ex;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NestedServletException</span>(<span class="string">&quot;Request processing failed&quot;</span>, ex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">finally</span> &#123;</span><br><span class="line">        resetContextHolders(request, previousLocaleContext, previousAttributes);</span><br><span class="line">        <span class="keyword">if</span> (requestAttributes != <span class="literal">null</span>) &#123;</span><br><span class="line">            requestAttributes.requestCompleted();</span><br><span class="line">        &#125;</span><br><span class="line">        logResult(request, response, failureCause, asyncManager);</span><br><span class="line">        publishRequestHandledEvent(request, response, startTime, failureCause);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>processRequest方法处理此请求并发布事件，而不管结果如何。</p>
+<p>实际的事件处理由抽象的**<code>doService</code>**模板方法执行。</p>
+<h4 id="doservice"><a href="#doservice" class="headerlink" title="doservice"></a>doservice</h4><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425205822009.png"></p>
+<p>doService方法为模板方法，子类必须实现这个方法来处理请求，接收GET、POST、PUT和DELETE的集中回调。<br>该回调基本上与HttpServlet中通常被重写的doGet或doPost方法的回调相同。<br>这个类<strong>拦截</strong>调用，以确保进行<strong>异常处理</strong>和<strong>事件发布</strong>。</p>
+<h3 id="5、DispatcherServlet"><a href="#5、DispatcherServlet" class="headerlink" title="5、DispatcherServlet"></a>5、DispatcherServlet</h3><h4 id="doservice-1"><a href="#doservice-1" class="headerlink" title="doservice"></a>doservice</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doService</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    logRequest(request);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Keep a snapshot of the request attributes in case of an include,</span></span><br><span class="line">    <span class="comment">// to be able to restore the original attributes after the include.</span></span><br><span class="line">    Map&lt;String, Object&gt; attributesSnapshot = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (WebUtils.isIncludeRequest(request)) &#123;</span><br><span class="line">        attributesSnapshot = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        Enumeration&lt;?&gt; attrNames = request.getAttributeNames();</span><br><span class="line">        <span class="keyword">while</span> (attrNames.hasMoreElements()) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">attrName</span> <span class="operator">=</span> (String) attrNames.nextElement();</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">this</span>.cleanupAfterInclude || attrName.startsWith(DEFAULT_STRATEGIES_PREFIX)) &#123;</span><br><span class="line">                attributesSnapshot.put(attrName, request.getAttribute(attrName));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Make framework objects available to handlers and view objects.</span></span><br><span class="line">    request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, getWebApplicationContext());</span><br><span class="line">    request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, <span class="built_in">this</span>.localeResolver);</span><br><span class="line">    request.setAttribute(THEME_RESOLVER_ATTRIBUTE, <span class="built_in">this</span>.themeResolver);</span><br><span class="line">    request.setAttribute(THEME_SOURCE_ATTRIBUTE, getThemeSource());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.flashMapManager != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="type">FlashMap</span> <span class="variable">inputFlashMap</span> <span class="operator">=</span> <span class="built_in">this</span>.flashMapManager.retrieveAndUpdate(request, response);</span><br><span class="line">        <span class="keyword">if</span> (inputFlashMap != <span class="literal">null</span>) &#123;</span><br><span class="line">            request.setAttribute(INPUT_FLASH_MAP_ATTRIBUTE, Collections.unmodifiableMap(inputFlashMap));</span><br><span class="line">        &#125;</span><br><span class="line">        request.setAttribute(OUTPUT_FLASH_MAP_ATTRIBUTE, <span class="keyword">new</span> <span class="title class_">FlashMap</span>());</span><br><span class="line">        request.setAttribute(FLASH_MAP_MANAGER_ATTRIBUTE, <span class="built_in">this</span>.flashMapManager);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">RequestPath</span> <span class="variable">requestPath</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.parseRequestPath &amp;&amp; !ServletRequestPathUtils.hasParsedRequestPath(request)) &#123;</span><br><span class="line">        requestPath = ServletRequestPathUtils.parseAndCache(request);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 处理请求和响应</span></span><br><span class="line">        doDispatch(request, response);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) &#123;</span><br><span class="line">            <span class="comment">// Restore the original attribute snapshot, in case of an include.</span></span><br><span class="line">            <span class="keyword">if</span> (attributesSnapshot != <span class="literal">null</span>) &#123;</span><br><span class="line">                restoreAttributesAfterInclude(request, attributesSnapshot);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (requestPath != <span class="literal">null</span>) &#123;</span><br><span class="line">            ServletRequestPathUtils.clearParsedRequestPath(request);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="保留快照"><a href="#保留快照" class="headerlink" title="保留快照"></a>保留快照</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425211140603.png"></p>
+<p>这部分代码创建一个Map映射，将当前请求的属性名及其对应的值保存在这个Map映射中。这个Map映射就被称为是当前请求的一个快照。</p>
+<p>保留这个快照，可以以防包含，可以在包含后恢复原始的请求属性数据。</p>
+<h5 id="设置请求属性"><a href="#设置请求属性" class="headerlink" title="设置请求属性"></a>设置请求属性</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425211648823.png"></p>
+<p>通过将执行器和视图对象放入请求域中，使得框架对象能用于处理它们。</p>
+<h5 id="跳转管理"><a href="#跳转管理" class="headerlink" title="跳转管理"></a>跳转管理</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425212004036.png"></p>
+<p>将跳转映射和跳转映射管理器放入request域以便共享使用</p>
+<h5 id="解析请求路径"><a href="#解析请求路径" class="headerlink" title="解析请求路径"></a>解析请求路径</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425212146508.png"></p>
+<p>判断若需要解析请求路径，并且当前请求还未被解析路径，则进行解析</p>
+<h5 id="委托doDispatch调度"><a href="#委托doDispatch调度" class="headerlink" title="委托doDispatch调度"></a>委托doDispatch调度</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425212312342.png"></p>
+<p>将DispatcherServlet特定的请求属性和委托公开给doDispatch以进行实际调度。</p>
+<h4 id="doDispatch"><a href="#doDispatch" class="headerlink" title="doDispatch"></a>doDispatch</h4><p>处理实际分派给执行器的任务。<br>处理程序将通过按顺序应用servlet的handler映射来获得。<strong>执行器适配器</strong>将通过查询servlet安装的<strong>执行器适配器</strong>来获得，以找到第一个支持handler类的HandlerAdapter。<br>所有HTTP方法都由该方法处理。由<strong>执行器适配器</strong>或<strong>执行器</strong>自己决定哪些方法是可以接受的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doDispatch</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    <span class="type">HttpServletRequest</span> <span class="variable">processedRequest</span> <span class="operator">=</span> request;</span><br><span class="line">    <span class="type">HandlerExecutionChain</span> <span class="variable">mappedHandler</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">multipartRequestParsed</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">WebAsyncManager</span> <span class="variable">asyncManager</span> <span class="operator">=</span> WebAsyncUtils.getAsyncManager(request);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="type">ModelAndView</span> <span class="variable">mv</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">Exception</span> <span class="variable">dispatchException</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            processedRequest = checkMultipart(request);</span><br><span class="line">            multipartRequestParsed = (processedRequest != request);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Determine handler for the current request.</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            	mappedHandler：调用链</span></span><br><span class="line"><span class="comment">                包含handler、interceptorList、interceptorIndex</span></span><br><span class="line"><span class="comment">            	handler：浏览器发送的请求所匹配的控制器方法</span></span><br><span class="line"><span class="comment">            	interceptorList：处理控制器方法的所有拦截器集合</span></span><br><span class="line"><span class="comment">            	interceptorIndex：拦截器索引，控制拦截器afterCompletion()的执行</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            mappedHandler = getHandler(processedRequest);</span><br><span class="line">            <span class="keyword">if</span> (mappedHandler == <span class="literal">null</span>) &#123;</span><br><span class="line">                noHandlerFound(processedRequest, response);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Determine handler adapter for the current request.</span></span><br><span class="line">           	<span class="comment">// 通过控制器方法创建相应的处理器适配器，调用所对应的控制器方法</span></span><br><span class="line">            <span class="type">HandlerAdapter</span> <span class="variable">ha</span> <span class="operator">=</span> getHandlerAdapter(mappedHandler.getHandler());</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Process last-modified header, if supported by the handler.</span></span><br><span class="line">            <span class="type">String</span> <span class="variable">method</span> <span class="operator">=</span> request.getMethod();</span><br><span class="line">            <span class="type">boolean</span> <span class="variable">isGet</span> <span class="operator">=</span> <span class="string">&quot;GET&quot;</span>.equals(method);</span><br><span class="line">            <span class="keyword">if</span> (isGet || <span class="string">&quot;HEAD&quot;</span>.equals(method)) &#123;</span><br><span class="line">                <span class="type">long</span> <span class="variable">lastModified</span> <span class="operator">=</span> ha.getLastModified(request, mappedHandler.getHandler());</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">new</span> <span class="title class_">ServletWebRequest</span>(request, response).checkNotModified(lastModified) &amp;&amp; isGet) &#123;</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">			</span><br><span class="line">            <span class="comment">// 调用拦截器的preHandle()</span></span><br><span class="line">            <span class="keyword">if</span> (!mappedHandler.applyPreHandle(processedRequest, response)) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Actually invoke the handler.</span></span><br><span class="line">            <span class="comment">// 由处理器适配器调用具体的控制器方法，最终获得ModelAndView对象</span></span><br><span class="line">            mv = ha.handle(processedRequest, response, mappedHandler.getHandler());</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (asyncManager.isConcurrentHandlingStarted()) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            applyDefaultViewName(processedRequest, mv);</span><br><span class="line">            <span class="comment">// 调用拦截器的postHandle()</span></span><br><span class="line">            mappedHandler.applyPostHandle(processedRequest, response, mv);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">            dispatchException = ex;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Throwable err) &#123;</span><br><span class="line">            <span class="comment">// As of 4.3, we&#x27;re processing Errors thrown from handler methods as well,</span></span><br><span class="line">            <span class="comment">// making them available for @ExceptionHandler methods and other scenarios.</span></span><br><span class="line">            dispatchException = <span class="keyword">new</span> <span class="title class_">NestedServletException</span>(<span class="string">&quot;Handler dispatch failed&quot;</span>, err);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 后续处理：处理模型数据和渲染视图</span></span><br><span class="line">        processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">        triggerAfterCompletion(processedRequest, response, mappedHandler, ex);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Throwable err) &#123;</span><br><span class="line">        triggerAfterCompletion(processedRequest, response, mappedHandler,</span><br><span class="line">                               <span class="keyword">new</span> <span class="title class_">NestedServletException</span>(<span class="string">&quot;Handler processing failed&quot;</span>, err));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (asyncManager.isConcurrentHandlingStarted()) &#123;</span><br><span class="line">            <span class="comment">// Instead of postHandle and afterCompletion</span></span><br><span class="line">            <span class="keyword">if</span> (mappedHandler != <span class="literal">null</span>) &#123;</span><br><span class="line">                mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Clean up any resources used by a multipart request.</span></span><br><span class="line">            <span class="keyword">if</span> (multipartRequestParsed) &#123;</span><br><span class="line">                cleanupMultipart(processedRequest);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="文件解析"><a href="#文件解析" class="headerlink" title="文件解析"></a>文件解析</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425213139284.png"></p>
+<p>通过调用checkMultiPart方法，来查看当前request请求是否需要进行文件处理解析（包括文件上传和文件下载）</p>
+<h5 id="获取处理器执行链"><a href="#获取处理器执行链" class="headerlink" title="获取处理器执行链"></a>获取处理器执行链</h5><p>在doDispatch方法最开始定义了HandlerExecutionChain处理器执行链</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">HandlerExecutionChain</span> <span class="variable">mappedHandler</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425213258648.png"></p>
+<p>调用getHandler方法根据请求的url、method等信息查找对应的Handler，并将它们赋给<strong>映射处理器mappedHandler</strong>。</p>
+<p>这里的handler即是程序员在<strong>controller层</strong>中由**@RequestMapping<strong>标注的</strong>controller控制器方法**。</p>
+<h5 id="获取处理器适配器"><a href="#获取处理器适配器" class="headerlink" title="获取处理器适配器"></a>获取处理器适配器</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425213716357.png"></p>
+<p>具体方法如下</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425213930476.png"></p>
+<p>判断当前的处理器适配器集合handlerAdapters是否为空，若不为空，则循环遍历。</p>
+<p>supports方法判断该适配器HandlerAdapter是否支持该处理器handler，HandlerAdapter通常只支持一种handler类型。</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425214221487.png"></p>
+<p>该handlerAdapters中有三个handlerAdapter：</p>
+<ul>
+<li>HttpRequestHandler</li>
+<li>SimpleControllerHandlerAdapter        </li>
+<li>RequestMappingHandlerAdapter</li>
+</ul>
+<p>getHandlerAdapter方法会返回合适的HandlerAdapter</p>
+<h5 id="处理最后修改的请求头"><a href="#处理最后修改的请求头" class="headerlink" title="处理最后修改的请求头"></a>处理最后修改的请求头</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425214937219.png"></p>
+<h5 id="拦截器preHandle"><a href="#拦截器preHandle" class="headerlink" title="拦截器preHandle"></a>拦截器preHandle</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425215040174-1.png"></p>
+<p><strong>正序遍历</strong>拦截器集合interceptorList，若拦截出错，则调用triggerAfterCompletion方法：在映射的HandlerInterceptor上触发完成后回调。将只为其预处理调用已成功完成并返回true的所有拦截器调用<strong>afterCompletion</strong>。返回false后，doDispatch方法结束。</p>
+<p>将正常执行preHandle方法的拦截器总数赋值给<strong>interceptorIndex</strong></p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425215057847.png"></p>
+<h5 id="调用处理器"><a href="#调用处理器" class="headerlink" title="调用处理器"></a>调用处理器</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ModelAndView</span> <span class="variable">mv</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="type">HandlerAdapter</span> <span class="variable">ha</span> <span class="operator">=</span> getHandlerAdapter(mappedHandler.getHandler());</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425215530433.png"></p>
+<p>HandlerAdapter处理器适配器通过调用**<code>handle</code>**方法来执行控制器方法（mappedHandler.getHandler()）</p>
+<h5 id="拦截器postHandle"><a href="#拦截器postHandle" class="headerlink" title="拦截器postHandle"></a>拦截器postHandle</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425215818720.png"></p>
+<p>应用默认视图名称，处理器执行链（mappedHandler），即controller层中与对应请求映射的控制器方法，调用拦截器的postHandle</p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425220111732.png"></p>
+<p><strong>反序遍历</strong>拦截器集合，调用其对应的postHandle方法。</p>
+<h5 id="处理调度结果"><a href="#处理调度结果" class="headerlink" title="处理调度结果"></a>处理调度结果</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425220321763.png"></p>
+<p>捕获前面的代码出现的异常并赋给dispatchException</p>
+<p>调用processDispatchResult处理调度结果</p>
+<h4 id="processDispatchResult"><a href="#processDispatchResult" class="headerlink" title="processDispatchResult"></a>processDispatchResult</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">processDispatchResult</span><span class="params">(HttpServletRequest request, HttpServletResponse response,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@Nullable</span> HandlerExecutionChain mappedHandler, <span class="meta">@Nullable</span> ModelAndView mv,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@Nullable</span> Exception exception)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">boolean</span> <span class="variable">errorView</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (exception != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (exception <span class="keyword">instanceof</span> ModelAndViewDefiningException) &#123;</span><br><span class="line">            logger.debug(<span class="string">&quot;ModelAndViewDefiningException encountered&quot;</span>, exception);</span><br><span class="line">            mv = ((ModelAndViewDefiningException) exception).getModelAndView();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="type">Object</span> <span class="variable">handler</span> <span class="operator">=</span> (mappedHandler != <span class="literal">null</span> ? mappedHandler.getHandler() : <span class="literal">null</span>);</span><br><span class="line">            mv = processHandlerException(request, response, handler, exception);</span><br><span class="line">            errorView = (mv != <span class="literal">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Did the handler return a view to render?</span></span><br><span class="line">    <span class="keyword">if</span> (mv != <span class="literal">null</span> &amp;&amp; !mv.wasCleared()) &#123;</span><br><span class="line">        <span class="comment">// 处理模型数据和渲染视图</span></span><br><span class="line">        render(mv, request, response);</span><br><span class="line">        <span class="keyword">if</span> (errorView) &#123;</span><br><span class="line">            WebUtils.clearErrorRequestAttributes(request);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (logger.isTraceEnabled()) &#123;</span><br><span class="line">            logger.trace(<span class="string">&quot;No view rendering, null ModelAndView returned.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) &#123;</span><br><span class="line">        <span class="comment">// Concurrent handling started during a forward</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mappedHandler != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// Exception (if any) is already handled..</span></span><br><span class="line">        <span class="comment">// 调用拦截器的afterCompletion()</span></span><br><span class="line">        mappedHandler.triggerAfterCompletion(request, response, <span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="错误视图"><a href="#错误视图" class="headerlink" title="错误视图"></a>错误视图</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425220706059.png"></p>
+<p>根据前面的dispatchException进行判断：</p>
+<p>若有异常：若自定义了错误视图，则将其赋给ModelAndView类型变量mv；否则使用默认的错误视图。</p>
+<h5 id="渲染视图"><a href="#渲染视图" class="headerlink" title="渲染视图"></a>渲染视图</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425220926558.png"></p>
+<p>调用**<code>render</code>**方法进行视图的渲染</p>
+<h5 id="拦截器afterCompletion"><a href="#拦截器afterCompletion" class="headerlink" title="拦截器afterCompletion"></a>拦截器afterCompletion</h5><p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425221023029.png"></p>
+<p><img src="https://www.yumoyumo.top/wp-content/uploads/2022/04/image-20220425221208198.png"></p>
+<p><strong>反序遍历</strong>拦截器集合interceptorList，根据interceptorIndex，使得所有正常执行的拦截器调用afterCompletion方法</p>
+<p>至此，DispatcherServlet调用组件处理请求的全过程完毕。</p>
+<h2 id="SpringMVC的执行流程"><a href="#SpringMVC的执行流程" class="headerlink" title="SpringMVC的执行流程"></a>SpringMVC的执行流程</h2><p>对SpringMVC整个的执行流程总结如下：</p>
+<ol>
+<li>用户向服务器发送请求，请求被SpringMVC 前端控制器 DispatcherServlet捕获。</li>
+<li>DispatcherServlet对请求URL进行解析，得到请求资源标识符（URI），判断请求URI对应的映射：</li>
+</ol>
+<p>a) 不存在</p>
+<p>i. 再判断是否配置了mvc:default-servlet-handler</p>
+<p>ii. 如果没配置，则控制台报映射查找不到，客户端展示404错误<br><img src="https://img-blog.csdnimg.cn/img_convert/584a1aa83611354bbd93ea8457459659.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/a37e15c07f070cfac014ab7b44f55876.png"></p>
+<p>iii. 如果有配置，则访问目标资源（一般为静态资源，如：JS,CSS,HTML），找不到客户端也会展示404错误</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/9519da76739af3d582c5957713b25c06.png"></p>
+<p>b) 存在则执行下面的流程</p>
+<p>​	3.根据该URI，调用HandlerMapping获得该Handler配置的所有相关的对象（包括Handler对象以及Handler对象对应的拦截器），最后以HandlerExecutionChain执行链对象的形式返回。</p>
+<p>​	4.DispatcherServlet 根据获得的Handler，选择一个合适的HandlerAdapter。</p>
+<p>​	5.如果成功获得HandlerAdapter，此时将开始执行拦截器的preHandler(…)方法【正向】</p>
+<p>​	6.提取Request中的模型数据，填充Handler入参，开始执行Handler（Controller)方法，处理请求。在填充Handler的入参过程中，根据你的配置，Spring将帮你做一些额外的工作：</p>
+<p>a) HttpMessageConveter： 将请求消息（如Json、xml等数据）转换成一个对象，将对象转换为指定的响应信息</p>
+<p>b) 数据转换：对请求消息进行数据转换。如String转换成Integer、Double等</p>
+<p>c) 数据格式化：对请求消息进行数据格式化。 如将字符串转换成格式化数字或格式化日期等</p>
+<p>d) 数据验证： 验证数据的有效性（长度、格式等），验证结果存储到BindingResult或Error中</p>
+<p>​	7.Handler执行完成后，向DispatcherServlet 返回一个ModelAndView对象。</p>
+<p>​	8.此时将开始执行拦截器的postHandle(…)方法【逆向】。</p>
+<p>​	9.根据返回的ModelAndView（此时会判断是否存在异常：如果存在异常，则执行HandlerExceptionResolver进行异常处理）选择一个适合的ViewResolver进行视图解析，根据Model和View，来渲染视图。</p>
+<p>​	10.渲染视图完毕执行拦截器的afterCompletion(…)方法【逆向】。</p>
+<p>​	11.将渲染结果返回给客户端。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SpringMVC%E5%B8%B8%E7%94%A8%E7%BB%84%E4%BB%B6"><span class="toc-number">1.</span> <span class="toc-text">SpringMVC常用组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DispatcherServlet%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">DispatcherServlet初始化过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81Servlet"><span class="toc-number">2.1.</span> <span class="toc-text">1、Servlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81GenericServlet"><span class="toc-number">2.2.</span> <span class="toc-text">2、GenericServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81HttpServlet"><span class="toc-number">2.3.</span> <span class="toc-text">3、HttpServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81HttpServletBean"><span class="toc-number">2.4.</span> <span class="toc-text">4、HttpServletBean</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E8%AE%BE%E7%BD%AEbean-properties"><span class="toc-number">2.4.1.</span> <span class="toc-text">1、设置bean properties</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E8%B0%83%E7%94%A8initServletBean"><span class="toc-number">2.4.2.</span> <span class="toc-text">2、调用initServletBean</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81FrameworkServlet"><span class="toc-number">2.5.</span> <span class="toc-text">5、FrameworkServlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96WebApplicationContext"><span class="toc-number">2.5.1.</span> <span class="toc-text">初始化WebApplicationContext</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5%E5%B7%B2%E6%9C%89"><span class="toc-number">2.5.1.1.</span> <span class="toc-text">检查已有</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA"><span class="toc-number">2.5.1.2.</span> <span class="toc-text">创建</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%B7%E6%96%B0"><span class="toc-number">2.5.2.</span> <span class="toc-text">刷新</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6%E3%80%81DispatcherServlet"><span class="toc-number">2.6.</span> <span class="toc-text">6、DispatcherServlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E7%AD%96%E7%95%A5"><span class="toc-number">2.6.1.</span> <span class="toc-text">初始化策略</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DispatcherServlet%E8%B0%83%E7%94%A8%E7%BB%84%E4%BB%B6%E5%A4%84%E7%90%86%E8%AF%B7%E6%B1%82"><span class="toc-number">3.</span> <span class="toc-text">DispatcherServlet调用组件处理请求</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81Servlet-1"><span class="toc-number">3.1.</span> <span class="toc-text">1、Servlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81GenericServlet-1"><span class="toc-number">3.2.</span> <span class="toc-text">2、GenericServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81HttpServlet-1"><span class="toc-number">3.3.</span> <span class="toc-text">3、HttpServlet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81FrameworkServlet"><span class="toc-number">3.4.</span> <span class="toc-text">4、FrameworkServlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#processRequest"><span class="toc-number">3.4.1.</span> <span class="toc-text">processRequest</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#doservice"><span class="toc-number">3.4.2.</span> <span class="toc-text">doservice</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81DispatcherServlet"><span class="toc-number">3.5.</span> <span class="toc-text">5、DispatcherServlet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#doservice-1"><span class="toc-number">3.5.1.</span> <span class="toc-text">doservice</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BF%9D%E7%95%99%E5%BF%AB%E7%85%A7"><span class="toc-number">3.5.1.1.</span> <span class="toc-text">保留快照</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E8%AF%B7%E6%B1%82%E5%B1%9E%E6%80%A7"><span class="toc-number">3.5.1.2.</span> <span class="toc-text">设置请求属性</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B7%B3%E8%BD%AC%E7%AE%A1%E7%90%86"><span class="toc-number">3.5.1.3.</span> <span class="toc-text">跳转管理</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E8%AF%B7%E6%B1%82%E8%B7%AF%E5%BE%84"><span class="toc-number">3.5.1.4.</span> <span class="toc-text">解析请求路径</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A7%94%E6%89%98doDispatch%E8%B0%83%E5%BA%A6"><span class="toc-number">3.5.1.5.</span> <span class="toc-text">委托doDispatch调度</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#doDispatch"><span class="toc-number">3.5.2.</span> <span class="toc-text">doDispatch</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90"><span class="toc-number">3.5.2.1.</span> <span class="toc-text">文件解析</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E5%A4%84%E7%90%86%E5%99%A8%E6%89%A7%E8%A1%8C%E9%93%BE"><span class="toc-number">3.5.2.2.</span> <span class="toc-text">获取处理器执行链</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E5%A4%84%E7%90%86%E5%99%A8%E9%80%82%E9%85%8D%E5%99%A8"><span class="toc-number">3.5.2.3.</span> <span class="toc-text">获取处理器适配器</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E6%9C%80%E5%90%8E%E4%BF%AE%E6%94%B9%E7%9A%84%E8%AF%B7%E6%B1%82%E5%A4%B4"><span class="toc-number">3.5.2.4.</span> <span class="toc-text">处理最后修改的请求头</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8preHandle"><span class="toc-number">3.5.2.5.</span> <span class="toc-text">拦截器preHandle</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B0%83%E7%94%A8%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-number">3.5.2.6.</span> <span class="toc-text">调用处理器</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8postHandle"><span class="toc-number">3.5.2.7.</span> <span class="toc-text">拦截器postHandle</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E8%B0%83%E5%BA%A6%E7%BB%93%E6%9E%9C"><span class="toc-number">3.5.2.8.</span> <span class="toc-text">处理调度结果</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#processDispatchResult"><span class="toc-number">3.5.3.</span> <span class="toc-text">processDispatchResult</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%94%99%E8%AF%AF%E8%A7%86%E5%9B%BE"><span class="toc-number">3.5.3.1.</span> <span class="toc-text">错误视图</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B8%B2%E6%9F%93%E8%A7%86%E5%9B%BE"><span class="toc-number">3.5.3.2.</span> <span class="toc-text">渲染视图</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8afterCompletion"><span class="toc-number">3.5.3.3.</span> <span class="toc-text">拦截器afterCompletion</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SpringMVC%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">SpringMVC的执行流程</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&text=SpringMVC手撕源码"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&is_video=false&description=SpringMVC手撕源码"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=SpringMVC手撕源码&body=Check out this article: https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&title=SpringMVC手撕源码"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&name=SpringMVC手撕源码&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/04/25/%E5%90%8E%E7%AB%AF/SpringMVC%E6%89%8B%E6%92%95%E6%BA%90%E7%A0%81/&t=SpringMVC手撕源码"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

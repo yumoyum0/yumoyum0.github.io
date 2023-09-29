@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="AQS导图 概念AbstractQueuedSynchronizer（抽象的队列同步器，简称AQS）  是用来实现锁或者其它同步器组件的公共基础部分的抽象实现， 是重量级基础框架及整个JUC体系的基石，主要用于解决锁分配给”谁”的问题 文档解释   为实现阻塞锁和相关的同步器提供一个框架，它是依赖于一个先进先出的等待队列 依靠单个原子int值表示状态，通过占用和释放方法，改变状态值  整体就是一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AQS原理">
+<meta property="og:url" content="https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="AQS导图 概念AbstractQueuedSynchronizer（抽象的队列同步器，简称AQS）  是用来实现锁或者其它同步器组件的公共基础部分的抽象实现， 是重量级基础框架及整个JUC体系的基石，主要用于解决锁分配给”谁”的问题 文档解释   为实现阻塞锁和相关的同步器提供一个框架，它是依赖于一个先进先出的等待队列 依靠单个原子int值表示状态，通过占用和释放方法，改变状态值  整体就是一个">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224182536690.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224180615349.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224181810058.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224182214727.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224182707225.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224183335797.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224183355548.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224183409450.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224185457286.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224191040218.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224190300698.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224191511067.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224191728175.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224192144654.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224192926295.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224193228346.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224205722652.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160330639.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160521697.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160708634.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160736934.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160920892.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309161149103.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309162536480.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309173758734.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309173908366.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309180557277.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309182000518.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309184750665.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309184811415.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309184353808.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309184919921.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309192218477.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309185002159.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204626026.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204647554.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310124612566.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204705392.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204727333.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310130212836.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204756293.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310130603998.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310130651593.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310130955623.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310131215208.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310131916466.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310143904559.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310144010389.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310144045718.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310144107224.png">
+<meta property="article:published_time" content="2023-03-11T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-28T08:10:48.422Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="并发">
+<meta property="article:tag" content="JUC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224182536690.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>AQS原理</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/03/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/IO%E6%A8%A1%E5%9E%8B/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&%E9%82%AE%E6%88%B3%E9%94%81/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&text=AQS原理"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&is_video=false&description=AQS原理"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=AQS原理&body=Check out this article: https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&name=AQS原理&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&t=AQS原理"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#AQS"><span class="toc-number">1.</span> <span class="toc-text">AQS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BC%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">导图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5"><span class="toc-number">1.2.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JUC%E7%9A%84%E5%9F%BA%E7%9F%B3-AQS"><span class="toc-number">1.3.</span> <span class="toc-text">JUC的基石 - AQS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">1.3.1.</span> <span class="toc-text">锁和同步器的关系</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8"><span class="toc-number">1.3.2.</span> <span class="toc-text">作用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AQS%E5%86%85%E9%83%A8%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">1.4.</span> <span class="toc-text">AQS内部体系架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AQS%E8%87%AA%E8%BA%AB"><span class="toc-number">1.4.1.</span> <span class="toc-text">AQS自身</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E7%8A%B6%E6%80%81State%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">同步状态State成员变量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CLH%E9%98%9F%E5%88%97"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">CLH队列</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Node%E5%86%85%E9%83%A8%E7%B1%BB"><span class="toc-number">1.4.2.</span> <span class="toc-text">Node内部类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B1%9E%E6%80%A7%E8%AF%B4%E6%98%8E"><span class="toc-number">1.4.2.1.</span> <span class="toc-text">属性说明</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ReentrantLock%E5%BA%95%E5%B1%82%E6%BA%90%E7%A0%81"><span class="toc-number">1.5.</span> <span class="toc-text">ReentrantLock底层源码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%9D%E8%AF%95%E8%8E%B7%E5%8F%96%E9%94%81"><span class="toc-number">1.5.1.</span> <span class="toc-text">尝试获取锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#lock"><span class="toc-number">1.5.1.1.</span> <span class="toc-text">lock()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%AC%E5%B9%B3%E5%92%8C%E9%9D%9E%E5%85%AC%E5%B9%B3"><span class="toc-number">1.5.1.2.</span> <span class="toc-text">公平和非公平</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#acquire"><span class="toc-number">1.5.1.3.</span> <span class="toc-text">acquire()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">1.5.1.4.</span> <span class="toc-text"></span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#tryAcquire"><span class="toc-number">1.5.1.4.1.</span> <span class="toc-text">tryAcquire</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#addWaiter"><span class="toc-number">1.5.1.4.2.</span> <span class="toc-text">addWaiter</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#acquireQueued"><span class="toc-number">1.5.1.4.3.</span> <span class="toc-text">acquireQueued</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#shouldParkAterFailedAcquire"><span class="toc-number">1.5.1.4.3.1.</span> <span class="toc-text">shouldParkAterFailedAcquire</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#parkAndCheckInterrupt"><span class="toc-number">1.5.1.4.3.2.</span> <span class="toc-text">parkAndCheckInterrupt</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%94%A4%E9%86%92%E9%98%BB%E5%A1%9E%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.5.2.</span> <span class="toc-text">唤醒阻塞线程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#release"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">release</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tryRelease"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">tryRelease</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unparkSuccessor"><span class="toc-number">1.5.2.3.</span> <span class="toc-text">unparkSuccessor</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#acquireQueued-1"><span class="toc-number">1.5.2.4.</span> <span class="toc-text">acquireQueued</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cancelAcquire"><span class="toc-number">1.5.3.</span> <span class="toc-text">cancelAcquire</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.6.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        AQS原理
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-03-11T08:51:33.000Z" class="dt-published" itemprop="datePublished">2023-03-11</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/JUC/" rel="tag">JUC</a>, <a class="p-category" href="/tags/Java/" rel="tag">Java</a>, <a class="p-category" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="AQS"><a href="#AQS" class="headerlink" title="AQS"></a>AQS</h1><h2 id="导图"><a href="#导图" class="headerlink" title="导图"></a>导图</h2><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224182536690.png" alt="image-20230224182536690"></p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p><strong>AbstractQueuedSynchronizer</strong>（抽象的队列同步器，简称<strong>AQS</strong>）</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224180615349.png" alt="image-20230224180615349"></p>
+<p>是用来实现锁或者其它同步器组件的公共基础部分的抽象实现，</p>
+<p><strong>是重量级基础框架及整个JUC体系的基石，主要用于解决锁分配给”谁”的问题</strong></p>
+<p><strong>文档解释</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224181810058.png" alt="image-20230224181810058"></p>
+<ul>
+<li>为实现阻塞锁和相关的同步器提供一个框架，它是依赖于一个先进先出的等待队列</li>
+<li>依靠单个原子int值表示状态，通过占用和释放方法，改变状态值</li>
+</ul>
+<p>整体就是一个抽象的FIFO<strong>队列</strong>来完成资源获取线程的排队工作，并通过一个<strong>int类变量</strong>表示持有锁的状态</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224182214727.png" alt="image-20230224182214727"></p>
+<p>CLH:Craig、Landin and Hagersten队列，是一个单向链表，AQS中的队列是<strong>CLH变体的虚拟双向队列FIFO</strong></p>
+<h2 id="JUC的基石-AQS"><a href="#JUC的基石-AQS" class="headerlink" title="JUC的基石 - AQS"></a>JUC的基石 - AQS</h2><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224182707225.png" alt="image-20230224182707225"></p>
+<ul>
+<li><p>**<code>ReentrantLock</code>**：ReentrantLock 是一次只允许一个线程访问某个资源</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224183335797.png" alt="image-20230224183335797"></p>
+</li>
+<li><p>**<code>CountDownLatch（做加法）</code>**：CountDownLatch 是一个同步工具类，用来协调多个线程之间的同步。这个工具通常用来控制线程等待，它可以让每一个线程<code>countDown()</code>，直到所有线程全部执行结束<code>await()</code>，再开始执行。 </p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224183355548.png" alt="image-20230224183355548"></p>
+</li>
+<li><p>**<code>CyclicBarrier(循环栅栏|做减法)</code>**：CyclicBarrier 和 CountDownLatch 非常类似，它也可以实现线程间的技术等待，但是它的功能比 CountDownLatch 更加复杂和强大。主要应用场景和 CountDownLatch 类似。CyclicBarrier 的字面意思是可循环使用（Cyclic）的屏障（Barrier）。它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活。CyclicBarrier 默认的构造方法是 <code>CyclicBarrier(int parties)</code>，其参数表示屏障拦截的线程数量，每个线程调用 <code>await()</code> 方法告诉 CyclicBarrier 我已经到达了屏障，然后当前线程被阻塞。 </p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224183409450.png" alt="image-20230224183409450"></p>
+</li>
+<li><p><strong><code>Semaphore(信号量|规定停车位|做限流)</code></strong>-<strong>允许多个线程同时访问，因为信号量的数量往往大于1</strong>：synchronized 和 ReentrantLock 都是一次只允许一个线程访问某个资源，Semaphore(信号量)可以指定多个线程同时访问某个资源。</p>
+</li>
+</ul>
+<h3 id="锁和同步器的关系"><a href="#锁和同步器的关系" class="headerlink" title="锁和同步器的关系"></a>锁和同步器的关系</h3><ul>
+<li><p>锁，面向锁的使用者</p>
+</li>
+<li><p>同步器，面向锁的实现者</p>
+<p>DougLee 提出统一规范并简化了锁的实现，将其<strong>抽象出来</strong>，屏蔽了同步状态管理、同步队列的管理和维护、阻塞线程排队和通知、唤醒机制等，是一切锁和同步组件实现的<strong>公共基础部分</strong></p>
+</li>
+</ul>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p><strong>加锁会导致阻塞</strong>，有阻塞就需要排队，实现排队必然需要队列。</p>
+<p>抢到资源的线程直接使用处理业务，抢不到资源的必然涉及一种<strong>排队等候机制</strong>。</p>
+<p>抢占资源失败的线程继续去等待（类似银行业务办理窗口都满了，暂时没有受理窗口的顾客只能去候客区排队等候)，但等候线程仍然保留获取锁的可能且获取锁流程仍在继续（候客区的顾客也在等着叫号，轮到了再去受理窗口办理业务)。</p>
+<p>既然说到了<strong>排队等候机制</strong>，那么就一定会有某种队列形成，这样的队列是什么数据结构呢？</p>
+<p>如果共享资源被占用，<strong>就需要一定的阻塞等待唤醒机制来保证锁分配</strong>。这个机制主要用的是<strong>CLH</strong>队列的变体实现的，将暂时获取不到锁的线程加入到队列中，这个队列就是<strong>AQS</strong>同步队列的抽象表现。它将要请求共享资源的线程及自身的等待状态封装成队列的结点对象(<strong>Node</strong>)，通过<strong>CAS</strong>、自旋以及<strong>LockSupport.park()<strong>的方式，维护</strong>state</strong>变量的状态，使并发达到同步的效果，</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224185457286.png" alt="image-20230224185457286"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224191040218.png"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224190300698.png" alt="image-20230224190300698"></p>
+<h2 id="AQS内部体系架构"><a href="#AQS内部体系架构" class="headerlink" title="AQS内部体系架构"></a>AQS内部体系架构</h2><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224191511067.png" alt="image-20230224191511067"></p>
+<h3 id="AQS自身"><a href="#AQS自身" class="headerlink" title="AQS自身"></a>AQS自身</h3><h4 id="同步状态State成员变量"><a href="#同步状态State成员变量" class="headerlink" title="同步状态State成员变量"></a>同步状态State成员变量</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224191728175.png" alt="image-20230224191728175"></p>
+<p>类似于银行处理业务的受理窗口状态：</p>
+<ul>
+<li>0 即无人，自由状态可办理</li>
+<li>大于等于1，有人占用窗口，进入等候区</li>
+</ul>
+<h4 id="CLH队列"><a href="#CLH队列" class="headerlink" title="CLH队列"></a>CLH队列</h4><p>为一个双向队列</p>
+<p>类似于银行等候区的等待顾客</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224192144654.png" alt="image-20230224192144654"></p>
+<h3 id="Node内部类"><a href="#Node内部类" class="headerlink" title="Node内部类"></a>Node内部类</h3><h4 id="属性说明"><a href="#属性说明" class="headerlink" title="属性说明"></a>属性说明</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">Node</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** Marker to indicate a node is waiting in shared mode */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Node</span> <span class="variable">SHARED</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** Marker to indicate a node is waiting in exclusive mode */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Node</span> <span class="variable">EXCLUSIVE</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** waitStatus value to indicate thread has cancelled */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 线程被取消了 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">CANCELLED</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** waitStatus value to indicate successor&#x27;s thread needs unparking */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 后续线程需要唤醒 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">SIGNAL</span> <span class="operator">=</span> -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** waitStatus value to indicate thread is waiting on condition */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 等待condition唤醒 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">CONDITION</span> <span class="operator">=</span> -<span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** waitStatus value to indicate the next acquireShared should unconditionally propagate */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 共享式同步状态获取将会无条件的传播下去 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">PROPAGATE</span> <span class="operator">=</span> -<span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始为0，状态就是以上几种</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">int</span> waitStatus;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">volatile</span> Node prev;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">volatile</span> Node next;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** The thread that enqueued this node. Initialized on construction and nulled out after use. */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">volatile</span> Thread thread;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* Link to next node waiting on condition, or the special</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* value SHARED. Because condition queues are accessed only</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* when holding in exclusive mode, we just need a simple</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* linked queue to hold nodes while they are waiting on</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* conditions. They are then transferred to the queue to</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* re-acquire. And because conditions can only be exclusive,</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* we save a field by using special value to indicate shared</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* mode.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line">    Node nextWaiter;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* Returns true if node is waiting in shared mode.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="type">boolean</span> <span class="title function_">isShared</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> nextWaiter == SHARED;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* Returns previous node, or throws NullPointerException if null.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* Use when predecessor cannot be null. The null check could</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* be elided, but is present to help the VM.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">* <span class="doctag">@return</span> the predecessor of this node</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> Node <span class="title function_">predecessor</span><span class="params">()</span> <span class="keyword">throws</span> NullPointerException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">Node</span> <span class="variable">p</span> <span class="operator">=</span> prev;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (p == <span class="literal">null</span>)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NullPointerException</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> p;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Node() &#123; <span class="comment">// Used to establish initial head or SHARED marker</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Node(Thread thread, Node mode) &#123; <span class="comment">// Used by addWaiter</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.nextWaiter = mode;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.thread = thread;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Node(Thread thread, <span class="type">int</span> waitStatus) &#123; <span class="comment">// Used by Condition</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.waitStatus = waitStatus;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.thread = thread;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224192926295.png" alt="image-20230224192926295"></p>
+<p><strong>java17</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224193228346.png" alt="image-20230224193228346"></p>
+<h2 id="ReentrantLock底层源码"><a href="#ReentrantLock底层源码" class="headerlink" title="ReentrantLock底层源码"></a>ReentrantLock底层源码</h2><h3 id="尝试获取锁"><a href="#尝试获取锁" class="headerlink" title="尝试获取锁"></a>尝试获取锁</h3><p>Lock接口的实现类，基本都是通过<strong>聚合</strong>了一个<strong>队列同步器</strong>的子类完成线程访问控制的</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230224205722652.png" alt="image-20230224205722652"></p>
+<p><strong>构造方法</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160330639.png" alt="image-20230309160330639"></p>
+<h4 id="lock"><a href="#lock" class="headerlink" title="lock()"></a><strong>lock()</strong></h4><ul>
+<li><p><strong>ReentrantLock$lock()</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160521697.png" alt="image-20230309160521697"></p>
+</li>
+<li><p><strong>Sync$lock()</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160708634.png" alt="image-20230309160708634"></p>
+<ul>
+<li><p><strong>NonfairSync$lock()</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160736934.png" alt="image-20230309160736934"></p>
+</li>
+<li><p><strong>FairSync$lock()</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309160920892.png" alt="image-20230309160920892"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="公平和非公平"><a href="#公平和非公平" class="headerlink" title="公平和非公平"></a>公平和非公平</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309161149103.png" alt="image-20230309161149103"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309162536480.png" alt="image-20230309162536480"></p>
+<p>采用了<strong>模板方法设计模式</strong></p>
+<p>hasQueuedPredecessors()中判断了是否需要排队，导致公平锁和非公平锁的差异如下：</p>
+<ul>
+<li><strong>公平锁</strong>：公平锁讲究先来先到，线程在获取锁时，如果这个锁的等待队列中己经有线程在等待，那么当前线程就会进入等待队列中；</li>
+<li><strong>非公平锁</strong>：不管是否有等待队列，如果可以获取锁，则立刻占有锁对象。也就是说队列的第一个排队线程苏醒后，不一定就是排头的这个线程获得锁，它还是需要参加竞争锁（存在线程竞争的情况下），后来的线程可能不讲武德插队夺锁了。</li>
+</ul>
+<h4 id="acquire"><a href="#acquire" class="headerlink" title="acquire()"></a>acquire()</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309173758734.png" alt="image-20230309173758734"></p>
+<p>以非公平锁为例：</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309173908366.png" alt="image-20230309173908366"></p>
+<ul>
+<li>NonfairSync若state&#x3D;0，没人占锁，直接CAS修改状态位state，然后当前线程占锁<code>setExclusiveOwnerThread(Thread.currentThread())</code></li>
+<li>否则，NonfairSync的方法acquire去尝试获得锁，分三步<code>tryAcquire</code>|<code>addWaiter</code>|<code>acquireQueued</code></li>
+</ul>
+<h4 id=""><a href="#" class="headerlink" title=""></a></h4><h5 id="tryAcquire"><a href="#tryAcquire" class="headerlink" title="tryAcquire"></a>tryAcquire</h5><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309180557277.png" alt="image-20230309180557277"></p>
+<ul>
+<li>先获取当前同步状态<ul>
+<li>若为0，则无占用线程，当前线程CAS修改state，成功则设置当前线程为独占线程</li>
+<li>若为1，则被占用。判断当前线程是否是该独占线程，若是则添加重入次数并设置state</li>
+</ul>
+</li>
+<li>若不是返回false，继续执行addWaiter()方法</li>
+</ul>
+<h5 id="addWaiter"><a href="#addWaiter" class="headerlink" title="addWaiter"></a>addWaiter</h5><p>创建并入队由当前线程和给定模式（这里是排他）组成的结点</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309182000518.png" alt="image-20230309182000518"></p>
+<p><strong>enq()</strong></p>
+<p>先设置一个虚拟结点（哨兵结点），然后将头尾指针指向它</p>
+<p>然后将新结点设置完后返回该结点</p>
+<p>双向链表中，<strong>第一个节点为虚节点（也叫哨兵节点）</strong>，其实并不存储任何信息，只是占位。</p>
+<p>真正的第一个有数据的节点，是从第二个节点开始的。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309184750665.png" alt="image-20230309184750665"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309184811415.png" alt="image-20230309184811415"></p>
+<h5 id="acquireQueued"><a href="#acquireQueued" class="headerlink" title="acquireQueued"></a>acquireQueued</h5><p>acquireQueued当中<code>for (;;) &#123;...&#125;</code>这是个大的<strong>自旋</strong> </p>
+<p>自旋当中会调用如下方法：<code>shouldParkAterFailedAcquire</code>和<code>parkAndCheckInterrupt</code></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309184353808.png" alt="image-20230309184353808"></p>
+<h6 id="shouldParkAterFailedAcquire"><a href="#shouldParkAterFailedAcquire" class="headerlink" title="shouldParkAterFailedAcquire"></a>shouldParkAterFailedAcquire</h6><p>如果前驱节点的 waitStatus是<strong>SIGNAL</strong>状态，即 <code>shouldParkAfterFailedAcquire</code>方法会返回 true程序会继续向下执行<code>parkAndCheckInterrupt</code>方法，用于将当前线程挂起</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309184919921.png" alt="image-20230309184919921"></p>
+<h6 id="parkAndCheckInterrupt"><a href="#parkAndCheckInterrupt" class="headerlink" title="parkAndCheckInterrupt"></a>parkAndCheckInterrupt</h6><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309192218477.png" alt="image-20230309192218477"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309185002159.png" alt="image-20230309185002159"></p>
+<h3 id="唤醒阻塞线程"><a href="#唤醒阻塞线程" class="headerlink" title="唤醒阻塞线程"></a>唤醒阻塞线程</h3><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204626026.png" alt="image-20230309204626026"></p>
+<h4 id="release"><a href="#release" class="headerlink" title="release"></a>release</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204647554.png" alt="image-20230309204647554"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310124612566.png" alt="image-20230310124612566"></p>
+<h4 id="tryRelease"><a href="#tryRelease" class="headerlink" title="tryRelease"></a>tryRelease</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204705392.png" alt="image-20230309204705392"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204727333.png" alt="image-20230309204727333"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310130212836.png"></p>
+<h4 id="unparkSuccessor"><a href="#unparkSuccessor" class="headerlink" title="unparkSuccessor"></a>unparkSuccessor</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230309204756293.png" alt="image-20230309204756293"></p>
+<p>这段代码执行完毕后,之前的哨兵节点和B节点的waitStatus从原来的-1变成0</p>
+<p>B、C线程获取到Permit</p>
+<h4 id="acquireQueued-1"><a href="#acquireQueued-1" class="headerlink" title="acquireQueued"></a>acquireQueued</h4><p><strong>setHead</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310130603998.png" alt="image-20230310130603998"></p>
+<p>③代码执行完毕后,会出现如下图所示</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310130651593.png" alt="image-20230310130651593"></p>
+<p>原有的傀儡节点离开，有助于GC</p>
+<p>线程B真正的执行业务去了，留下了线程B的空壳节点成为新的傀儡节点</p>
+<h3 id="cancelAcquire"><a href="#cancelAcquire" class="headerlink" title="cancelAcquire"></a>cancelAcquire</h3><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310130955623.png" alt="image-20230310130955623"></p>
+<p><strong>初始情况</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310131215208.png" alt="image-20230310131215208"></p>
+<ul>
+<li><p>例要删除队尾节点5</p>
+<p>若节点4的<code>waitStatus != CANCELLED</code> ，则pre &#x3D; 节点4，tail &#x3D; 节点4</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310131916466.png" alt="image-20230310131916466"></p>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整个ReentrantLock的加锁过程，可以分为三个阶段：</p>
+<ol>
+<li>尝试加锁，</li>
+<li>加锁失败，线程入队列：</li>
+<li>线程入队列后，进入阻塞状态。</li>
+</ol>
+<ul>
+<li><strong><code>lock() - &gt; acquire -&gt; tryAcquire -&gt; addWaiter</code></strong></li>
+</ul>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310143904559.png" alt="image-20230310143904559"></p>
+<ul>
+<li><p><strong>addWaiter</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310144010389.png" alt="image-20230310144010389"></p>
+</li>
+<li><p><strong>acquireQueued</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310144045718.png" alt="image-20230310144045718"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230310144107224.png" alt="image-20230310144107224"></p>
+</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#AQS"><span class="toc-number">1.</span> <span class="toc-text">AQS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BC%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">导图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5"><span class="toc-number">1.2.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JUC%E7%9A%84%E5%9F%BA%E7%9F%B3-AQS"><span class="toc-number">1.3.</span> <span class="toc-text">JUC的基石 - AQS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">1.3.1.</span> <span class="toc-text">锁和同步器的关系</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8"><span class="toc-number">1.3.2.</span> <span class="toc-text">作用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AQS%E5%86%85%E9%83%A8%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">1.4.</span> <span class="toc-text">AQS内部体系架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AQS%E8%87%AA%E8%BA%AB"><span class="toc-number">1.4.1.</span> <span class="toc-text">AQS自身</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E7%8A%B6%E6%80%81State%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">同步状态State成员变量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CLH%E9%98%9F%E5%88%97"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">CLH队列</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Node%E5%86%85%E9%83%A8%E7%B1%BB"><span class="toc-number">1.4.2.</span> <span class="toc-text">Node内部类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B1%9E%E6%80%A7%E8%AF%B4%E6%98%8E"><span class="toc-number">1.4.2.1.</span> <span class="toc-text">属性说明</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ReentrantLock%E5%BA%95%E5%B1%82%E6%BA%90%E7%A0%81"><span class="toc-number">1.5.</span> <span class="toc-text">ReentrantLock底层源码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%9D%E8%AF%95%E8%8E%B7%E5%8F%96%E9%94%81"><span class="toc-number">1.5.1.</span> <span class="toc-text">尝试获取锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#lock"><span class="toc-number">1.5.1.1.</span> <span class="toc-text">lock()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%AC%E5%B9%B3%E5%92%8C%E9%9D%9E%E5%85%AC%E5%B9%B3"><span class="toc-number">1.5.1.2.</span> <span class="toc-text">公平和非公平</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#acquire"><span class="toc-number">1.5.1.3.</span> <span class="toc-text">acquire()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">1.5.1.4.</span> <span class="toc-text"></span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#tryAcquire"><span class="toc-number">1.5.1.4.1.</span> <span class="toc-text">tryAcquire</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#addWaiter"><span class="toc-number">1.5.1.4.2.</span> <span class="toc-text">addWaiter</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#acquireQueued"><span class="toc-number">1.5.1.4.3.</span> <span class="toc-text">acquireQueued</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#shouldParkAterFailedAcquire"><span class="toc-number">1.5.1.4.3.1.</span> <span class="toc-text">shouldParkAterFailedAcquire</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#parkAndCheckInterrupt"><span class="toc-number">1.5.1.4.3.2.</span> <span class="toc-text">parkAndCheckInterrupt</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%94%A4%E9%86%92%E9%98%BB%E5%A1%9E%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.5.2.</span> <span class="toc-text">唤醒阻塞线程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#release"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">release</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#tryRelease"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">tryRelease</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unparkSuccessor"><span class="toc-number">1.5.2.3.</span> <span class="toc-text">unparkSuccessor</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#acquireQueued-1"><span class="toc-number">1.5.2.4.</span> <span class="toc-text">acquireQueued</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cancelAcquire"><span class="toc-number">1.5.3.</span> <span class="toc-text">cancelAcquire</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.6.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&text=AQS原理"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&is_video=false&description=AQS原理"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=AQS原理&body=Check out this article: https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&title=AQS原理"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&name=AQS原理&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/&t=AQS原理"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Java对象内存布局和对象头面试题 Object object &#x3D; new Object()谈谈你对这句话的理解？一般而言JDK8按照默认情况下，new一个对象占多少内存空间 位置所在在JVM堆里的新生区的伊甸园区（这些都是之前的基础知识了） 构成布局对象在堆内存中布局权威定义在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分：  对象头 实例数据 对齐填充   对象在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java对象内存布局及Synchronized锁升级">
+<meta property="og:url" content="https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="Java对象内存布局和对象头面试题 Object object &#x3D; new Object()谈谈你对这句话的理解？一般而言JDK8按照默认情况下，new一个对象占多少内存空间 位置所在在JVM堆里的新生区的伊甸园区（这些都是之前的基础知识了） 构成布局对象在堆内存中布局权威定义在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分：  对象头 实例数据 对齐填充   对象在">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6dec6853a18f461190651864183c58f2.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/e671f63f33fa4f2a819e476760923933.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/a545ca804b27471abda1f3754f39a4c4.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219124237933.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219124347191.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219124640165.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219125828682.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/76d636f2fea440f884bee3efbb5ece73.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/53df3f60fea84bb38e621b8ae53d3df3.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219130623109.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/f3ab347de6754c06a3f9b04b0b498099.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219130807960.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/9ecd513abf624152959f547796f5daac.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131110213.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131008783.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131245343.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131551590.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131800207.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219133457484.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219134147428.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/4690e91ab23643f198b4a1dab7d6d032.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/d9530c0b596540678d6cc97710129ebc.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/401ded1f99fd4e07bec8b8acfacabadd.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/fb4f7da2392a4c4cb6bd235cbd363eee.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/e9542129d6e840e989d7a9dfbc488371.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/a06a04184bba439ebdab392288c75051.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/3dd2e69b76d44992a69af41e533e1892.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/ace499e78fb24a13a9547e44529d509b.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219144044579.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/3cda3093bd464bd2aab95eb765cc23ac.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219145808513.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/2d5b99b129c842ac8c25a3a90ebacc8a.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/ee00dd5cf746442e96ff7a1577d5de2a.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6eccd9a620f34370b2f4ca1a3840d4e0.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219150338255.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/23f67d623e124ae99b08dc6a7ef9ff24.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/2e6f493eaba04be3ba4d194bacba3224.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219152255500.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/c9a0bfebceba4a2a9b0ba3b987155f0f.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219153736496.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/5137e71643794d519bf889a8ea47f99c.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219155540086.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219155156106.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/9aefeb4614e7432d8d35984497e70702.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/7586e480966c4265add78ac347e19a12.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/2326cc673efb4bf99f890cff224763ab.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/df67dda673c94056a69e40acd864a21a.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/b1db9b39ebd54afe9433436c4cc19d72.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/36a288923c7a4016ab489c72f2afd6e8.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/1f2c384c1b4e459cad7bb5160d43cd9f.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219171749821.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219172317620.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219173622348.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/31b417d60922451ca5a5a471e3badeb8.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/48c603c3b8154a08945e30a2ce2d094e.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/cc6e7ab5801e490ca7908056ed8fc907.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6a1c95588e55448b9f2e3fd4bd63151f.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219184952642.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/019bb3b645bb406a89f7469cab952f07.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/896a934c809740a68c5e18ec7374f100.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/dd2950cee7514ab1b79927cd8ae8cbd7.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/b1f38e7d992149f7b4a99142a172c426.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/274f22fcea7845af9371be3cfb7b2d1a.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/9386f22fc236434a8dd6da6a72f0f20d.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219192110483.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219192714411.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/f097ef47c0e14ae09b4639ed6fb6679b.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/4d5b2210ae7345f5a1059ecb7d3a6601.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230315124415451.png">
+<meta property="article:published_time" content="2023-02-19T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-28T08:10:11.229Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="并发">
+<meta property="article:tag" content="JUC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6dec6853a18f461190651864183c58f2.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Java对象内存布局及Synchronized锁升级</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&%E9%82%AE%E6%88%B3%E9%94%81/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&text=Java对象内存布局及Synchronized锁升级"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&is_video=false&description=Java对象内存布局及Synchronized锁升级"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java对象内存布局及Synchronized锁升级&body=Check out this article: https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&name=Java对象内存布局及Synchronized锁升级&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&t=Java对象内存布局及Synchronized锁升级"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%92%8C%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-number">1.</span> <span class="toc-text">Java对象内存布局和对象头</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="toc-number">1.1.</span> <span class="toc-text">面试题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Object-object-new-Object"><span class="toc-number">1.2.</span> <span class="toc-text">Object object &#x3D; new Object()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E7%BD%AE%E6%89%80%E5%9C%A8"><span class="toc-number">1.2.1.</span> <span class="toc-text">位置所在</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%84%E6%88%90%E5%B8%83%E5%B1%80"><span class="toc-number">1.2.2.</span> <span class="toc-text">构成布局</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%9C%A8%E5%A0%86%E5%86%85%E5%AD%98%E4%B8%AD%E5%B8%83%E5%B1%80"><span class="toc-number">1.3.</span> <span class="toc-text">对象在堆内存中布局</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%83%E5%A8%81%E5%AE%9A%E4%B9%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">权威定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%9C%A8%E5%A0%86%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E5%B8%83%E5%B1%80"><span class="toc-number">1.3.2.</span> <span class="toc-text">对象在堆内存中的存储布局</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">1.对象头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%AE%9E%E4%BE%8B%E6%95%B0%E6%8D%AE"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">2.实例数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%AF%B9%E9%BD%90%E5%A1%AB%E5%85%85"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">3.对齐填充</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%98%E7%BD%91%E7%90%86%E8%AE%BA"><span class="toc-number">1.3.3.</span> <span class="toc-text">官网理论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%8D%E8%AF%B4%E5%AF%B9%E8%B1%A1%E5%A4%B4%E7%9A%84MarkWord"><span class="toc-number">1.4.</span> <span class="toc-text">再说对象头的MarkWord</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#32%E4%BD%8D%EF%BC%88%E7%9C%8B%E4%B8%80%E4%B8%8B%E5%8D%B3%E5%8F%AF%EF%BC%8C%E4%BB%A564%E4%BD%8D%E4%B8%BA%E5%87%86%EF%BC%89"><span class="toc-number">1.4.1.</span> <span class="toc-text">32位（看一下即可，以64位为准）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#64%E4%BD%8D%E9%87%8D%E8%A6%81"><span class="toc-number">1.4.2.</span> <span class="toc-text">64位重要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#markword-64%E4%BD%8D-%E5%88%86%E5%B8%83%E5%9B%BE"><span class="toc-number">1.4.3.</span> <span class="toc-text">markword(64位)分布图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%81%8A%E8%81%8AObject-obj-new-Object-%E3%80%90%E7%94%A8%E4%BB%A3%E7%A0%81%E6%BC%94%E7%A4%BA%E3%80%91"><span class="toc-number">1.5.</span> <span class="toc-text">聊聊Object obj &#x3D; new Object()【用代码演示】</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JOL%E8%AF%81%E6%98%8E"><span class="toc-number">1.5.1.</span> <span class="toc-text">JOL证明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">1.5.2.</span> <span class="toc-text">代码</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BC%94%E7%A4%BA%E4%B8%80-%E7%94%A8%E8%87%AA%E5%B8%A6%E7%9A%84%E7%B1%BB"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">演示一 | 用自带的类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BC%94%E7%A4%BA%E4%BA%8C-%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E7%B1%BB"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">演示二 | 用自己的类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GC%E5%B9%B4%E9%BE%84"><span class="toc-number">1.5.3.</span> <span class="toc-text">GC年龄</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E6%83%B3%E8%AF%81%E6%98%8E%E4%B8%80%E4%B8%8B"><span class="toc-number">1.5.3.1.</span> <span class="toc-text">如果想证明一下</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%BE%E5%B7%B4%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E%EF%BC%88%E5%8E%8B%E7%BC%A9%E6%8C%87%E9%92%88%E7%9B%B8%E5%85%B3%EF%BC%89"><span class="toc-number">1.5.4.</span> <span class="toc-text">尾巴参数说明（压缩指针相关）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8DJVM%E8%BF%90%E8%A1%8C%E5%8F%82%E6%95%B0%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="toc-number">1.5.4.1.</span> <span class="toc-text">查看当前JVM运行参数的指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%8B%E7%BC%A9%E6%8C%87%E9%92%88%E9%BB%98%E8%AE%A4%E6%98%AF%E5%BC%80%E5%90%AF%E7%9A%84"><span class="toc-number">1.5.4.2.</span> <span class="toc-text">压缩指针默认是开启的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%87%E5%A6%82%E4%B8%8D%E5%8E%8B%E7%BC%A9%E7%9A%84%E6%83%85%E5%86%B5%EF%BC%9F%E6%88%91%E4%BB%AC%E6%89%8B%E5%8A%A8%E5%85%B3%E9%97%AD%E5%8E%8B%E7%BC%A9%E6%8C%87%E9%92%88%E7%9C%8B%E7%9C%8B%EF%BC%9F"><span class="toc-number">1.5.4.3.</span> <span class="toc-text">假如不压缩的情况？我们手动关闭压缩指针看看？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8D%A2%E6%88%90%E5%85%B6%E4%BB%96%E5%AF%B9%E8%B1%A1%E8%AF%95%E8%AF%95"><span class="toc-number">1.5.5.</span> <span class="toc-text">换成其他对象试试</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Synchronized%E4%B8%8E%E9%94%81%E5%8D%87%E7%BA%A7"><span class="toc-number">2.</span> <span class="toc-text">Synchronized与锁升级</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98-1"><span class="toc-number">2.1.</span> <span class="toc-text">面试题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E7%AB%A0%E8%B7%AF%E7%BA%BF%E6%80%BB%E7%BA%B2"><span class="toc-number">2.2.</span> <span class="toc-text">本章路线总纲</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E"><span class="toc-number">2.2.1.</span> <span class="toc-text">说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#synchronized%E9%94%81"><span class="toc-number">2.2.2.</span> <span class="toc-text">synchronized锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Synchronized%E7%9A%84%E6%80%A7%E8%83%BD%E5%8F%98%E5%8C%96"><span class="toc-number">2.3.</span> <span class="toc-text">Synchronized的性能变化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java5%E4%BB%A5%E5%89%8D"><span class="toc-number">2.3.1.</span> <span class="toc-text">java5以前</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Java5%E4%B9%8B%E5%89%8D%EF%BC%8C%E7%94%A8%E6%88%B7%E6%80%81%E5%92%8C%E5%86%85%E6%A0%B8%E6%80%81%E4%B9%8B%E9%97%B4%E7%9A%84%E5%88%87%E6%8D%A2"><span class="toc-number">2.3.1.1.</span> <span class="toc-text">Java5之前，用户态和内核态之间的切换</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AF%8F%E4%B8%80%E4%B8%AA%E5%AF%B9%E8%B1%A1%E9%83%BD%E5%8F%AF%E4%BB%A5%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E9%94%81-%E5%A4%8D%E4%B9%A0%E4%B9%8B%E5%89%8D%E7%9A%84%E7%9F%A5%E8%AF%86"><span class="toc-number">2.3.2.</span> <span class="toc-text">为什么每一个对象都可以成为一个锁-复习之前的知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#markOop-hpp"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">markOop.hpp</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Monitor-%E7%9B%91%E8%A7%86%E5%99%A8%E9%94%81"><span class="toc-number">2.3.2.2.</span> <span class="toc-text">Monitor(监视器锁)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E5%90%88%E4%B9%8B%E5%89%8D%E7%9A%84synchronized%E5%92%8C%E5%AF%B9%E8%B1%A1%E5%A4%B4%E8%AF%B4%E6%98%8E"><span class="toc-number">2.3.2.3.</span> <span class="toc-text">结合之前的synchronized和对象头说明</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#java6%E5%BC%80%E5%A7%8B%EF%BC%8C%E4%BC%98%E5%8C%96Synchronized"><span class="toc-number">2.3.3.</span> <span class="toc-text">java6开始，优化Synchronized</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Synchronized%E9%94%81%E7%A7%8D%E7%B1%BB%E5%8F%8A%E5%8D%87%E7%BA%A7%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.4.</span> <span class="toc-text">Synchronized锁种类及升级步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E8%AE%BF%E9%97%AE%E6%83%85%E5%86%B5%EF%BC%8C3%E7%A7%8D"><span class="toc-number">2.4.1.</span> <span class="toc-text">多线程访问情况，3种</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%87%E7%BA%A7%E6%B5%81%E7%A8%8B"><span class="toc-number">2.4.2.</span> <span class="toc-text">升级流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%94%81%E6%8C%87%E5%90%91"><span class="toc-number">2.4.2.1.</span> <span class="toc-text">锁指向</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E9%94%81"><span class="toc-number">2.4.3.</span> <span class="toc-text">无锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#C%E6%BA%90%E7%A0%81%E7%9A%84MarkWord%E6%A0%87%E8%AE%B0"><span class="toc-number">2.4.3.1.</span> <span class="toc-text">C源码的MarkWord标记</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA"><span class="toc-number">2.4.3.2.</span> <span class="toc-text">Code演示</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E4%B8%8D%E4%BC%9A%E6%9C%89%E9%94%81%E7%9A%84%E7%AB%9E%E4%BA%89"><span class="toc-number">2.4.3.3.</span> <span class="toc-text">程序不会有锁的竞争</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%81%8F%E9%94%81"><span class="toc-number">2.4.4.</span> <span class="toc-text">偏锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.4.4.1.</span> <span class="toc-text">是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E4%BD%9C%E7%94%A8"><span class="toc-number">2.4.4.2.</span> <span class="toc-text">主要作用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93%E8%AE%BA"><span class="toc-number">2.4.4.3.</span> <span class="toc-text">小结论</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81%E7%9A%84%E6%8C%81%E6%9C%89"><span class="toc-number">2.4.4.4.</span> <span class="toc-text">偏向锁的持有</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E-1"><span class="toc-number">2.4.4.4.1.</span> <span class="toc-text">说明</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%86%E5%8C%96Account%E5%AF%B9%E8%B1%A1%E4%B8%BE%E4%BE%8B%E8%AF%B4%E6%98%8E"><span class="toc-number">2.4.4.4.2.</span> <span class="toc-text">细化Account对象举例说明</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81JVM%E5%91%BD%E4%BB%A4"><span class="toc-number">2.4.4.5.</span> <span class="toc-text">偏向锁JVM命令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%87%8D%E8%A6%81%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E"><span class="toc-number">2.4.4.5.1.</span> <span class="toc-text">重要参数说明</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA-%E9%80%9A%E8%BF%87%E5%B0%86%E5%BB%B6%E8%BF%9F%E6%94%B9%E4%B8%BA0%E6%9D%A5%E5%BC%80%E5%90%AF%E5%81%8F%E5%90%91%E9%94%81"><span class="toc-number">2.4.4.6.</span> <span class="toc-text">Code演示-通过将延迟改为0来开启偏向锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA2-%E4%B8%BB%E5%8A%A8%E8%BF%8E%E5%90%88%E8%BF%994%E7%A7%92%E7%9A%84%E5%BB%B6%E8%BF%9F"><span class="toc-number">2.4.4.7.</span> <span class="toc-text">Code演示2-主动迎合这4秒的延迟</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%BB%E5%8A%A8%E8%BF%8E%E5%90%884%E7%A7%92%E7%9A%84%E5%BB%B6%E8%BF%9F"><span class="toc-number">2.4.4.7.1.</span> <span class="toc-text">主动迎合4秒的延迟</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%A7%8D%E6%83%85%E5%86%B5-%E6%B2%A1%E7%94%A8synchronized"><span class="toc-number">2.4.4.7.2.</span> <span class="toc-text">第一种情况-没用synchronized</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%A7%8D%E6%83%85%E5%86%B5-%E7%94%A8synchronized"><span class="toc-number">2.4.4.7.3.</span> <span class="toc-text">第二种情况- 用synchronized</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8D%E5%86%8D%E6%98%AF%E4%B8%80%E4%B8%AA%E7%BA%BF%E7%A8%8B%E7%8B%AC%E4%BA%AB"><span class="toc-number">2.4.4.8.</span> <span class="toc-text">不再是一个线程独享</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81%E7%9A%84%E6%92%A4%E9%94%80"><span class="toc-number">2.4.4.9.</span> <span class="toc-text">偏向锁的撤销</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%92%A4%E9%94%80"><span class="toc-number">2.4.4.9.1.</span> <span class="toc-text">撤销</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%BB%E4%BD%93%E6%AD%A5%E9%AA%A4%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%A4%BA"><span class="toc-number">2.4.4.10.</span> <span class="toc-text">总体步骤流程图示</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#java15%E9%80%90%E6%AD%A5%E5%BA%9F%E5%BC%83%E5%81%8F%E5%90%91%E9%94%81"><span class="toc-number">2.4.4.11.</span> <span class="toc-text">java15逐步废弃偏向锁</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%BB%E9%94%81"><span class="toc-number">2.4.5.</span> <span class="toc-text">轻锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88-1"><span class="toc-number">2.4.5.1.</span> <span class="toc-text">是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E4%BD%9C%E7%94%A8-1"><span class="toc-number">2.4.5.2.</span> <span class="toc-text">主要作用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81%E7%9A%84%E8%8E%B7%E5%8F%96"><span class="toc-number">2.4.5.3.</span> <span class="toc-text">轻量级锁的获取</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A1%A5%E5%85%85%E8%AF%B4%E6%98%8E"><span class="toc-number">2.4.5.3.1.</span> <span class="toc-text">补充说明</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA-1"><span class="toc-number">2.4.5.4.</span> <span class="toc-text">Code演示</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E5%85%B3%E9%97%AD%E5%81%8F%E5%90%91%E9%94%81%EF%BC%8C%E5%B0%B1%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E8%BF%9B%E5%85%A5%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81"><span class="toc-number">2.4.5.4.1.</span> <span class="toc-text">如果关闭偏向锁，就可以直接进入轻量级锁</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#XX-UseBiasedLocking"><span class="toc-number">2.4.5.4.2.</span> <span class="toc-text">-XX:-UseBiasedLocking</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%A4%BA"><span class="toc-number">2.4.5.5.</span> <span class="toc-text">步骤流程图示</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E6%97%8B%E8%BE%BE%E5%88%B0%E4%B8%80%E5%AE%9A%E6%AC%A1%E6%95%B0%E5%92%8C%E7%A8%8B%E5%BA%A6"><span class="toc-number">2.4.5.6.</span> <span class="toc-text">自旋达到一定次数和程度</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#java6%E4%B9%8B%E5%89%8D"><span class="toc-number">2.4.5.6.1.</span> <span class="toc-text">java6之前</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#java6%E4%B9%8B%E5%90%8E"><span class="toc-number">2.4.5.6.2.</span> <span class="toc-text">java6之后</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BD%BB%E9%87%8F%E9%94%81%E5%92%8C%E5%81%8F%E5%90%91%E9%94%81%E7%9A%84%E5%8C%BA%E5%88%AB%E5%92%8C%E4%B8%8D%E5%90%8C"><span class="toc-number">2.4.5.7.</span> <span class="toc-text">轻量锁和偏向锁的区别和不同</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E9%94%81"><span class="toc-number">2.4.6.</span> <span class="toc-text">重锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%A4%A7%E9%87%8F%E7%9A%84%E7%BA%BF%E7%A8%8B%E5%8F%82%E4%B8%8E%E9%94%81%E7%9A%84%E7%AB%9E%E4%BA%89%EF%BC%8C%E5%86%B2%E7%AA%81%E6%80%A7%E5%BE%88%E9%AB%98"><span class="toc-number">2.4.6.1.</span> <span class="toc-text">有大量的线程参与锁的竞争，冲突性很高</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%94%81%E6%A0%87%E5%BF%97%E4%BD%8D"><span class="toc-number">2.4.6.2.</span> <span class="toc-text">锁标志位</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81%E5%8E%9F%E7%90%86"><span class="toc-number">2.4.6.3.</span> <span class="toc-text">重量级锁原理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA-2"><span class="toc-number">2.4.7.</span> <span class="toc-text">Code演示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E6%80%BB%E7%BB%93-%E9%9D%A2%E8%AF%95%E4%B8%AD%E7%9A%84%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9"><span class="toc-number">2.4.8.</span> <span class="toc-text">小总结-面试中的高频考点</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%94%81%E5%8D%87%E7%BA%A7%E5%8F%91%E7%94%9F%E5%90%8E%EF%BC%8Chashcode%E5%8E%BB%E5%93%AA%E4%BA%86"><span class="toc-number">2.4.8.1.</span> <span class="toc-text">锁升级发生后，hashcode去哪了</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E-2"><span class="toc-number">2.4.8.1.1.</span> <span class="toc-text">说明</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#code01"><span class="toc-number">2.4.8.1.2.</span> <span class="toc-text">code01</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#code02"><span class="toc-number">2.4.8.1.3.</span> <span class="toc-text">code02</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%84%E7%A7%8D%E9%94%81%E4%BC%98%E7%BC%BA%E7%82%B9%E3%80%81synchronized%E9%94%81%E5%8D%87%E7%BA%A7%E5%92%8C%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-number">2.4.8.2.</span> <span class="toc-text">各种锁优缺点、synchronized锁升级和实现原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JIT%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E9%94%81%E7%9A%84%E4%BC%98%E5%8C%96"><span class="toc-number">2.5.</span> <span class="toc-text">JIT编译器对锁的优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JIT"><span class="toc-number">2.5.1.</span> <span class="toc-text">JIT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E6%B6%88%E9%99%A4"><span class="toc-number">2.5.2.</span> <span class="toc-text">锁消除</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%B2%97%E5%8C%96"><span class="toc-number">2.5.3.</span> <span class="toc-text">锁粗化</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%94%99%E8%AF%AF"><span class="toc-number">3.</span> <span class="toc-text">错误</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Java对象内存布局及Synchronized锁升级
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-02-19T08:51:33.000Z" class="dt-published" itemprop="datePublished">2023-02-19</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/JUC/" rel="tag">JUC</a>, <a class="p-category" href="/tags/Java/" rel="tag">Java</a>, <a class="p-category" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Java对象内存布局和对象头"><a href="#Java对象内存布局和对象头" class="headerlink" title="Java对象内存布局和对象头"></a>Java对象内存布局和对象头</h1><h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6dec6853a18f461190651864183c58f2.png" alt="在这里插入图片描述"></p>
+<h2 id="Object-object-new-Object"><a href="#Object-object-new-Object" class="headerlink" title="Object object &#x3D; new Object()"></a>Object object &#x3D; new Object()</h2><p>谈谈你对这句话的理解？一般而言JDK8按照默认情况下，new一个对象占多少内存空间</p>
+<h3 id="位置所在"><a href="#位置所在" class="headerlink" title="位置所在"></a>位置所在</h3><p>在JVM堆里的新生区的伊甸园区（这些都是之前的基础知识了）</p>
+<h3 id="构成布局"><a href="#构成布局" class="headerlink" title="构成布局"></a>构成布局</h3><h2 id="对象在堆内存中布局"><a href="#对象在堆内存中布局" class="headerlink" title="对象在堆内存中布局"></a>对象在堆内存中布局</h2><h3 id="权威定义"><a href="#权威定义" class="headerlink" title="权威定义"></a>权威定义</h3><p>在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分：</p>
+<ul>
+<li><strong>对象头</strong></li>
+<li><strong>实例数据</strong></li>
+<li><strong>对齐填充</strong></li>
+</ul>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/e671f63f33fa4f2a819e476760923933.png" alt="在这里插入图片描述"></p>
+<h3 id="对象在堆内存中的存储布局"><a href="#对象在堆内存中的存储布局" class="headerlink" title="对象在堆内存中的存储布局"></a>对象在堆内存中的存储布局</h3><p>下面分别是 <strong>java对象</strong> 和<strong>数组</strong>（数组对象会多一个length），原理其实类似</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/a545ca804b27471abda1f3754f39a4c4.png" alt="在这里插入图片描述"></p>
+<h4 id="1-对象头"><a href="#1-对象头" class="headerlink" title="1.对象头"></a>1.对象头</h4><ul>
+<li><strong>对象头</strong>分为<strong>对象标记（markOpp）</strong>和 <strong>类元信息 (klassOop)</strong></li>
+<li><strong>类元信息</strong>存储的是指向该对象类元数据（klass）的首地址。</li>
+</ul>
+<blockquote>
+<p>先提出几个问题来引出下面的概念</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class Demo01 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Object o = new Object();//?new 一个对象，内存占多少，记录在哪里？</span><br><span class="line"></span><br><span class="line">        System.out.println(o.hashCode());//356573597，这个hashCode又是记录在哪里的</span><br><span class="line"></span><br><span class="line">        synchronized (o)&#123;//加锁信息又是记录在哪里的</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        System.gc();//手动垃圾收集中，15次可以从新生代到养老区，那这个次数又是记录在哪里的</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>先回复一下问题</p>
+</blockquote>
+<ul>
+<li><p>刚刚几个问题都保存在<strong>对象标记</strong>里</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219124237933.png" alt="image-20230219124237933"></p>
+</li>
+</ul>
+<p><strong>对象标记Mark Word</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219124347191.png" alt="image-20230219124347191"></p>
+<ul>
+<li><p>在64位系统中，MarkWord占了8个字节，类型指针占了8个字节，一共是16个字节</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219124640165.png" alt="image-20230219124640165"></p>
+</li>
+</ul>
+<p>默认存储对象的HashCode、分代年龄和锁标志位等信息。这些信息都是与对象自身定这无关的数据，所以MarkWord被设计成一个非固定的数据结构以便在极小的空间内存存储尽量多的数据。它会根据对象的状态复用自己的存储空间，也就是说在运行期间MarkWord上存储的数据会随着锁标志位的变化而变化。</p>
+<p><strong>类元信息（又叫类型指针）Class Pointer</strong></p>
+<blockquote>
+<p>所谓的类元信息（类型指针）其实就可以说是<strong>模板</strong></p>
+</blockquote>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219125828682.png" alt="image-20230219125828682"></p>
+<ul>
+<li>对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的示例。</li>
+</ul>
+<p><strong>对象头多大</strong></p>
+<ul>
+<li>在64位系统中，MarkWord占了8个字节，类型指针占了8个字节，一共是16个字节</li>
+</ul>
+<h4 id="2-实例数据"><a href="#2-实例数据" class="headerlink" title="2.实例数据"></a>2.实例数据</h4><p><strong>实例数据</strong>：存放类的属性（Field）信息，包括父类的属性信息</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/76d636f2fea440f884bee3efbb5ece73.png" alt="在这里插入图片描述"></p>
+<h4 id="3-对齐填充"><a href="#3-对齐填充" class="headerlink" title="3.对齐填充"></a>3.对齐填充</h4><p>用来保证8字节的倍数</p>
+<p><strong>对齐填充</strong>：虚拟机要求对象起始地址必须是8字节的整数倍。填充数据不是必须存在的，仅仅是为了字节对齐这部分内存按8字节补充对齐。</p>
+<p>有个案例，对象头16+实例数据5+对齐填充3&#x3D;24字节</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/53df3f60fea84bb38e621b8ae53d3df3.png" alt="在这里插入图片描述"></p>
+<h3 id="官网理论"><a href="#官网理论" class="headerlink" title="官网理论"></a>官网理论</h3><ul>
+<li>Hotspot术语表官网</li>
+</ul>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219130623109.png" alt="image-20230219130623109"></p>
+<ul>
+<li><p>底层源码理论证明</p>
+<p><code>http://hg.openjdk.java.netjidlk8u/jdk8u/hotspot/file/89fb452b3688/src/share/vm/oops/oop.hpp</code></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/f3ab347de6754c06a3f9b04b0b498099.png" alt="在这里插入图片描述"></p>
+<p><em>mark字段是mark word，</em> metadata是类指针klass pointer，<br>对象头（object header）即是由这两个字段组成，这些术语可以参考Hotspot术语表，</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219130807960.png" alt="image-20230219130807960"></p>
+</li>
+</ul>
+<h2 id="再说对象头的MarkWord"><a href="#再说对象头的MarkWord" class="headerlink" title="再说对象头的MarkWord"></a>再说对象头的MarkWord</h2><h3 id="32位（看一下即可，以64位为准）"><a href="#32位（看一下即可，以64位为准）" class="headerlink" title="32位（看一下即可，以64位为准）"></a>32位（看一下即可，以64位为准）</h3><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/9ecd513abf624152959f547796f5daac.png" alt="在这里插入图片描述"></p>
+<h3 id="64位重要"><a href="#64位重要" class="headerlink" title="64位重要"></a>64位重要</h3><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131110213.png" alt="image-20230219131110213"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131008783.png" alt="image-20230219131008783"></p>
+<ul>
+<li><p>看看C中的源码</p>
+</li>
+<li><p>oop.hpp</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131245343.png" alt="image-20230219131245343"></p>
+</li>
+<li><p>markOop.hpp</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131551590.png" alt="image-20230219131551590"></p>
+<ul>
+<li>hash：保存对象的哈希码</li>
+<li>age： 保存对象的分代年龄</li>
+<li>biased_lock： 偏向锁标识位</li>
+<li>lock： 锁状态标识位</li>
+<li>JavaThread ：保存持有偏向锁的线程ID</li>
+<li>epoch： 保存偏向时间戳</li>
+</ul>
+</li>
+</ul>
+<h3 id="markword-64位-分布图"><a href="#markword-64位-分布图" class="headerlink" title="markword(64位)分布图"></a>markword(64位)分布图</h3><p>对象布局、GC回收和后面的锁升级就是对象标记MarkWord里面标志位的变化</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219131800207.png" alt="image-20230219131800207"></p>
+<h2 id="聊聊Object-obj-new-Object-【用代码演示】"><a href="#聊聊Object-obj-new-Object-【用代码演示】" class="headerlink" title="聊聊Object obj &#x3D; new Object()【用代码演示】"></a>聊聊Object obj &#x3D; new Object()【用代码演示】</h2><h3 id="JOL证明"><a href="#JOL证明" class="headerlink" title="JOL证明"></a>JOL证明</h3><p>JOL工具（Java Object Layout工具）-可以帮助分析对象在Java虚拟机中的大小和布局</p>
+<p><code>http://openjdk.java.net/projects/code-tools/joll</code>(网站已经失效了)</p>
+<p>但我们可以直接用<strong>依赖</strong>来实现这个功能</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.openjdk.jol&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jol-core&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;0.9&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//简单测试</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="comment">//Vm的细节详细情况</span></span><br><span class="line">    System.out.println(VM.current().details());</span><br><span class="line">    <span class="comment">//# WARNING: Unable to attach Serviceability Agent. You can try again with escalated privileges. Two options: a) use -Djol.tryWithSudo=true to try with sudo; b) echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope</span></span><br><span class="line">    <span class="comment">//# Running 64-bit HotSpot VM.</span></span><br><span class="line">    <span class="comment">//# Using compressed oop with 3-bit shift.</span></span><br><span class="line">    <span class="comment">//# Using compressed klass with 3-bit shift.</span></span><br><span class="line">    <span class="comment">//# WARNING | Compressed references base/shifts are guessed by the experiment!</span></span><br><span class="line">    <span class="comment">//# WARNING | Therefore, computed addresses are just guesses, and ARE NOT RELIABLE.</span></span><br><span class="line">    <span class="comment">//# WARNING | Make sure to attach Serviceability Agent to get the reliable addresses.</span></span><br><span class="line">    <span class="comment">//# Objects are 8 bytes aligned.</span></span><br><span class="line">    <span class="comment">//# Field sizes by type: 4, 1, 1, 2, 2, 4, 4, 8, 8 [bytes]</span></span><br><span class="line">    <span class="comment">//# Array element sizes: 4, 1, 1, 2, 2, 4, 4, 8, 8 [bytes]</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//所有的对象分配的字节都是8的整数倍</span></span><br><span class="line">    System.out.println(VM.current().objectAlignment());</span><br><span class="line">    <span class="comment">//8</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><h4 id="演示一-用自带的类"><a href="#演示一-用自带的类" class="headerlink" title="演示一 | 用自带的类"></a>演示一 | 用自带的类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//第一个演示，16bytes演示</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Demo01</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Object</span>();<span class="comment">//----------新建一个Object对象就是  16bytes</span></span><br><span class="line">        System.out.println(ClassLayout.parseInstance(o).toPrintable());</span><br><span class="line"><span class="comment">//java.lang.Object object internals:</span></span><br><span class="line"><span class="comment">// OFFSET  SIZE   TYPE DESCRIPTION                               VALUE</span></span><br><span class="line"><span class="comment">//      0     4        (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)</span></span><br><span class="line"><span class="comment">//      4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span></span><br><span class="line"><span class="comment">//      8     4        (object header)                           e5 01 00 f8 (11100101 00000001 00000000 11111000) (-134217243)</span></span><br><span class="line"><span class="comment">//     12     4        (loss due to the next object alignment)</span></span><br><span class="line"><span class="comment">//Instance size: 16 bytes</span></span><br><span class="line"><span class="comment">//Space losses: 0 bytes internal + 4 bytes external = 4 bytes total</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219133457484.png" alt="image-20230219133457484"></p>
+<blockquote>
+<p>这里丢下一个疑问，为什么类型指针是4字节？之前不都是说是8字节的吗？（因为压缩指针默认开启了，后面有讲）</p>
+</blockquote>
+<h4 id="演示二-用自己的类"><a href="#演示二-用自己的类" class="headerlink" title="演示二 | 用自己的类"></a>演示二 | 用自己的类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//只有对象头，没有实例数据,依然是16byte</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Demo01</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">c1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Customer</span>();</span><br><span class="line">        System.out.println(ClassLayout.parseInstance(c1).toPrintable());</span><br><span class="line">        <span class="comment">//com.zhang.java.Customer object internals:</span></span><br><span class="line">        <span class="comment">// OFFSET  SIZE   TYPE DESCRIPTION                               VALUE</span></span><br><span class="line">        <span class="comment">//      0     4        (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)</span></span><br><span class="line">        <span class="comment">//      4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span></span><br><span class="line">        <span class="comment">//      8     4        (object header)                           43 c1 00 f8 (01000011 11000001 00000000 11111000) (-134168253)</span></span><br><span class="line">        <span class="comment">//     12     4        (loss due to the next object alignment)</span></span><br><span class="line">        <span class="comment">//Instance size: 16 bytes</span></span><br><span class="line">        <span class="comment">//Space losses: 0 bytes internal + 4 bytes external = 4 bytes total</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Customer</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//有了对象头，且有实例数据(int+boolean)，它进行了对齐填充，到了24byte</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Demo01</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">c1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Customer</span>();</span><br><span class="line">        System.out.println(ClassLayout.parseInstance(c1).toPrintable());</span><br><span class="line"><span class="comment">//com.zhang.java.Customer object internals:</span></span><br><span class="line"><span class="comment">// OFFSET  SIZE      TYPE DESCRIPTION                               VALUE</span></span><br><span class="line"><span class="comment">//      0     4           (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)</span></span><br><span class="line"><span class="comment">//      4     4           (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span></span><br><span class="line"><span class="comment">//      8     4           (object header)                           43 c1 00 f8 (01000011 11000001 00000000 11111000) (-134168253)</span></span><br><span class="line"><span class="comment">//     12     4       int Customer.id                               0</span></span><br><span class="line"><span class="comment">//     16     1   boolean Customer.flag                             false</span></span><br><span class="line"><span class="comment">//     17     7           (loss due to the next object alignment)</span></span><br><span class="line"><span class="comment">//Instance size: 24 bytes</span></span><br><span class="line"><span class="comment">//Space losses: 0 bytes internal + 7 bytes external = 7 bytes total</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Customer</span>&#123;</span><br><span class="line">    <span class="type">int</span> id;</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">flag</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="GC年龄"><a href="#GC年龄" class="headerlink" title="GC年龄"></a>GC年龄</h3><p>GC年龄采用4位bit存储，最大位15，例如MaxTenuringThreshold参数默认值就是15</p>
+<ul>
+<li><p>对象分代年龄最大就是15</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219134147428.png" alt="image-20230219134147428"></p>
+</li>
+</ul>
+<h4 id="如果想证明一下"><a href="#如果想证明一下" class="headerlink" title="如果想证明一下"></a>如果想证明一下</h4><ul>
+<li><p>我们假如想直接把分代最大年龄修改为16会直接报错。</p>
+<p><code>-XX:MaxTenurningThreshold=16</code></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/4690e91ab23643f198b4a1dab7d6d032.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h3 id="尾巴参数说明（压缩指针相关）"><a href="#尾巴参数说明（压缩指针相关）" class="headerlink" title="尾巴参数说明（压缩指针相关）"></a>尾巴参数说明（压缩指针相关）</h3><p><strong>压缩指针相关的命令</strong>（压缩指针是否开启对我们new一个对象是不是16字节的影响）</p>
+<h4 id="查看当前JVM运行参数的指令"><a href="#查看当前JVM运行参数的指令" class="headerlink" title="查看当前JVM运行参数的指令"></a>查看当前JVM运行参数的指令</h4><p><code>java -XX:+PrintCommandLineFlags -version</code></p>
+<h4 id="压缩指针默认是开启的"><a href="#压缩指针默认是开启的" class="headerlink" title="压缩指针默认是开启的"></a>压缩指针默认是开启的</h4><p>(这也就解释了为什么前面的类型指针是4个字节，节约了内存空间）</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/d9530c0b596540678d6cc97710129ebc.png" alt="在这里插入图片描述"></p>
+<h4 id="假如不压缩的情况？我们手动关闭压缩指针看看？"><a href="#假如不压缩的情况？我们手动关闭压缩指针看看？" class="headerlink" title="假如不压缩的情况？我们手动关闭压缩指针看看？"></a>假如不压缩的情况？我们手动关闭压缩指针看看？</h4><p>＋是开启，-就是关闭，所以指令是<code>-XX:-UseCompressedClassPointers</code></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/401ded1f99fd4e07bec8b8acfacabadd.png" alt="在这里插入图片描述"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/fb4f7da2392a4c4cb6bd235cbd363eee.png" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>也要注意，不管是否开启压缩指针，创建一个对象就是16字节的。（开启压缩指针后缺失的会由对齐填充补充）</p>
+</blockquote>
+<h3 id="换成其他对象试试"><a href="#换成其他对象试试" class="headerlink" title="换成其他对象试试"></a>换成其他对象试试</h3><ul>
+<li><p>同样的道理</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/e9542129d6e840e989d7a9dfbc488371.png"></p>
+</li>
+</ul>
+<hr>
+<h1 id="Synchronized与锁升级"><a href="#Synchronized与锁升级" class="headerlink" title="Synchronized与锁升级"></a>Synchronized与锁升级</h1><h2 id="面试题-1"><a href="#面试题-1" class="headerlink" title="面试题"></a>面试题</h2><ul>
+<li><p>谈谈你对Synchronized的理解</p>
+</li>
+<li><p>请你聊聊Synchronized的锁升级</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/a06a04184bba439ebdab392288c75051.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h2 id="本章路线总纲"><a href="#本章路线总纲" class="headerlink" title="本章路线总纲"></a>本章路线总纲</h2><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><ul>
+<li><p>阿里巴巴规范：加锁的代码块工作量尽可能小，不要一竹竿打死</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/3dd2e69b76d44992a69af41e533e1892.png" alt="在这里插入图片描述"></p>
+</li>
+<li><p>synchronized锁优化的背景</p>
+<p>用锁能够实现数据的安全性，但是会带来性能下降。</p>
+<p>无锁能够基于现成并行提升程序性能，但是会带来安全性下降</p>
+<p>那么如何<strong>求平衡</strong>？</p>
+</li>
+<li><p>锁的升级过程</p>
+<p><strong>无锁-偏向锁-轻量级锁-重量级锁</strong></p>
+</li>
+</ul>
+<h3 id="synchronized锁"><a href="#synchronized锁" class="headerlink" title="synchronized锁"></a>synchronized锁</h3><p>由对象头中的Mark Word根据锁标志位的不同而被复用及锁升级策略</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/ace499e78fb24a13a9547e44529d509b.png" alt="在这里插入图片描述"></p>
+<h2 id="Synchronized的性能变化"><a href="#Synchronized的性能变化" class="headerlink" title="Synchronized的性能变化"></a>Synchronized的性能变化</h2><h3 id="java5以前"><a href="#java5以前" class="headerlink" title="java5以前"></a>java5以前</h3><p>java5以前，只有Synchronized，这个是<strong>操作系统级别</strong>的<strong>重量级</strong>操作</p>
+<p><strong>重量级锁</strong>，假如锁的竞争比较激烈的话，性能下降</p>
+<h4 id="Java5之前，用户态和内核态之间的切换"><a href="#Java5之前，用户态和内核态之间的切换" class="headerlink" title="Java5之前，用户态和内核态之间的切换"></a>Java5之前，用户态和内核态之间的切换</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219144044579.png" alt="image-20230219144044579"></p>
+<p>(我们写一个new Thread().start()的话是调用了底层的native方法的）</p>
+<ul>
+<li>java的线程是映射到操作系统原生线程之上的，如果要阻塞或唤醒一个线程就<strong>需要操作系统介入</strong>，需要在用户态与内核态之间切换，这种切换会消耗大量的系统资源，因为用户态与内核态都有各自专用的内存空间，专用的寄存器等，用户态切换至内核态需要传递给许多变量、参数给内核，内核也需要保护好用户态在切换时的一些寄存器值、变量等，以便内核态调用结束后切换回用户态继续工作。</li>
+<li>在Java早期版本中，<strong>synchronized属于重量级锁，效率低下，因为监视器锁（monitor）是依赖于底层的操作系统的Mutex Lock（系统互斥量）来实现的</strong>，挂起线程和恢复线程都需要转入内核态去完成，阻塞或唤醒一个Java线程需要操作系统切换CPU状态来完成，这种状态切换需要耗费处理器时间，如果同步代码块中内容过于简单，<strong>这种切换的时间可能比用户代码执行的时间还长</strong>，时间成本相对较高，这也是为什么早期的synchronized效率低的原因</li>
+<li>Java 6之后，为了减少获得锁和释放锁所带来的性能消耗，<strong>引入了轻量级锁和偏向锁</strong></li>
+</ul>
+<p>（<strong>一句话就是尽量减少用户态和内核态的切换</strong>）</p>
+<h3 id="为什么每一个对象都可以成为一个锁-复习之前的知识"><a href="#为什么每一个对象都可以成为一个锁-复习之前的知识" class="headerlink" title="为什么每一个对象都可以成为一个锁-复习之前的知识"></a>为什么每一个对象都可以成为一个锁-复习之前的知识</h3><h4 id="markOop-hpp"><a href="#markOop-hpp" class="headerlink" title="markOop.hpp"></a>markOop.hpp</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/3cda3093bd464bd2aab95eb765cc23ac.png" alt="在这里插入图片描述"></p>
+<h4 id="Monitor-监视器锁"><a href="#Monitor-监视器锁" class="headerlink" title="Monitor(监视器锁)"></a>Monitor(监视器锁)</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219145808513.png" alt="image-20230219145808513"></p>
+<ul>
+<li><p><strong>Mutex Lock</strong></p>
+<p>Monitor是在jvm底层实现的，底层代码是c++。本质是依赖于底层操作系统的Mutex Lock实现，操作系统实现线程之间的切换需要从用户态到内核态的转换，状态转换需要耗费很多的处理器时间成本非常高。<strong>所以synchronized是Java语言中的一个重量级操作</strong>。</p>
+</li>
+<li><p><strong>Monitor与java对象以及线程是如何关联</strong>？</p>
+<ol>
+<li>如果一个java对象被某个线程锁住，则该java对象的Mark Word字段中LockWord指向monitor的起始地址</li>
+<li>Monitor的Owner字段会存放拥有相关联对象锁的线程id</li>
+</ol>
+</li>
+<li><p>Mutex Lock的切换需要从用户态转换到核心态中，因此状态转换需要耗费很多的处理器时间。</p>
+</li>
+</ul>
+<p>我们说在java中每个对象都可以成为一把锁，因为在JVM中每个对象都一个monitor(监视器锁)。对应到C底层叫做Object Monitor，并用c定义了很多信息。再往下到操作系统中是基于Mutex Lock互斥锁实现，涉及到了用户态和内核态的切换，所以非常耗费资源</p>
+<h4 id="结合之前的synchronized和对象头说明"><a href="#结合之前的synchronized和对象头说明" class="headerlink" title="结合之前的synchronized和对象头说明"></a>结合之前的synchronized和对象头说明</h4><ul>
+<li><p>主要就是MarkWord中是什么代码表示了他是什么<strong>锁状态</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/2d5b99b129c842ac8c25a3a90ebacc8a.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h3 id="java6开始，优化Synchronized"><a href="#java6开始，优化Synchronized" class="headerlink" title="java6开始，优化Synchronized"></a>java6开始，优化Synchronized</h3><ul>
+<li>Java6之后，为了减少获得锁和释放锁所带来的性能消耗，引入了轻量级锁和偏向锁</li>
+<li>需要有个逐步升级的过程，别一开始就捅到重量级锁</li>
+</ul>
+<h2 id="Synchronized锁种类及升级步骤"><a href="#Synchronized锁种类及升级步骤" class="headerlink" title="Synchronized锁种类及升级步骤"></a>Synchronized锁种类及升级步骤</h2><h3 id="多线程访问情况，3种"><a href="#多线程访问情况，3种" class="headerlink" title="多线程访问情况，3种"></a>多线程访问情况，3种</h3><ul>
+<li>只有一个线程来访问，有且唯一Only One</li>
+<li>有多个线程（2个线程A、B来交替访问）</li>
+<li>竞争激烈，更多个线程来访问</li>
+</ul>
+<h3 id="升级流程"><a href="#升级流程" class="headerlink" title="升级流程"></a>升级流程</h3><p>synchronized用的锁是存在Java对象头里的Mark Word中，锁升级功能主要依赖MarkWord中<strong>锁标志位</strong>和释放<strong>偏向锁标志位</strong></p>
+<p><strong>64位标记图再看看</strong></p>
+<ul>
+<li><p>重点关注【偏向锁位】和【锁标志位】</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/ee00dd5cf746442e96ff7a1577d5de2a.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h4 id="锁指向"><a href="#锁指向" class="headerlink" title="锁指向"></a>锁指向</h4><ul>
+<li><p>偏向锁：MarkWord存储的是<strong>偏向的线程ID</strong>；</p>
+</li>
+<li><p>轻量锁：MarkWord存储的是<strong>指向线程栈中Lock Record的指针</strong>；</p>
+</li>
+<li><p>重量锁：MarkWord存储的是<strong>指向堆中的monitor对象的指针</strong>；</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6eccd9a620f34370b2f4ca1a3840d4e0.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h3 id="无锁"><a href="#无锁" class="headerlink" title="无锁"></a>无锁</h3><h4 id="C源码的MarkWord标记"><a href="#C源码的MarkWord标记" class="headerlink" title="C源码的MarkWord标记"></a>C源码的MarkWord标记</h4><ul>
+<li><p>和上面是对应的</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219150338255.png" alt="image-20230219150338255"></p>
+</li>
+</ul>
+<h4 id="Code演示"><a href="#Code演示" class="headerlink" title="Code演示"></a>Code演示</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/23f67d623e124ae99b08dc6a7ef9ff24.png" alt="在这里插入图片描述"></p>
+<ul>
+<li><p>注1：整体从右下角往左上角看，但是每8位都是从左往右看</p>
+</li>
+<li><p>注2：这个HashCode调用了才有，不然就是0000…</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/2e6f493eaba04be3ba4d194bacba3224.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h4 id="程序不会有锁的竞争"><a href="#程序不会有锁的竞争" class="headerlink" title="程序不会有锁的竞争"></a>程序不会有锁的竞争</h4><p>无锁：初始状态，一个对象被实例化后，如果还没有被任何线程竞争锁，那么它就为无锁状态（001)</p>
+<h3 id="偏锁"><a href="#偏锁" class="headerlink" title="偏锁"></a>偏锁</h3><h4 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h4><p><strong>偏向锁</strong>：<strong>单线程竞争</strong></p>
+<p>当线程A第一次竞争到锁时，通过修改Mark Word中的偏向ID、偏向模式。</p>
+<p>如果不存在其他线程竞争，那么持有偏向锁的线程将永远不需要进行同步。</p>
+<h4 id="主要作用"><a href="#主要作用" class="headerlink" title="主要作用"></a>主要作用</h4><ul>
+<li><p><strong>当一段同步代码一直被同一个线程多次访问，由于只有一个线程访问那么该线程在后续访问时便会自动获得锁</strong>。</p>
+<p>（防止不停的在用户态和内核态之间切换）</p>
+</li>
+<li><p>举个例子，同一个老顾客来访，直接老规矩行方便</p>
+</li>
+<li><p>看看多线程卖票，同一个线程获得体会一下（表面上又三个线程在竞争，但实际上呈现aaaa bbbb cccccc 这样的特性，大部分情况下都是一个线程获得票）</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219152255500.png" alt="image-20230219152255500"></p>
+</li>
+</ul>
+<h4 id="小结论"><a href="#小结论" class="headerlink" title="小结论"></a>小结论</h4><p>Hotspot 的作者经过研究发现，大多数情况下：</p>
+<ul>
+<li>多线程的情况下，锁不仅不存在多线程竞争，还存在锁由<strong>同一个线程多次获得的情况</strong>，</li>
+<li>偏向锁就是在这种情况下出现的，它的出现是为了解决<strong>只有在一个线程执行同步时提高性能</strong>。</li>
+</ul>
+<p><strong>备注</strong>：</p>
+<p>偏向锁会偏向于<strong>第一个访问锁的线程</strong>，如果在接下来的运行过程中，该锁没有被其他的线程访问，则持有偏向锁的线程将永远不需要触发同步。也即偏向锁在资源没有竞争情况下消除了同步语句，懒的连CAS操作都不做了，直接提高程序性能</p>
+<p><strong>64位标记图</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/c9a0bfebceba4a2a9b0ba3b987155f0f.png" alt="在这里插入图片描述"></p>
+<h4 id="偏向锁的持有"><a href="#偏向锁的持有" class="headerlink" title="偏向锁的持有"></a>偏向锁的持有</h4><h5 id="说明-1"><a href="#说明-1" class="headerlink" title="说明"></a>说明</h5><p>理论落地：</p>
+<ul>
+<li><p>在实际应用运行过程中发现，“锁总是同一个线程持有，很少发生竞争”，也就是说<strong>锁总是被第一个占用他的线程拥有，这个线程就是锁的偏向线程</strong>。</p>
+</li>
+<li><p>那么只需要在锁第一次被拥有的时候，记录下偏向线程ID。这样偏向线程就一直持有着锁。</p>
+<p>后续这个线程进入和退出这段加了同步锁的代码块时，<strong>不需要再次加锁和释放锁</strong>。而是直接会去检查锁的MarkWord里面是不是放的自己的线程ID。</p>
+<ul>
+<li><p><strong>如果相等</strong>，表示偏向锁是偏向于当前线程的，就不需要再尝试获得锁了，直到竞争发生才释放锁。</p>
+<p>以后每次同步，检查锁的偏向线程ID与当前线程ID是否一致，如果一致直接进入同步。无需每次加锁解锁都去CAS更新对象头。</p>
+<p><strong>如果自始至终使用锁的线程只有一个</strong>，很明显偏向锁几乎没有额外开销，性能极高。</p>
+</li>
+<li><p><strong>如果不等</strong>，表示发生了竞争，锁己经不是总是偏向于同一个线程了，这个时候会尝试使用CAS来替换MarkWord里面的线程ID为新线程的ID，</p>
+<ul>
+<li><strong>竞争成功</strong>，表示之前的线程不存在了，MarkWord里面的线程ID为新线程的ID，锁不会升级，仍然为偏向锁；</li>
+<li><strong>竞争失败</strong>，这时候可能需要升级变为<strong>轻量级锁</strong>，才能保证线程间公平竞争锁。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>注意，偏向锁只有遇到其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁，线程是不会主动释放偏向锁的</strong>。</p>
+</li>
+</ul>
+<p>技术实现：</p>
+<ul>
+<li><p>一个synchronized方法被一个线程抢到了锁时，那这个方法所在的对象就会在其所在的Mark Word中将偏向锁修改状态位，同时还会占用前54位来存储县城指针作为标识。若该线程再次访问同一个synchronized方法时，该线程只需要去对象头的Mark Word中去判断一下是否有偏向锁指向本身的ID，无需再进入Monitor去竞争对象了</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219153736496.png" alt="image-20230219153736496"></p>
+</li>
+</ul>
+<h5 id="细化Account对象举例说明"><a href="#细化Account对象举例说明" class="headerlink" title="细化Account对象举例说明"></a>细化Account对象举例说明</h5><p><strong>结论</strong>：JVM不用和操作系统协商设置Mutex（争取内核），它只需要记录下线程ID就标识自己获得了当前锁，不用操作系统接入。<br><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/5137e71643794d519bf889a8ea47f99c.png" alt="在这里插入图片描述"></p>
+<h4 id="偏向锁JVM命令"><a href="#偏向锁JVM命令" class="headerlink" title="偏向锁JVM命令"></a>偏向锁JVM命令</h4><p><strong><code>java -XX:+PrintFlagsInitial |grep BiasedLock</code></strong></p>
+<ul>
+<li><p>偏向锁存在且默认开启（图片里最后一行的false），并且有4s延迟（图片里的4000）</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219155540086.png" alt="image-20230219155540086"></p>
+</li>
+</ul>
+<blockquote>
+<p>jdk17中默认不开启偏向锁，启动延迟为0。因为从java15开始逐步废弃偏向锁</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219155156106.png"></p>
+</blockquote>
+<h5 id="重要参数说明"><a href="#重要参数说明" class="headerlink" title="重要参数说明"></a>重要参数说明</h5><ul>
+<li><p>关于如何开启偏向锁（延迟设置为0即可）和关闭偏向锁</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">实际上偏向锁在JDK1.6之后是款认开启的，但是启动时间有延迟，</span><br><span class="line">所以需要添加参数-XX:BiasedLockingStartupDelay=0，让其在程序启动时立刻启动。</span><br><span class="line"></span><br><span class="line">开启偏向锁：</span><br><span class="line">-XX:+UseBiasedLocking -XX:BiasedLockingStartupDelay=0</span><br><span class="line"></span><br><span class="line">关闭偏向锁：关闭之后程序默认会直接进入 -----------------------&gt;&gt;&gt;&gt;&gt;&gt;&gt; 轻量级锁状态</span><br><span class="line">-XX:-UseBiasedLocking</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="Code演示-通过将延迟改为0来开启偏向锁"><a href="#Code演示-通过将延迟改为0来开启偏向锁" class="headerlink" title="Code演示-通过将延迟改为0来开启偏向锁"></a>Code演示-通过将延迟改为0来开启偏向锁</h4><p><strong>一切默认</strong></p>
+<ul>
+<li><p>演示无效果，偏向锁本应该是101，000是轻量级锁（无效是因为有4s延迟，程序直接变成了轻量级锁）</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/9aefeb4614e7432d8d35984497e70702.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<p><strong>因为参数系统默认开启</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/7586e480966c4265add78ac347e19a12.png" alt="在这里插入图片描述"></p>
+<p><strong>关闭延迟参数，启用该功能</strong>.</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/2326cc673efb4bf99f890cff224763ab.png" alt="在这里插入图片描述"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/df67dda673c94056a69e40acd864a21a.png" alt="在这里插入图片描述"></p>
+<h4 id="Code演示2-主动迎合这4秒的延迟"><a href="#Code演示2-主动迎合这4秒的延迟" class="headerlink" title="Code演示2-主动迎合这4秒的延迟"></a>Code演示2-主动迎合这4秒的延迟</h4><h5 id="主动迎合4秒的延迟"><a href="#主动迎合4秒的延迟" class="headerlink" title="主动迎合4秒的延迟"></a>主动迎合4秒的延迟</h5><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/b1db9b39ebd54afe9433436c4cc19d72.png" alt="在这里插入图片描述"></p>
+<h5 id="第一种情况-没用synchronized"><a href="#第一种情况-没用synchronized" class="headerlink" title="第一种情况-没用synchronized"></a>第一种情况-没用synchronized</h5><ul>
+<li><p>确实开启了偏向锁101，但是o对象未采用synchronized加锁，所以线程id是空的</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/36a288923c7a4016ab489c72f2afd6e8.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h5 id="第二种情况-用synchronized"><a href="#第二种情况-用synchronized" class="headerlink" title="第二种情况- 用synchronized"></a>第二种情况- 用synchronized</h5><ul>
+<li><p>使用synchronized锁住o之后，发现这五十四位指向了当前线程指针</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/1f2c384c1b4e459cad7bb5160d43cd9f.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h4 id="不再是一个线程独享"><a href="#不再是一个线程独享" class="headerlink" title="不再是一个线程独享"></a>不再是一个线程独享</h4><ul>
+<li>开始有第二个线程来竞争了</li>
+</ul>
+<h4 id="偏向锁的撤销"><a href="#偏向锁的撤销" class="headerlink" title="偏向锁的撤销"></a>偏向锁的撤销</h4><ul>
+<li>当有另外线程逐步来竞争所的时候，就不能再使用偏向锁了，要升级为轻量级锁</li>
+<li>竞争线程尝试CAS更新对象头失败，会等待到<strong>全局安全点</strong>（此时不会执行任何代码）撤销偏向锁</li>
+</ul>
+<h5 id="撤销"><a href="#撤销" class="headerlink" title="撤销"></a>撤销</h5><p>偏向锁使用一种等到<strong>竞争出现才释放锁的机制</strong>，只有当其他线程竞争锁时，持有偏向锁的原来线程才会被撤销。</p>
+<p>撇销需要等待<strong>全局安全点</strong>(该时间点上没有字节码正在执行)，同时检查持有偏向锁的线程是否还在执行：</p>
+<ul>
+<li>第一个线程<code>正在执行synchronized方法(处于同步块)</code>，它还没有执行完，其它线程来抢夺，该偏向锁会被取消掉并出现<strong>锁升级</strong>。此时轻量级锁由原持有偏向锁的线程持有，继续执行其同步代码，而正在竞争的线程会进入自旋等待获得该轻量级锁。</li>
+<li>第一个线程<code>执行完成synchronized方法(退出同步块)</code>，则将对象头<strong>设置成无锁状态并撤销偏向锁，重新偏向</strong>。<br><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219171749821.png" alt="image-20230219171749821"></li>
+</ul>
+<h4 id="总体步骤流程图示"><a href="#总体步骤流程图示" class="headerlink" title="总体步骤流程图示"></a>总体步骤流程图示</h4><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219172317620.png" alt="image-20230219172317620" style="zoom: 200%;" />
+
+<h4 id="java15逐步废弃偏向锁"><a href="#java15逐步废弃偏向锁" class="headerlink" title="java15逐步废弃偏向锁"></a>java15逐步废弃偏向锁</h4><ul>
+<li>在过去，Java 应用通常使用的都是 HashTable、Vector 等比较老的集合库，这类集合库大量使用了 synchronized 来保证线程安全。</li>
+<li>如果在单线程的情景下使用这些集合库就会有不必要的加锁操作，从而导致性能下降。</li>
+<li>而偏向锁可以保证即使是使用了这些老的集合库，也不会产生很大的性能损耗，因为 JVM 知道访问临界区的线程始终是同一个，也就避免了加锁操作。</li>
+<li>这一切都很美好，但是随着时代的变化，新的 Java 应用基本都已经使用了无锁的集合库，比如 HashMap、ArrayList 等，这些集合库在单线程场景下比老的集合库性能更好。</li>
+<li>即使是在多线程场景下，Java 也提供了 ConcurrentHashMap、CopyOnWriteArrayList 等性能更好的线程安全的集合库。</li>
+<li>综上，<strong>对于使用了新类库的 Java 应用来说，偏向锁带来的收益已不如过去那么明显，而且在当下多线程应用越来越普遍的情况下，偏向锁带来的锁升级操作反而会影响应用的性能</strong>。</li>
+</ul>
+<img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219173622348.png" alt="image-20230219173622348"  />
+
+<p>在废弃偏向锁的提案 <strong><a href="https://link.zhihu.com/?target=https://openjdk.java.net/jeps/374">JEP374</a></strong> 中还提到了与 HotSpot 相关的一点</p>
+<blockquote>
+<p>Biased locking introduced a lot of complex code into the synchronization subsystem and is invasive to other HotSpot components as well.</p>
+</blockquote>
+<p>简单翻译就是<strong>偏向锁</strong>为整个「同步子系统」引入了大量的复杂度，并且这些复杂度也入侵到了 HotSpot 的其它组件。</p>
+<p>这导致了系统代码难以理解，难以进行大的设计变更，降低了子系统的演进能力，</p>
+<p>总结下来其实就是 ROI （投资回报率）太低了，考虑到兼容性，所以决定先废弃该特性，最终的目标是移除它。</p>
+<h3 id="轻锁"><a href="#轻锁" class="headerlink" title="轻锁"></a>轻锁</h3><h4 id="是什么-1"><a href="#是什么-1" class="headerlink" title="是什么"></a>是什么</h4><p><strong>轻量级锁</strong>：多线程竞争，但是<strong>任意时刻最多只有一个线程竞争</strong>，即不存在锁竞争太过激烈的情况，也就没有线程阻寨</p>
+<h4 id="主要作用-1"><a href="#主要作用-1" class="headerlink" title="主要作用"></a>主要作用</h4><ul>
+<li>有线程来参与锁的竞争，但是获取锁的冲突时间极短</li>
+<li>本质就是自选锁CAS</li>
+</ul>
+<p><strong>64位标记图再看</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/31b417d60922451ca5a5a471e3badeb8.png" alt="在这里插入图片描述"></p>
+<h4 id="轻量级锁的获取"><a href="#轻量级锁的获取" class="headerlink" title="轻量级锁的获取"></a>轻量级锁的获取</h4><p>轻量级锁是为了在线程<strong>近乎交替</strong>执行同步块时提高性能。</p>
+<p>主要目的：在没有多线程竞争的前提下，<strong>通过CAS减少</strong>重量级锁使用操作系统互斥量产生的性能消耗．说白了<strong>先自旋，不行才升级阻寨</strong>。</p>
+<p>升级时机：当关闭偏向锁功能或多线程竞争偏向锁会导致偏向锁升级为轻量级锁</p>
+<p>假如线程A己经拿到锁，这时线程B又来抢该对象的锁，由于该对象的锁己经被线程A拿到，当前该锁己是偏向锁了。</p>
+<p>而线程B在争抢时发现对象头Mark Ward中的线程ID不是线程B自己的线程1D(而是线程A)，那线程B就会进行CAS操作希望能获得锁。</p>
+<p>此吋线程B操作中有两种情况：</p>
+<ul>
+<li><p><strong>如果锁获取成功</strong>，直接替换Mark Word中的线程1D为B自己的1D(A—B)．重新偏向于其他线程(即将偏向锁交给其他线程，相当于当前线程”被”释放了锁)，该锁会保持偏向锁状态，A线程Over，B线程上位：<br><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/48c603c3b8154a08945e30a2ce2d094e.png" alt="在这里插入图片描述"></p>
+</li>
+<li><p><strong>如果锁获取失败</strong>，则偏向锁升级为轻量级锁(设置偏向锁标识为0并设置锁标志位为00)，此时轻量级锁由原持有偏向锁的线程持有，继续执行其同步代码，而正在竞争的线程B会进入自旋等待获得该轻量级锁。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/cc6e7ab5801e490ca7908056ed8fc907.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h5 id="补充说明"><a href="#补充说明" class="headerlink" title="补充说明"></a>补充说明</h5><ul>
+<li><strong>轻量级锁的加锁</strong><ul>
+<li>JVM会为每个线程在当前线程的栈帧中<strong>创建用于存储锁记录的空间</strong>，官方成为<code>Displaced Mark Word</code>。若一个线程获得锁时发现是轻量级锁，会把锁的MarkWord复制到自己的Displaced Mark Word里面。然后线程尝试用CAS将锁的MarkWord替换为<strong>指向锁记录的指针</strong>。如果成功，当前线程获得锁，如果失败，表示Mark Word已经被替换成了其他线程的锁记录，说明在与其它线程竞争锁，当前线程就尝试使用自旋来获取锁。</li>
+<li>自旋CAS：不断尝试去获取锁，能不升级就不往上捅，尽量不要阻寨</li>
+</ul>
+</li>
+<li><strong>轻量级锁的释放</strong><ul>
+<li>在释放锁时，当前线程会使用CAS操作将Displaced Mark Word的内容复制回锁的Mark Word里面。如果没有发生竞争，那么这个复制的操作会成功。如果有其他线程因为自旋多次导致轻量级锁升级成了重量级锁，那么CAS操作会失败，此时会释放锁并唤醒被阻寨的线程。</li>
+</ul>
+</li>
+</ul>
+<h4 id="Code演示-1"><a href="#Code演示-1" class="headerlink" title="Code演示"></a>Code演示</h4><h5 id="如果关闭偏向锁，就可以直接进入轻量级锁"><a href="#如果关闭偏向锁，就可以直接进入轻量级锁" class="headerlink" title="如果关闭偏向锁，就可以直接进入轻量级锁"></a>如果关闭偏向锁，就可以直接进入轻量级锁</h5><h5 id="XX-UseBiasedLocking"><a href="#XX-UseBiasedLocking" class="headerlink" title="-XX:-UseBiasedLocking"></a>-XX:-UseBiasedLocking</h5><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6a1c95588e55448b9f2e3fd4bd63151f.png" alt="在这里插入图片描述"></p>
+<h4 id="步骤流程图示"><a href="#步骤流程图示" class="headerlink" title="步骤流程图示"></a>步骤流程图示</h4><ul>
+<li><p>轻量级锁状态下，CAS自旋达到一定次数也会<strong>升级为重量级锁</strong></p>
+<img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219184952642.png" alt="image-20230219184952642" style="zoom: 67%;" /></li>
+</ul>
+<h4 id="自旋达到一定次数和程度"><a href="#自旋达到一定次数和程度" class="headerlink" title="自旋达到一定次数和程度"></a>自旋达到一定次数和程度</h4><h5 id="java6之前"><a href="#java6之前" class="headerlink" title="java6之前"></a>java6之前</h5><ul>
+<li><p>了解即可</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/019bb3b645bb406a89f7469cab952f07.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h5 id="java6之后"><a href="#java6之后" class="headerlink" title="java6之后"></a>java6之后</h5><p><strong>【自适应自旋锁】</strong>的大致原理</p>
+<ul>
+<li>线程如果自旋成功了，那下次自旋的最大次数会增加，因为JVM认为既然上次成功了，那么这一次也很大概率会成功。</li>
+<li>反之如果很少会自旋成功，那么下次会减少自旋的次数甚至不自旋，避免CPU空转。</li>
+</ul>
+<p>总之，自适应意味着自选的次数不是固定不变的，而是根据：<strong>同一个锁上一次自旋的时间和拥有锁线程的状态来决定</strong>。</p>
+<h4 id="轻量锁和偏向锁的区别和不同"><a href="#轻量锁和偏向锁的区别和不同" class="headerlink" title="轻量锁和偏向锁的区别和不同"></a>轻量锁和偏向锁的区别和不同</h4><ul>
+<li>争夺轻量级锁失败时，自旋尝试抢占锁</li>
+<li>轻量级锁每次退出同步块都需要释放锁，而偏向锁是在竞争发生时才释放锁</li>
+</ul>
+<h3 id="重锁"><a href="#重锁" class="headerlink" title="重锁"></a>重锁</h3><h4 id="有大量的线程参与锁的竞争，冲突性很高"><a href="#有大量的线程参与锁的竞争，冲突性很高" class="headerlink" title="有大量的线程参与锁的竞争，冲突性很高"></a>有大量的线程参与锁的竞争，冲突性很高</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/896a934c809740a68c5e18ec7374f100.png" alt="在这里插入图片描述"></p>
+<h4 id="锁标志位"><a href="#锁标志位" class="headerlink" title="锁标志位"></a>锁标志位</h4><h4 id="重量级锁原理"><a href="#重量级锁原理" class="headerlink" title="重量级锁原理"></a>重量级锁原理</h4><p>Java中synchronized的重量级锁，是基于进入和退出Monitor对象实现的。在编译时会将同步块的开始位置插入<code>monitor enter</code>指令，在结束位置插入monitor exit指令。</p>
+<p>当线程执行到<code>monitor enter</code>指令时，会尝试获取对象所对应的Monitor所有权，如果获取到了，即获取到了锁，会在Monitor的owner中存放当前线程的id，这样它将处于锁定状态，除非退出同步块，否则其他线程无法获取到这个Monitor。</p>
+<h3 id="Code演示-2"><a href="#Code演示-2" class="headerlink" title="Code演示"></a>Code演示</h3><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/dd2950cee7514ab1b79927cd8ae8cbd7.png" alt="在这里插入图片描述"></p>
+<h3 id="小总结-面试中的高频考点"><a href="#小总结-面试中的高频考点" class="headerlink" title="小总结-面试中的高频考点"></a>小总结-面试中的高频考点</h3><h4 id="锁升级发生后，hashcode去哪了"><a href="#锁升级发生后，hashcode去哪了" class="headerlink" title="锁升级发生后，hashcode去哪了"></a>锁升级发生后，hashcode去哪了</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/b1f38e7d992149f7b4a99142a172c426.png" alt="在这里插入图片描述"></p>
+<h5 id="说明-2"><a href="#说明-2" class="headerlink" title="说明"></a>说明</h5><p>锁升级为轻量级或重量级锁后，Mark Word中保存的分别是<strong>线程栈帧里的锁记录指针</strong>和<strong>重量级锁指针</strong>，己经没有位置再保存哈希码，GC年龄了，那么这些信息被移动到哪里去了呢？</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/274f22fcea7845af9371be3cfb7b2d1a.png" alt="在这里插入图片描述"></p>
+<ul>
+<li>用更加通俗的话解释（四种锁的不同情况）<ul>
+<li><strong>在无锁状态下</strong>，Mark Word中可以存储对象的identity hash code值。当对象的hashCode()方法第一次被调用时，JVM会生成对应的identity hash code值并将该值存储到Mark Word中。</li>
+<li><strong>对于偏向锁</strong>，在线程获取偏向锁时，会用Thread |D和epoch值覆盖identity hash code所在的位置。如果一个对象的hashCode()方法己经被调用过一次之后，这个对象<strong>不能</strong>被设置偏向锁。因为如果可以的化，那Mark Word中的identity hash code必然会被偏向线程Id给覆盖，这就会造成同一个对象前后两次调用hashCode()方法得到的结果不一致。</li>
+<li><strong>升级为轻量级锁时</strong>，JVM会在当前线程的栈帧中创建一个<strong>锁记录(Lock Record)<strong>空间，用于存储锁对象的Mark Word拷贝，该拷贝中可以包含identity hash code，所以</strong>轻量级锁可以和identity hash code共存</strong>，哈希码和GC年龄自然保存在此，释放锁后会将这些信息写回到对象头。</li>
+<li><strong>升级为重量级锁后</strong>，Mark Word保存的重量级锁指针，代表重量级锁的<strong>ObjectMonitor类</strong>里有字段记录非加锁状态下的<strong>Mark Word</strong>，锁释放后也会将信息写回到对象头。</li>
+</ul>
+</li>
+</ul>
+<h5 id="code01"><a href="#code01" class="headerlink" title="code01"></a>code01</h5><ul>
+<li><p>当一个对象已经计算过identity hash code，它就无法进入偏向锁状态，跳过偏向锁，直接升级轻量级锁3</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/9386f22fc236434a8dd6da6a72f0f20d.png" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h5 id="code02"><a href="#code02" class="headerlink" title="code02"></a>code02</h5><ul>
+<li><p>在偏向锁的状态中遇到一致性哈希计算请求，立马<strong>撤销</strong>偏向模式，<strong>膨胀为重量级锁</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219192110483.png" alt="image-20230219192110483"></p>
+</li>
+</ul>
+<h4 id="各种锁优缺点、synchronized锁升级和实现原理"><a href="#各种锁优缺点、synchronized锁升级和实现原理" class="headerlink" title="各种锁优缺点、synchronized锁升级和实现原理"></a>各种锁优缺点、synchronized锁升级和实现原理</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230219192714411.png" alt="image-20230219192714411"></p>
+<p>synchronized锁升级过程总结：<strong>一句话，就是先自旋，不行再阻塞</strong>。</p>
+<ul>
+<li>实际上是把之前的悲观锁（重量级锁）变成在一定条件下使用偏向锁以及使用轻量级（自旋锁CAS）的形式</li>
+<li>synchronized在修饰方法和代码块在字节码上实现方式有很大差异，但是内部实现还是基于对象头的MarkWord来实现的。<br>JDK1.6之前synchronized使用的是重量级锁，<strong>JDK1.6之后进行了优化，拥有了无锁-&gt;偏向锁-&gt;轻量级锁-&gt;重量级锁的升级过程</strong>，而不是无论什么情况都使用重量级锁。</li>
+<li><strong>偏向锁</strong>：适用于单线程适用的情况，在不存在锁竞争的时候进入同步方法&#x2F;代码块则使用偏向锁。</li>
+<li><strong>轻量级锁</strong>：适用于竞争较不激烈的情况(这和乐观锁的使用范围类似)，存在竞争时升级为轻量级锁，轻量级锁采用的是自旋锁，如果<br>同步方法&#x2F;代码块执行时间很短的话，采用轻量级锁虽然会占用cpu资源但是相对比使用重量级锁还是更高效。</li>
+<li><strong>重量级锁</strong>：适用于竞争激烈的情况，如果同步方法&#x2F;代码块执行时间很长，那么使用轻量级锁自旋带来的性能消耗就比使用重量级锁更严重，这时候就需要升级为重量级锁。</li>
+</ul>
+<h2 id="JIT编译器对锁的优化"><a href="#JIT编译器对锁的优化" class="headerlink" title="JIT编译器对锁的优化"></a>JIT编译器对锁的优化</h2><h3 id="JIT"><a href="#JIT" class="headerlink" title="JIT"></a>JIT</h3><p>Just In Time Compiler，一般翻译为即时编译器</p>
+<h3 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h3><p>从JIT角度看相当于无视它，synchronized(o)不存在了，</p>
+<p>这个锁对象并没有被共用扩散到其它线程使用，</p>
+<p>极端的说就是根本没有加这个锁对象的底层机器码，消除了锁的使用</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/f097ef47c0e14ae09b4639ed6fb6679b.png" alt="在这里插入图片描述"></p>
+<p>锁消除的主要判定依据来源于<strong>逃逸分析</strong>的数据支持。</p>
+<h3 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h3><p>假如方法中首位相接，前后相邻的都是同一个锁对象，那JIT编译器就会把这几个synchronized块合并成一个大块，</p>
+<p>加粗加大范围，一次申请使用即可，避免次次都申请和释放锁，提升了性能</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/4d5b2210ae7345f5a1059ecb7d3a6601.png" alt="在这里插入图片描述"></p>
+<h1 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h1><p>轻量锁升级重量锁过程中没有自旋，CAS 失败了之后，<strong>并没有什么自旋操作</strong>，如果 CAS 成功就直接获取轻量锁，如果失败直接锁膨胀为重量锁</p>
+<p>实际的自旋操作是在重量锁中</p>
+<p>即网上流传的这张图中，轻量锁和重量锁的范围为需要调整如下：</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230315124415451.png" alt="image-20230315124415451"></p>
+<p><a target="_blank" rel="noopener" href="https://www.nowcoder.com/discuss/353157586415460352">别再和面试官说Synchronized轻量级锁自旋了，错了！_牛客网 (nowcoder.com)</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%92%8C%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-number">1.</span> <span class="toc-text">Java对象内存布局和对象头</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="toc-number">1.1.</span> <span class="toc-text">面试题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Object-object-new-Object"><span class="toc-number">1.2.</span> <span class="toc-text">Object object &#x3D; new Object()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E7%BD%AE%E6%89%80%E5%9C%A8"><span class="toc-number">1.2.1.</span> <span class="toc-text">位置所在</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%84%E6%88%90%E5%B8%83%E5%B1%80"><span class="toc-number">1.2.2.</span> <span class="toc-text">构成布局</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%9C%A8%E5%A0%86%E5%86%85%E5%AD%98%E4%B8%AD%E5%B8%83%E5%B1%80"><span class="toc-number">1.3.</span> <span class="toc-text">对象在堆内存中布局</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%83%E5%A8%81%E5%AE%9A%E4%B9%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">权威定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%9C%A8%E5%A0%86%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E5%B8%83%E5%B1%80"><span class="toc-number">1.3.2.</span> <span class="toc-text">对象在堆内存中的存储布局</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">1.对象头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%AE%9E%E4%BE%8B%E6%95%B0%E6%8D%AE"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">2.实例数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%AF%B9%E9%BD%90%E5%A1%AB%E5%85%85"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">3.对齐填充</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%98%E7%BD%91%E7%90%86%E8%AE%BA"><span class="toc-number">1.3.3.</span> <span class="toc-text">官网理论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%8D%E8%AF%B4%E5%AF%B9%E8%B1%A1%E5%A4%B4%E7%9A%84MarkWord"><span class="toc-number">1.4.</span> <span class="toc-text">再说对象头的MarkWord</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#32%E4%BD%8D%EF%BC%88%E7%9C%8B%E4%B8%80%E4%B8%8B%E5%8D%B3%E5%8F%AF%EF%BC%8C%E4%BB%A564%E4%BD%8D%E4%B8%BA%E5%87%86%EF%BC%89"><span class="toc-number">1.4.1.</span> <span class="toc-text">32位（看一下即可，以64位为准）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#64%E4%BD%8D%E9%87%8D%E8%A6%81"><span class="toc-number">1.4.2.</span> <span class="toc-text">64位重要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#markword-64%E4%BD%8D-%E5%88%86%E5%B8%83%E5%9B%BE"><span class="toc-number">1.4.3.</span> <span class="toc-text">markword(64位)分布图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%81%8A%E8%81%8AObject-obj-new-Object-%E3%80%90%E7%94%A8%E4%BB%A3%E7%A0%81%E6%BC%94%E7%A4%BA%E3%80%91"><span class="toc-number">1.5.</span> <span class="toc-text">聊聊Object obj &#x3D; new Object()【用代码演示】</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JOL%E8%AF%81%E6%98%8E"><span class="toc-number">1.5.1.</span> <span class="toc-text">JOL证明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">1.5.2.</span> <span class="toc-text">代码</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BC%94%E7%A4%BA%E4%B8%80-%E7%94%A8%E8%87%AA%E5%B8%A6%E7%9A%84%E7%B1%BB"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">演示一 | 用自带的类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BC%94%E7%A4%BA%E4%BA%8C-%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E7%B1%BB"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">演示二 | 用自己的类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GC%E5%B9%B4%E9%BE%84"><span class="toc-number">1.5.3.</span> <span class="toc-text">GC年龄</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E6%83%B3%E8%AF%81%E6%98%8E%E4%B8%80%E4%B8%8B"><span class="toc-number">1.5.3.1.</span> <span class="toc-text">如果想证明一下</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%BE%E5%B7%B4%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E%EF%BC%88%E5%8E%8B%E7%BC%A9%E6%8C%87%E9%92%88%E7%9B%B8%E5%85%B3%EF%BC%89"><span class="toc-number">1.5.4.</span> <span class="toc-text">尾巴参数说明（压缩指针相关）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8DJVM%E8%BF%90%E8%A1%8C%E5%8F%82%E6%95%B0%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="toc-number">1.5.4.1.</span> <span class="toc-text">查看当前JVM运行参数的指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%8B%E7%BC%A9%E6%8C%87%E9%92%88%E9%BB%98%E8%AE%A4%E6%98%AF%E5%BC%80%E5%90%AF%E7%9A%84"><span class="toc-number">1.5.4.2.</span> <span class="toc-text">压缩指针默认是开启的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%87%E5%A6%82%E4%B8%8D%E5%8E%8B%E7%BC%A9%E7%9A%84%E6%83%85%E5%86%B5%EF%BC%9F%E6%88%91%E4%BB%AC%E6%89%8B%E5%8A%A8%E5%85%B3%E9%97%AD%E5%8E%8B%E7%BC%A9%E6%8C%87%E9%92%88%E7%9C%8B%E7%9C%8B%EF%BC%9F"><span class="toc-number">1.5.4.3.</span> <span class="toc-text">假如不压缩的情况？我们手动关闭压缩指针看看？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8D%A2%E6%88%90%E5%85%B6%E4%BB%96%E5%AF%B9%E8%B1%A1%E8%AF%95%E8%AF%95"><span class="toc-number">1.5.5.</span> <span class="toc-text">换成其他对象试试</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Synchronized%E4%B8%8E%E9%94%81%E5%8D%87%E7%BA%A7"><span class="toc-number">2.</span> <span class="toc-text">Synchronized与锁升级</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98-1"><span class="toc-number">2.1.</span> <span class="toc-text">面试题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E7%AB%A0%E8%B7%AF%E7%BA%BF%E6%80%BB%E7%BA%B2"><span class="toc-number">2.2.</span> <span class="toc-text">本章路线总纲</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E"><span class="toc-number">2.2.1.</span> <span class="toc-text">说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#synchronized%E9%94%81"><span class="toc-number">2.2.2.</span> <span class="toc-text">synchronized锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Synchronized%E7%9A%84%E6%80%A7%E8%83%BD%E5%8F%98%E5%8C%96"><span class="toc-number">2.3.</span> <span class="toc-text">Synchronized的性能变化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java5%E4%BB%A5%E5%89%8D"><span class="toc-number">2.3.1.</span> <span class="toc-text">java5以前</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Java5%E4%B9%8B%E5%89%8D%EF%BC%8C%E7%94%A8%E6%88%B7%E6%80%81%E5%92%8C%E5%86%85%E6%A0%B8%E6%80%81%E4%B9%8B%E9%97%B4%E7%9A%84%E5%88%87%E6%8D%A2"><span class="toc-number">2.3.1.1.</span> <span class="toc-text">Java5之前，用户态和内核态之间的切换</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AF%8F%E4%B8%80%E4%B8%AA%E5%AF%B9%E8%B1%A1%E9%83%BD%E5%8F%AF%E4%BB%A5%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E9%94%81-%E5%A4%8D%E4%B9%A0%E4%B9%8B%E5%89%8D%E7%9A%84%E7%9F%A5%E8%AF%86"><span class="toc-number">2.3.2.</span> <span class="toc-text">为什么每一个对象都可以成为一个锁-复习之前的知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#markOop-hpp"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">markOop.hpp</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Monitor-%E7%9B%91%E8%A7%86%E5%99%A8%E9%94%81"><span class="toc-number">2.3.2.2.</span> <span class="toc-text">Monitor(监视器锁)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E5%90%88%E4%B9%8B%E5%89%8D%E7%9A%84synchronized%E5%92%8C%E5%AF%B9%E8%B1%A1%E5%A4%B4%E8%AF%B4%E6%98%8E"><span class="toc-number">2.3.2.3.</span> <span class="toc-text">结合之前的synchronized和对象头说明</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#java6%E5%BC%80%E5%A7%8B%EF%BC%8C%E4%BC%98%E5%8C%96Synchronized"><span class="toc-number">2.3.3.</span> <span class="toc-text">java6开始，优化Synchronized</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Synchronized%E9%94%81%E7%A7%8D%E7%B1%BB%E5%8F%8A%E5%8D%87%E7%BA%A7%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.4.</span> <span class="toc-text">Synchronized锁种类及升级步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E8%AE%BF%E9%97%AE%E6%83%85%E5%86%B5%EF%BC%8C3%E7%A7%8D"><span class="toc-number">2.4.1.</span> <span class="toc-text">多线程访问情况，3种</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%87%E7%BA%A7%E6%B5%81%E7%A8%8B"><span class="toc-number">2.4.2.</span> <span class="toc-text">升级流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%94%81%E6%8C%87%E5%90%91"><span class="toc-number">2.4.2.1.</span> <span class="toc-text">锁指向</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E9%94%81"><span class="toc-number">2.4.3.</span> <span class="toc-text">无锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#C%E6%BA%90%E7%A0%81%E7%9A%84MarkWord%E6%A0%87%E8%AE%B0"><span class="toc-number">2.4.3.1.</span> <span class="toc-text">C源码的MarkWord标记</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA"><span class="toc-number">2.4.3.2.</span> <span class="toc-text">Code演示</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E4%B8%8D%E4%BC%9A%E6%9C%89%E9%94%81%E7%9A%84%E7%AB%9E%E4%BA%89"><span class="toc-number">2.4.3.3.</span> <span class="toc-text">程序不会有锁的竞争</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%81%8F%E9%94%81"><span class="toc-number">2.4.4.</span> <span class="toc-text">偏锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.4.4.1.</span> <span class="toc-text">是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E4%BD%9C%E7%94%A8"><span class="toc-number">2.4.4.2.</span> <span class="toc-text">主要作用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93%E8%AE%BA"><span class="toc-number">2.4.4.3.</span> <span class="toc-text">小结论</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81%E7%9A%84%E6%8C%81%E6%9C%89"><span class="toc-number">2.4.4.4.</span> <span class="toc-text">偏向锁的持有</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E-1"><span class="toc-number">2.4.4.4.1.</span> <span class="toc-text">说明</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%86%E5%8C%96Account%E5%AF%B9%E8%B1%A1%E4%B8%BE%E4%BE%8B%E8%AF%B4%E6%98%8E"><span class="toc-number">2.4.4.4.2.</span> <span class="toc-text">细化Account对象举例说明</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81JVM%E5%91%BD%E4%BB%A4"><span class="toc-number">2.4.4.5.</span> <span class="toc-text">偏向锁JVM命令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%87%8D%E8%A6%81%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E"><span class="toc-number">2.4.4.5.1.</span> <span class="toc-text">重要参数说明</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA-%E9%80%9A%E8%BF%87%E5%B0%86%E5%BB%B6%E8%BF%9F%E6%94%B9%E4%B8%BA0%E6%9D%A5%E5%BC%80%E5%90%AF%E5%81%8F%E5%90%91%E9%94%81"><span class="toc-number">2.4.4.6.</span> <span class="toc-text">Code演示-通过将延迟改为0来开启偏向锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA2-%E4%B8%BB%E5%8A%A8%E8%BF%8E%E5%90%88%E8%BF%994%E7%A7%92%E7%9A%84%E5%BB%B6%E8%BF%9F"><span class="toc-number">2.4.4.7.</span> <span class="toc-text">Code演示2-主动迎合这4秒的延迟</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%BB%E5%8A%A8%E8%BF%8E%E5%90%884%E7%A7%92%E7%9A%84%E5%BB%B6%E8%BF%9F"><span class="toc-number">2.4.4.7.1.</span> <span class="toc-text">主动迎合4秒的延迟</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%A7%8D%E6%83%85%E5%86%B5-%E6%B2%A1%E7%94%A8synchronized"><span class="toc-number">2.4.4.7.2.</span> <span class="toc-text">第一种情况-没用synchronized</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%A7%8D%E6%83%85%E5%86%B5-%E7%94%A8synchronized"><span class="toc-number">2.4.4.7.3.</span> <span class="toc-text">第二种情况- 用synchronized</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8D%E5%86%8D%E6%98%AF%E4%B8%80%E4%B8%AA%E7%BA%BF%E7%A8%8B%E7%8B%AC%E4%BA%AB"><span class="toc-number">2.4.4.8.</span> <span class="toc-text">不再是一个线程独享</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81%E7%9A%84%E6%92%A4%E9%94%80"><span class="toc-number">2.4.4.9.</span> <span class="toc-text">偏向锁的撤销</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%92%A4%E9%94%80"><span class="toc-number">2.4.4.9.1.</span> <span class="toc-text">撤销</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%BB%E4%BD%93%E6%AD%A5%E9%AA%A4%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%A4%BA"><span class="toc-number">2.4.4.10.</span> <span class="toc-text">总体步骤流程图示</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#java15%E9%80%90%E6%AD%A5%E5%BA%9F%E5%BC%83%E5%81%8F%E5%90%91%E9%94%81"><span class="toc-number">2.4.4.11.</span> <span class="toc-text">java15逐步废弃偏向锁</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%BB%E9%94%81"><span class="toc-number">2.4.5.</span> <span class="toc-text">轻锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88-1"><span class="toc-number">2.4.5.1.</span> <span class="toc-text">是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E4%BD%9C%E7%94%A8-1"><span class="toc-number">2.4.5.2.</span> <span class="toc-text">主要作用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81%E7%9A%84%E8%8E%B7%E5%8F%96"><span class="toc-number">2.4.5.3.</span> <span class="toc-text">轻量级锁的获取</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A1%A5%E5%85%85%E8%AF%B4%E6%98%8E"><span class="toc-number">2.4.5.3.1.</span> <span class="toc-text">补充说明</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA-1"><span class="toc-number">2.4.5.4.</span> <span class="toc-text">Code演示</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E5%85%B3%E9%97%AD%E5%81%8F%E5%90%91%E9%94%81%EF%BC%8C%E5%B0%B1%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E8%BF%9B%E5%85%A5%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81"><span class="toc-number">2.4.5.4.1.</span> <span class="toc-text">如果关闭偏向锁，就可以直接进入轻量级锁</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#XX-UseBiasedLocking"><span class="toc-number">2.4.5.4.2.</span> <span class="toc-text">-XX:-UseBiasedLocking</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4%E6%B5%81%E7%A8%8B%E5%9B%BE%E7%A4%BA"><span class="toc-number">2.4.5.5.</span> <span class="toc-text">步骤流程图示</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E6%97%8B%E8%BE%BE%E5%88%B0%E4%B8%80%E5%AE%9A%E6%AC%A1%E6%95%B0%E5%92%8C%E7%A8%8B%E5%BA%A6"><span class="toc-number">2.4.5.6.</span> <span class="toc-text">自旋达到一定次数和程度</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#java6%E4%B9%8B%E5%89%8D"><span class="toc-number">2.4.5.6.1.</span> <span class="toc-text">java6之前</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#java6%E4%B9%8B%E5%90%8E"><span class="toc-number">2.4.5.6.2.</span> <span class="toc-text">java6之后</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BD%BB%E9%87%8F%E9%94%81%E5%92%8C%E5%81%8F%E5%90%91%E9%94%81%E7%9A%84%E5%8C%BA%E5%88%AB%E5%92%8C%E4%B8%8D%E5%90%8C"><span class="toc-number">2.4.5.7.</span> <span class="toc-text">轻量锁和偏向锁的区别和不同</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E9%94%81"><span class="toc-number">2.4.6.</span> <span class="toc-text">重锁</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%A4%A7%E9%87%8F%E7%9A%84%E7%BA%BF%E7%A8%8B%E5%8F%82%E4%B8%8E%E9%94%81%E7%9A%84%E7%AB%9E%E4%BA%89%EF%BC%8C%E5%86%B2%E7%AA%81%E6%80%A7%E5%BE%88%E9%AB%98"><span class="toc-number">2.4.6.1.</span> <span class="toc-text">有大量的线程参与锁的竞争，冲突性很高</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%94%81%E6%A0%87%E5%BF%97%E4%BD%8D"><span class="toc-number">2.4.6.2.</span> <span class="toc-text">锁标志位</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81%E5%8E%9F%E7%90%86"><span class="toc-number">2.4.6.3.</span> <span class="toc-text">重量级锁原理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Code%E6%BC%94%E7%A4%BA-2"><span class="toc-number">2.4.7.</span> <span class="toc-text">Code演示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E6%80%BB%E7%BB%93-%E9%9D%A2%E8%AF%95%E4%B8%AD%E7%9A%84%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9"><span class="toc-number">2.4.8.</span> <span class="toc-text">小总结-面试中的高频考点</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%94%81%E5%8D%87%E7%BA%A7%E5%8F%91%E7%94%9F%E5%90%8E%EF%BC%8Chashcode%E5%8E%BB%E5%93%AA%E4%BA%86"><span class="toc-number">2.4.8.1.</span> <span class="toc-text">锁升级发生后，hashcode去哪了</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E-2"><span class="toc-number">2.4.8.1.1.</span> <span class="toc-text">说明</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#code01"><span class="toc-number">2.4.8.1.2.</span> <span class="toc-text">code01</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#code02"><span class="toc-number">2.4.8.1.3.</span> <span class="toc-text">code02</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%84%E7%A7%8D%E9%94%81%E4%BC%98%E7%BC%BA%E7%82%B9%E3%80%81synchronized%E9%94%81%E5%8D%87%E7%BA%A7%E5%92%8C%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-number">2.4.8.2.</span> <span class="toc-text">各种锁优缺点、synchronized锁升级和实现原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JIT%E7%BC%96%E8%AF%91%E5%99%A8%E5%AF%B9%E9%94%81%E7%9A%84%E4%BC%98%E5%8C%96"><span class="toc-number">2.5.</span> <span class="toc-text">JIT编译器对锁的优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JIT"><span class="toc-number">2.5.1.</span> <span class="toc-text">JIT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E6%B6%88%E9%99%A4"><span class="toc-number">2.5.2.</span> <span class="toc-text">锁消除</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%B2%97%E5%8C%96"><span class="toc-number">2.5.3.</span> <span class="toc-text">锁粗化</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%94%99%E8%AF%AF"><span class="toc-number">3.</span> <span class="toc-text">错误</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&text=Java对象内存布局及Synchronized锁升级"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&is_video=false&description=Java对象内存布局及Synchronized锁升级"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java对象内存布局及Synchronized锁升级&body=Check out this article: https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&title=Java对象内存布局及Synchronized锁升级"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&name=Java对象内存布局及Synchronized锁升级&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/&t=Java对象内存布局及Synchronized锁升级"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

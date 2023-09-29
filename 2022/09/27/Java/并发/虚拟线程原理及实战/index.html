@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="理论简介虚拟线程具有和 Go 语言的 goroutines 和 Erlang 语言的进程类似的实现方式，它们是用户模式（user-mode）线程的一种形式。 在过去 Java 中常常使用线程池来进行平台线程的共享以提高对计算机硬件的使用率，但在这种异步风格中，请求的每个阶段可能在不同的线程上执行，每个线程以交错的方式运行属于不同请求的阶段，与 Java 平台的设计不协调从而导致：  堆栈跟踪不提供">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟线程原理及实战">
+<meta property="og:url" content="https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="理论简介虚拟线程具有和 Go 语言的 goroutines 和 Erlang 语言的进程类似的实现方式，它们是用户模式（user-mode）线程的一种形式。 在过去 Java 中常常使用线程池来进行平台线程的共享以提高对计算机硬件的使用率，但在这种异步风格中，请求的每个阶段可能在不同的线程上执行，每个线程以交错的方式运行属于不同请求的阶段，与 Java 平台的设计不协调从而导致：  堆栈跟踪不提供">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211147077.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211224026.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211329870.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211544282.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211813228.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211844445.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926142005267.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926152820636.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926134304140.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926134649777.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926154448262.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926171002384.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927192914775.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927190351486.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221008133135799.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927184514398.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221008133212320.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927184620531.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221008133251274.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927200707984.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927201407669.png">
+<meta property="article:published_time" content="2022-09-27T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-28T08:49:12.488Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="并发">
+<meta property="article:tag" content="虚拟线程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211147077.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>虚拟线程原理及实战</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/10/27/linux/Docker%E9%83%A8%E7%BD%B2Springboot%E9%A1%B9%E7%9B%AE(jdk19)/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/09/24/Java/%E5%B9%B6%E5%8F%91/Java%E9%AB%98%E5%B9%B6%E5%8F%91%E9%9D%A9%E5%91%BD%EF%BC%81JDK19%E6%96%B0%E7%89%B9%E6%80%A7%E2%80%94%E2%80%94%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%EF%BC%88Virtual%20Threads%EF%BC%89/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&text=虚拟线程原理及实战"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&is_video=false&description=虚拟线程原理及实战"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=虚拟线程原理及实战&body=Check out this article: https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&name=虚拟线程原理及实战&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&t=虚拟线程原理及实战"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%90%86%E8%AE%BA"><span class="toc-number">1.</span> <span class="toc-text">理论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.0.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E5%B9%B6%E5%8F%91%E9%A3%8E%E6%A0%BC"><span class="toc-number">1.0.2.</span> <span class="toc-text">两种并发风格</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#thread-per-request-style"><span class="toc-number">1.0.2.1.</span> <span class="toc-text">**thread-per-request  style **</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#thread-sharing-style"><span class="toc-number">1.0.2.2.</span> <span class="toc-text">**thread-sharing  style **</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94"><span class="toc-number">1.0.2.3.</span> <span class="toc-text">对比</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E4%BF%9D%E7%95%99thread-per-request-style"><span class="toc-number">1.0.3.</span> <span class="toc-text">使用虚拟线程保留thread-per-request style</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%84%8F%E4%B9%89"><span class="toc-number">1.0.4.</span> <span class="toc-text">虚拟线程的意义</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E8%B7%B5"><span class="toc-number">2.</span> <span class="toc-text">实践</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.</span> <span class="toc-text">环境配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IDEA"><span class="toc-number">2.1.1.</span> <span class="toc-text">IDEA</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Project-Structure"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">Project Structure</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Settings"><span class="toc-number">2.1.1.2.</span> <span class="toc-text">Settings</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Maven"><span class="toc-number">2.1.2.</span> <span class="toc-text">Maven</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%94%9FAPI"><span class="toc-number">2.2.</span> <span class="toc-text">原生API</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">2.2.1.</span> <span class="toc-text">使用方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94%E5%AE%9E%E9%AA%8C"><span class="toc-number">2.2.2.</span> <span class="toc-text">对比实验</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%80%EF%BC%9A%E6%B5%8B%E8%AF%95n%E4%B8%AA%E6%89%A7%E8%A1%8C1s%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%80%BB%E8%BF%90%E8%A1%8C%E6%97%B6%E9%97%B4"><span class="toc-number">2.2.2.1.</span> <span class="toc-text">实验一：测试n个执行1s的线程总运行时间</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%85%B1%E4%BA%AB%E5%B9%B3%E5%8F%B0%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.2.2.1.1.</span> <span class="toc-text">线程池共享平台线程</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">2.2.2.1.1.1.</span> <span class="toc-text">代码</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C"><span class="toc-number">2.2.2.1.1.2.</span> <span class="toc-text">结果</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.2.2.1.2.</span> <span class="toc-text">虚拟线程</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-1"><span class="toc-number">2.2.2.1.2.1.</span> <span class="toc-text">代码</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C-1"><span class="toc-number">2.2.2.1.2.2.</span> <span class="toc-text">结果</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%9F%E8%AE%A1%E7%BB%93%E6%9E%9C"><span class="toc-number">2.2.2.1.3.</span> <span class="toc-text">统计结果</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E5%90%88SpringBoot"><span class="toc-number">2.3.</span> <span class="toc-text">整合SpringBoot</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bean%E5%88%9B%E5%BB%BA"><span class="toc-number">2.3.1.</span> <span class="toc-text">Bean创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AOP%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91"><span class="toc-number">2.3.2.</span> <span class="toc-text">AOP注解驱动开发</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E4%BC%A0%E5%85%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%BC%8A%E7%AB%AF"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">手动传入任务的弊端</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%80%9D%E8%B7%AF"><span class="toc-number">2.3.2.2.</span> <span class="toc-text">优化思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%B3%A8%E8%A7%A3"><span class="toc-number">2.3.2.3.</span> <span class="toc-text">创建注解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAAOP"><span class="toc-number">2.3.2.4.</span> <span class="toc-text">创建AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%BA%8C%EF%BC%9A%E9%AA%8C%E8%AF%81AOP%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E8%83%BD%E5%A4%9F%E5%BA%94%E7%94%A8%E4%BA%8E%E5%B9%B6%E5%8F%91%E8%AF%B7%E6%B1%82%E6%89%A7%E8%A1%8C"><span class="toc-number">2.3.2.4.1.</span> <span class="toc-text">实验二：验证AOP注解驱动开发能够应用于并发请求执行</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">2.3.2.5.</span> <span class="toc-text">注意事项</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8E%A8%E5%B9%BF"><span class="toc-number">3.</span> <span class="toc-text">推广</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%93%E8%AF%AD"><span class="toc-number">4.</span> <span class="toc-text">结语</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="toc-number">5.</span> <span class="toc-text">参考文章</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        虚拟线程原理及实战
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-09-27T08:51:33.000Z" class="dt-published" itemprop="datePublished">2022-09-27</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Java/" rel="tag">Java</a>, <a class="p-category" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>, <a class="p-category" href="/tags/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/" rel="tag">虚拟线程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h1><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>虚拟线程具有和 Go 语言的 goroutines 和 Erlang 语言的进程类似的实现方式，它们是<strong>用户模式（<em>user-mode</em>）线程</strong>的一种形式。</p>
+<p>在过去 Java 中常常使用线程池来进行<strong>平台线程的共享</strong>以提高对计算机硬件的使用率，但在这种异步风格中，请求的每个阶段可能在不同的线程上执行，每个线程以交错的方式运行属于不同请求的阶段，<strong>与 Java 平台的设计不协调从而导致</strong>：</p>
+<ul>
+<li>堆栈跟踪不提供可用的上下文</li>
+<li>调试器不能单步执行请求处理逻辑</li>
+<li>分析器不能将操作的成本与其调用方关联。</li>
+</ul>
+<p>而虚拟线程既保持与平台的设计兼容，同时又能最佳地利用硬件从而不影响可伸缩性。<strong>虚拟线程是由 JDK 而非操作系统提供的线程的轻量级实现</strong>：</p>
+<ul>
+<li><strong>虚拟线程</strong>是没有绑定到<strong>特定操作系统线程</strong>的线程。</li>
+<li><strong>平台线程</strong>是以传统方式实现的线程，作为<strong>围绕操作系统线程的简单包装</strong>。</li>
+</ul>
+<p>这里我们引入一条重要法则：</p>
+<ul>
+<li><strong>利特尔法则（<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Little's_law">Little’s Law</a><strong>）：对于给定的</strong>延迟</strong> ，<strong>并发性</strong>与<strong>吞吐量</strong>成正比增长<ul>
+<li>延迟：请求处理持续时间</li>
+<li>并发性：应用程序同时处理的请求数</li>
+<li>吞吐量：到达速率</li>
+</ul>
+</li>
+</ul>
+<h3 id="两种并发风格"><a href="#两种并发风格" class="headerlink" title="两种并发风格"></a>两种并发风格</h3><h4 id="thread-per-request-style"><a href="#thread-per-request-style" class="headerlink" title="**thread-per-request  style **"></a>**thread-per-request  style **</h4><ul>
+<li><p>服务器应用程序通常处理<strong>彼此独立的并发用户请求</strong>，因此应用程序通过在整个请求持续期间为该请求分配一个线程来处理请求是有意义的。这种按请求执行线程的风格易于理解、易于编程、易于调试和配置，因为它使用<strong>平台的并发单元</strong>来表示<strong>应用程序的并发单元</strong>。</p>
+</li>
+<li><p>服务器应用程序的可伸缩性受到<strong>利特尔法则（<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Little's_law">Little’s Law</a><strong>）的支配，该定律关系到</strong>延迟</strong>、<strong>并发性</strong>和<strong>吞吐量</strong>: 对于给定的<strong>请求处理持续时间(延迟)</strong> ，**应用程序同时处理的请求数(并发性)<strong>必须与</strong>到达速率(吞吐量)**成正比增长。</p>
+<p>例如，假设一个平均延迟为 50ms 的应用程序通过并发处理 10 个请求实现每秒 200 个请求的吞吐量。为了使该应用程序的吞吐量达到每秒 2000 个请求，它将需要同时处理 100 个请求。如果在请求持续期间每个请求都在一个线程中处理，那么为了让应用程序跟上，<strong>线程的数量必须随着吞吐量的增长而增长</strong>。</p>
+</li>
+<li><p>不幸的是，可用线程的数量是有限的，因为 <strong>JDK 将线程实现为操作系统(OS)线程的包装器</strong>。操作系统线程代价高昂，因此我们不能拥有太多线程，这使得实现不适合每个请求一个线程的 style 。</p>
+</li>
+<li><p>如果每个请求在其持续时间内消耗一个线程，从而消耗一个 OS 线程，那么线程的最大数量会受到CPU的限制。JDK 当前的线程实现将<strong>应用程序的吞吐量</strong>限制在<strong>远低于硬件所能支持的水平</strong>。即使在线程池中也会发生这种情况，<strong>因为池有助于避免启动新线程的高成本，但不会增加线程的总数</strong>。</p>
+</li>
+</ul>
+<h4 id="thread-sharing-style"><a href="#thread-sharing-style" class="headerlink" title="**thread-sharing  style **"></a>**thread-sharing  style **</h4><ul>
+<li>一些希望充分利用硬件的开发人员已经放弃了<strong>每个请求一个线程（thread-per-request）</strong>的 style ，转而采用<strong>线程共享（thread-sharing ）</strong>的 style 。</li>
+<li>请求处理代码不是从头到尾处理一个线程上的请求，而是在等待 I&#x2F;O 操作完成时将其线程返回到一个池中，以便该线程能够处理其他请求。这种细粒度的线程共享（其中代码<strong>只在执行计算时保留一个线程</strong>，<strong>而不是在等待 I&#x2F;O 时保留该线程</strong>）允许大量并发操作，而不需要消耗大量线程。</li>
+<li>虽然它消除了操作系统线程的稀缺性对吞吐量的限制，但代价很高: 它需要**异步风格 **，采用一组独立的 I&#x2F;O 方法，这些方法不等待 I&#x2F;O 操作完成，而是在以后将其完成信号发送给回调。如果没有专门的线程，开发人员必须将请求处理逻辑分解成小的阶段，通常以 lambda 表达式的形式编写，然后将它们组合成带有 API 的顺序管道。因此，它们放弃了语言的基本顺序组合运算符，如循环和 try&#x2F;catch 块。</li>
+<li><strong>在异步风格中，请求的每个阶段可能在不同的线程上执行，每个线程以交错的方式运行属于不同请求的阶段</strong>。这对于理解程序行为有着深刻的含义:<ul>
+<li>堆栈跟踪不提供可用的上下文</li>
+<li>调试器不能单步执行请求处理逻辑</li>
+<li>分析器不能将操作的成本与其调用方关联。</li>
+</ul>
+</li>
+<li>当使用 Java 的流 API 在短管道中处理数据时，组合 lambda 表达式是可管理的，但是当应用程序中的所有请求处理代码都必须以这种方式编写时，就有问题了。这种编程风格 与 Java 平台不一致，<strong>因为应用程序的并发单元（异步管道）不再是平台的并发单元</strong>。</li>
+</ul>
+<h4 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h4><table>
+<thead>
+<tr>
+<th></th>
+<th>thread-per-request  style</th>
+<th>**thread-sharing  style **</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>优点</td>
+<td>使用<strong>平台的并发单元</strong>来表示<strong>应用程序的并发单元</strong>。<br />与 Java 平台的设计相协调，易于理解、易于编程、易于调试和配置</td>
+<td>减小了操作系统线程的稀缺性对吞吐量的限制。<br />这种细粒度的线程共享允许大量并发操作，而不需要消耗大量线程，<strong>提高可伸缩性</strong></td>
+</tr>
+<tr>
+<td>缺点</td>
+<td>可用线程的数量是有限的，操作系统线程代价高昂，因此我们不能拥有太多线程。 <br />JDK 当前的线程实现将<strong>应用程序的吞吐量</strong>限制在<strong>远低于硬件所能支持的水平</strong></td>
+<td><strong>应用程序的并发单元（异步管道）不再是平台的并发单元</strong>。请求的每个阶段可能在不同的线程上执行，<strong>每个线程以交错的方式运行属于不同请求的阶段</strong><br />难以跟踪堆栈、单步调试</td>
+</tr>
+</tbody></table>
+<h3 id="使用虚拟线程保留thread-per-request-style"><a href="#使用虚拟线程保留thread-per-request-style" class="headerlink" title="使用虚拟线程保留thread-per-request style"></a>使用虚拟线程保留thread-per-request style</h3><p>为了使应用程序能够在与平台保持和谐的同时进行扩展，我们应该通过更有效地实现线程来努力保持每个请求一个线程的风格。</p>
+<p>操作系统无法更有效地实现 OS 线程，因为不同的语言和运行时以不同的方式使用线程堆栈。然而，<strong>Java 运行时实现 Java 线程的方式可以切断它们与操作系统线程之间的一一对应关系</strong>。正如操作系统通过将大量虚拟地址空间映射到有限数量的物理 RAM 而给人一种内存充足的错觉一样，<strong>Java 运行时也可以通过将大量虚拟线程映射到少量操作系统线程而给人一种线程充足的错觉</strong>。</p>
+<ul>
+<li><strong>虚拟线程</strong>是没有绑定到<strong>特定操作系统线程</strong>的线程。</li>
+<li><strong>平台线程</strong>是以传统方式实现的线程，作为<strong>围绕操作系统线程的简单包装</strong>。</li>
+</ul>
+<p><strong>thread-per-request 样式</strong>的应用程序代码可以在整个请求期间在虚拟线程中运行，但是虚拟线程<strong>只在 CPU 上执行计算时</strong>使用操作系统线程。其结果是<strong>与异步样式相同的可伸缩性</strong>，除了它是<strong>透明</strong>实现的：</p>
+<p>当在虚拟线程中运行的代码调用 <code>Java.*</code> API 中的阻塞 I&#x2F;O 操作时，运行时执行一个非阻塞操作系统调用，并自动挂起虚拟线程，直到稍后可以恢复。</p>
+<p>对于 Java 开发人员来说，虚拟线程是<strong>创建成本低廉、数量几乎无限多</strong>的线程。<strong>硬件利用率接近最佳，允许高水平的并发性，从而提高吞吐量</strong>，而应用程序仍然与 Java 平台及其工具的多线程设计保持协调。</p>
+<h3 id="虚拟线程的意义"><a href="#虚拟线程的意义" class="headerlink" title="虚拟线程的意义"></a>虚拟线程的意义</h3><p>虚拟线程同时聚合了两个风格的优点：</p>
+<ul>
+<li><strong>thread-per-request style</strong>：与 Java 平台设计相协调，易于跟踪、调试</li>
+<li>**thread-sharing  style **：消除了操作系统线程的稀缺性对吞吐量的限制，允许大量并发，提高可伸缩性</li>
+</ul>
+<p>虚拟线程是<strong>廉价</strong>和<strong>丰富</strong>的，因此永远<strong>不应该被共享（即使用线程池）</strong>: 应该为每个应用程序任务创建一个新的虚拟线程。</p>
+<p>因此，大多数虚拟线程的<strong>寿命都很短</strong>，并且具有浅层调用堆栈，执行的操作只有单个 HTTP 客户端调用或单个 数据库查询那么少。相比之下，<strong>平台线程</strong>是<strong>重量级</strong>和<strong>昂贵</strong>的，因此经常<strong>必须共享</strong>。它们往往是<strong>长期存在</strong>的，具有深度调用堆栈，并且在许多任务之间共享。</p>
+<p>总之，虚拟线程保留了可靠的 thread-per-request  style ，这种风格<strong>与 Java 平台的设计相协调</strong>，同时又能<strong>最佳地利用硬件</strong>。虚拟线程不仅可以帮助应用程序开发人员ーー它们还可以帮助框架设计人员提供易于使用的 API，<strong>这些 API 与平台的设计兼容，同时又不影响可伸缩性</strong>。</p>
+<h1 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h1><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><h3 id="IDEA"><a href="#IDEA" class="headerlink" title="IDEA"></a>IDEA</h3><p>IDEA至少要更新到<strong>2022.2</strong></p>
+<h4 id="Project-Structure"><a href="#Project-Structure" class="headerlink" title="Project Structure"></a>Project Structure</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211147077.png" alt="image-20220924211147077"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211224026.png" alt="image-20220924211224026"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211329870.png" alt="image-20220924211329870"></p>
+<h4 id="Settings"><a href="#Settings" class="headerlink" title="Settings"></a>Settings</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211544282.png" alt="image-20220924211544282"></p>
+<h3 id="Maven"><a href="#Maven" class="headerlink" title="Maven"></a>Maven</h3><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211813228.png" alt="image-20220924211813228"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220924211844445.png" alt="image-20220924211844445"></p>
+<h2 id="原生API"><a href="#原生API" class="headerlink" title="原生API"></a>原生API</h2><h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><p>创建虚拟线程并分配任务只需两步：</p>
+<ol>
+<li><p>创建 <strong>executorService</strong>：</p>
+<p> <code>ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()</code></p>
+</li>
+<li><p>调用 <strong>submit</strong> 方法提交任务：</p>
+</li>
+</ol>
+<p>   <code>executorService.submit( task )</code></p>
+<h3 id="对比实验"><a href="#对比实验" class="headerlink" title="对比实验"></a>对比实验</h3><p><strong>实验设备</strong></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926142005267.png" alt="image-20220926142005267"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926152820636.png" alt="image-20220926152820636"></p>
+<p>最大平台线程数：<strong>12</strong></p>
+<p>最大内存：<strong>16G</strong></p>
+<h4 id="实验一：测试n个执行1s的线程总运行时间"><a href="#实验一：测试n个执行1s的线程总运行时间" class="headerlink" title="实验一：测试n个执行1s的线程总运行时间"></a>实验一：测试n个执行1s的线程总运行时间</h4><h5 id="线程池共享平台线程"><a href="#线程池共享平台线程" class="headerlink" title="线程池共享平台线程"></a><strong>线程池共享平台线程</strong></h5><h6 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h6><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">threadTest1</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">val</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">    <span class="keyword">try</span> (<span class="type">ExecutorService</span> <span class="variable">executorService</span> <span class="operator">=</span> Executors.newCachedThreadPool()) &#123;</span><br><span class="line">        IntStream.range(<span class="number">0</span>, <span class="number">10000</span>).forEach(i -&gt; &#123;</span><br><span class="line">            executorService.submit(() -&gt; &#123;</span><br><span class="line">                Thread.sleep(Duration.ofSeconds(<span class="number">1</span>));</span><br><span class="line">                <span class="keyword">return</span> i;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(<span class="string">&quot;10000个执行1s的平台线程耗时：&quot;</span>+(System.currentTimeMillis()-start)/<span class="number">1000.0</span>+<span class="string">&quot;s&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h6 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h6><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926134304140.png" alt="image-20220926134304140"></p>
+<h5 id="虚拟线程"><a href="#虚拟线程" class="headerlink" title="虚拟线程"></a>虚拟线程</h5><h6 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h6><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">virtualThreadTest1</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">val</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">    <span class="keyword">try</span> (<span class="type">ExecutorService</span> <span class="variable">executorService</span> <span class="operator">=</span> Executors.newVirtualThreadPerTaskExecutor()) &#123;</span><br><span class="line">        IntStream.range(<span class="number">0</span>, <span class="number">10000</span>).forEach(i -&gt; &#123;</span><br><span class="line">            executorService.submit(() -&gt; &#123;</span><br><span class="line">                Thread.sleep(Duration.ofSeconds(<span class="number">1</span>));</span><br><span class="line">                <span class="keyword">return</span> i;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(<span class="string">&quot;10000个执行1s的虚拟线程耗时：&quot;</span>+(System.currentTimeMillis()-start)/<span class="number">1000.0</span>+<span class="string">&quot;s&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h6 id="结果-1"><a href="#结果-1" class="headerlink" title="结果"></a>结果</h6><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926134649777.png" alt="image-20220926134649777"></p>
+<h5 id="统计结果"><a href="#统计结果" class="headerlink" title="统计结果"></a>统计结果</h5><p><strong>线程池共享平台线程</strong></p>
+<table>
+<thead>
+<tr>
+<th>测试次数i \ 耗时(s)</th>
+<th>10,000并发量</th>
+<th>100,000并发量</th>
+<th>1,000,000并发量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1.926</td>
+<td>11.693</td>
+<td>50.337</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1.981</td>
+<td>11.377</td>
+<td>41.581</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2.051</td>
+<td>10.364</td>
+<td>45.999</td>
+</tr>
+<tr>
+<td>4</td>
+<td>1.919</td>
+<td>10.487</td>
+<td>46.313</td>
+</tr>
+<tr>
+<td>5</td>
+<td>2.203</td>
+<td>10.851</td>
+<td>47.274</td>
+</tr>
+<tr>
+<td>平均值</td>
+<td>2.106</td>
+<td>10.954</td>
+<td>46.301</td>
+</tr>
+</tbody></table>
+<p><strong>虚拟线程</strong></p>
+<table>
+<thead>
+<tr>
+<th>测试次数i \ 耗时(s)</th>
+<th>10,000并发量</th>
+<th>100,000并发量</th>
+<th>1,000,000并发量</th>
+<th>5,000,000并发量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1.054</td>
+<td>1.614</td>
+<td>18.243</td>
+<td>38.822</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1.057</td>
+<td>1.743</td>
+<td>18.407</td>
+<td>35.669</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1.051</td>
+<td>1.663</td>
+<td>19.101</td>
+<td>40.235</td>
+</tr>
+<tr>
+<td>4</td>
+<td>1.043</td>
+<td>1.593</td>
+<td>17.219</td>
+<td>36.156</td>
+</tr>
+<tr>
+<td>5</td>
+<td>1.044</td>
+<td>1.706</td>
+<td>18.064</td>
+<td>37.245</td>
+</tr>
+<tr>
+<td>平均值</td>
+<td>1.050</td>
+<td>1.664</td>
+<td>18.207</td>
+<td>37.625</td>
+</tr>
+</tbody></table>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926154448262.png" alt="image-20220926154448262"></p>
+<p>可以看到，随着并发量越来越大，<strong>线程池共享平台线程模式</strong>和<strong>对每个任务创建一个新的虚拟线程模式</strong>二者的耗时差距越来越大。</p>
+<p>相比于用线程池共享平台线程的<strong>异步</strong>，<strong>虚拟线程</strong>显著提高了<strong>硬件利用率</strong>，从而大幅提高<strong>吞吐量</strong></p>
+<p>根据<strong>利特尔法则</strong>：<strong>时延</strong>一定，<strong>并发性</strong>跟<strong>吞吐量</strong>成正相关</p>
+<p>由此得出结论：<strong>在硬件条件相同、时延一定的情况下，虚拟线程的并发性远超线程池共享模式</strong></p>
+<h2 id="整合SpringBoot"><a href="#整合SpringBoot" class="headerlink" title="整合SpringBoot"></a>整合SpringBoot</h2><h3 id="Bean创建"><a href="#Bean创建" class="headerlink" title="Bean创建"></a>Bean创建</h3><p><strong>VirtualThreadConfig.class</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: yumo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span>: 虚拟线程配置</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DateTime</span>: 2022/9/24 19:11</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">VirtualThreadConfig</span> &#123;</span><br><span class="line">    <span class="meta">@Bean(&quot;executorService&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> ExecutorService <span class="title function_">executorService</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Executors.newVirtualThreadPerTaskExecutor();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样我们就可以在springboot启动时就创建好<strong>唯一</strong>的一个<code>executorService</code></p>
+<p>例如，在<strong>Controller</strong>层获取<strong>executorService</strong>：</p>
+<ul>
+<li>请求方法内首先对整个代码块创建一个新的虚拟线程：实现<strong>多请求并发</strong>执行</li>
+<li>然后对for循环内10000个互相独立的代码创建10000个虚拟线程：对于调用方来说，他从发起请求到获取响应的时间<strong>从原来的n变为1</strong></li>
+</ul>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220926171002384.png" alt="image-20220926171002384"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/test&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestController</span> &#123;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> ExecutorService executorService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/test1&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">virtualThreadTest1</span><span class="params">()</span>&#123;</span><br><span class="line">        executorService.submit(()-&gt;&#123;</span><br><span class="line">            <span class="type">val</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">            IntStream.range(<span class="number">0</span>, <span class="number">10000</span>).forEach(i -&gt; &#123;</span><br><span class="line">                executorService.submit(() -&gt; &#123;</span><br><span class="line">                    Thread.sleep(Duration.ofSeconds(<span class="number">1</span>));</span><br><span class="line">                    <span class="keyword">return</span> i;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;);</span><br><span class="line">            System.out.println(<span class="string">&quot;10000个执行1s的虚拟线程耗时：&quot;</span>+(System.currentTimeMillis()-start)/<span class="number">1000.0</span>+<span class="string">&quot;s&quot;</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="AOP注解驱动开发"><a href="#AOP注解驱动开发" class="headerlink" title="AOP注解驱动开发"></a>AOP注解驱动开发</h3><h4 id="手动传入任务的弊端"><a href="#手动传入任务的弊端" class="headerlink" title="手动传入任务的弊端"></a>手动传入任务的弊端</h4><p>调用一个方法时，为该方法创建另外一个新的虚拟线程，我们将此过程抽象为对该方法的一种<strong>增强</strong>。</p>
+<p>在上面我们想要给一个任务创建一个虚拟线程，需要如下步骤：</p>
+<ol>
+<li>导入<code>executorService</code> bean</li>
+<li>调用<code>executorService.submit( task )</code></li>
+</ol>
+<p>但这种方式过于繁琐，需要将所有原子任务抽象为方法，将这些方法的整个方法体用lambda表达式放入<code>executorService.submit(  ......  )</code>中。</p>
+<h4 id="优化思路"><a href="#优化思路" class="headerlink" title="优化思路"></a>优化思路</h4><p>对此，我们设想有一个这样的注解：</p>
+<ul>
+<li>将这个注解标注在一个方法上，当该方法被执行时，会自动为其新开一个虚拟线程供其执行。</li>
+</ul>
+<p>而为被执行方法创建一个新线程这一功能，我们可以将其抽象为对该方法的<strong>增强</strong>。</p>
+<h4 id="创建注解"><a href="#创建注解" class="headerlink" title="创建注解"></a>创建注解</h4><p><strong>@VirtualThread</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.annotation.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: yumo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span>: 虚拟线程注解，被标注的方法会被分配到一个虚拟线程中执行</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DateTime</span>: 2022/9/25 14:39</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Target(ElementType.METHOD)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> VirtualThread &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="创建AOP"><a href="#创建AOP" class="headerlink" title="创建AOP"></a>创建AOP</h4><p><strong>VirtualThreadAspect.class</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.qqbot.aop;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.example.qqbot.annotation.VirtualThread;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.logging.Log;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.logging.LogFactory;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.ProceedingJoinPoint;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Around;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Pointcut;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: yumo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span>: 虚拟线程切面，被 <span class="doctag">@VirtualThread</span> 标注的方法会被分配到一个虚拟线程中执行</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DateTime</span>: 2022/9/25 15:24</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">VirtualThreadAspect</span> &#123;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> ExecutorService executorService;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">final</span> <span class="type">Log</span> <span class="variable">logger</span> <span class="operator">=</span> LogFactory.getLog(getClass());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 所有被标注了<span class="doctag">@VirtualThread</span>的方法都是切点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Pointcut(&quot;@annotation(com.example.qqbot.annotation.VirtualThread)&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">start</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 使用环绕通知，对切点新建一个虚拟线程来执行</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> proceedingJoinPoint 执行连接点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> virtualThread 注解，未来可能用其传参</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> Future</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Around(&quot;start()&amp;&amp;@annotation(virtualThread)&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Future&lt;Object&gt; <span class="title function_">virtualThread</span><span class="params">(ProceedingJoinPoint proceedingJoinPoint, VirtualThread virtualThread)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        <span class="keyword">return</span> executorService.submit(() -&gt; &#123;</span><br><span class="line">            <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                result = proceedingJoinPoint.proceed();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (result <span class="keyword">instanceof</span> Future) &#123;</span><br><span class="line">                <span class="keyword">return</span> ((Future&lt;?&gt;) result).get();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>结论：</p>
+<ul>
+<li><strong>AOP注解驱动</strong>开发能够应用于<strong>并发请求</strong>执行</li>
+<li><strong>AOP注解驱动</strong>开发无法应用于方法内嵌套并发执行，但依然可以用<code>executorService.submit( task )</code></li>
+</ul>
+<h5 id="实验二：验证AOP注解驱动开发能够应用于并发请求执行"><a href="#实验二：验证AOP注解驱动开发能够应用于并发请求执行" class="headerlink" title="实验二：验证AOP注解驱动开发能够应用于并发请求执行"></a>实验二：验证<strong>AOP注解驱动</strong>开发能够应用于<strong>并发请求</strong>执行</h5><p>实验设备：使用<strong>Jmeter</strong>在本机上对本地接口并发测试，当Jmeter发送并发请求时，本机CPU压力变大，能分配给本地接口执行的平台线程越来越少。</p>
+<p>观察三种方法在<strong>硬件压力越来越大</strong>的情况下<strong>吞吐量</strong>随<strong>并发请求数</strong>和<strong>时间</strong>的变化。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927192914775.png" alt="image-20220927192914775"></p>
+<p>对照组：<strong>sync</strong>方法，<strong>同步</strong>执行</p>
+<p>100,000次请求</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927190351486.png" alt="image-20220927190351486"></p>
+<img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221008133135799.png" alt="image-20221008133135799" style="zoom:200%;" />
+
+<p>实验组1：<strong>async</strong>方法，<strong>异步</strong>执行</p>
+<p>1,000,000次请求</p>
+<img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927184514398.png" alt="image-20220927184514398"  />
+
+<img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221008133212320.png" alt="image-20221008133212320" style="zoom:200%;" />
+
+<p>实验组2：<strong>virtualThread</strong>方法，<strong>虚拟线程</strong>执行</p>
+<p>1,000,000次请求</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927184620531.png" alt="image-20220927184620531"></p>
+<img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221008133251274.png" alt="image-20221008133251274" style="zoom:200%;" />
+
+<p>重复以上操作，统计得下表：</p>
+<table>
+<thead>
+<tr>
+<th>处理方式\请求结束时吞吐量(&#x2F;sec)\并发请求数</th>
+<th>10,000</th>
+<th>100,000</th>
+<th>1,000,000</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同步sync</td>
+<td>99.0</td>
+<td>99.1</td>
+<td>99.1</td>
+</tr>
+<tr>
+<td>异步async</td>
+<td>9842.3</td>
+<td>24197.7</td>
+<td>13481.3</td>
+</tr>
+<tr>
+<td>虚拟线程virtualThread</td>
+<td>9842.5</td>
+<td>25647.6</td>
+<td>23691.1</td>
+</tr>
+</tbody></table>
+<p>由上表得出结论：</p>
+<ul>
+<li>虚拟线程和线程池共享一开始的吞吐量接近，随着并发量和时间的增加，虚拟线程开始显著优于线程池共享。</li>
+</ul>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><strong><code>@VirtualThread</code></strong> 和 <strong><code>@Async</code></strong> 因为底层皆使用<strong>aop</strong>，所以同一个类中的方法不能互相调用，其他使用aop的注解如 <strong><code>@Transaction</code></strong> 同样：<ul>
+<li>原因：aop底层使用<strong>动态代理</strong>，对该类生成其<strong>代理类</strong>，由<strong>代理对象</strong>执行<strong>原对象的方法1</strong>；而同一个类中被方法1调用的<strong>方法2</strong>仍然是由<strong>原对象执行</strong>，无法生成其代理类从而<strong>无法实现增强逻辑</strong>。</li>
+<li>解决办法：<ul>
+<li>使用<code>springcontext</code>获取该类的<code>bean</code>，用该<code>bean</code>对象显式调用同类中的其他方法。</li>
+<li>使用<code>executorService.submit( task )</code> 手动调用该方法。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>@VirtualThread</code></strong> 和 <strong><code>@Async</code></strong> 一样，被标注的方法的返回值必须为<code>void</code>或<code>Future</code>类型<ul>
+<li>原因：增强逻辑返回的是<code>Future</code>对象。</li>
+<li>解决办法：如要调用返回值为其他类型的方法，可以用<code>executorService.submit( task )</code> 手动调用该方法</li>
+</ul>
+</li>
+</ul>
+<h1 id="推广"><a href="#推广" class="headerlink" title="推广"></a>推广</h1><p>由上述例子启发，将以下概念推广：</p>
+<ul>
+<li>客户端 			-&gt; 	方法的调用方</li>
+<li>发起请求         -&gt;     调用方法</li>
+<li>返回响应         -&gt;     方法返回</li>
+<li>服务端             -&gt;     被调用方</li>
+</ul>
+<p>运用上述广义概念，我们可得出以下定义：</p>
+<ul>
+<li><strong>原子任务</strong>：由一个<strong>复合任务</strong>划分成的<strong>有限个、独立的、最小的子任务</strong>之一。记作<code>a</code></li>
+<li><strong>复合任务</strong>：由有限次个<strong>原子任务</strong>组成的任务</li>
+<li><strong>主原子任务</strong>：接收请求到返回响应的<strong>原子任务</strong>。记作<code>main(a)</code></li>
+</ul>
+<p>对于请求到响应的这一过程所耗费的时间：</p>
+<ul>
+<li><p>若不使用虚拟线程，则为同步执行：耗费所有原子任务各自耗费时间的总和（<code>Σa</code>）</p>
+</li>
+<li><p>从服务器的角度来看：耗费原子任务中最长的那一个的时间（ <code>max(a)</code> ）</p>
+</li>
+<li><p>从客户端的用户反馈角度来看：耗费主原子任务时间（<code>main(a)</code>）</p>
+</li>
+</ul>
+<p>如下图所示，一个向数据库增加数据的请求。</p>
+<ul>
+<li>对于用户来说，从请求到响应只耗时<code>t2</code>，即主原子任务时间</li>
+</ul>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927200707984.png" alt="image-20220927200707984"></p>
+<p>而如果是原本的管道式同步执行：</p>
+<ul>
+<li>对于用户来说，从请求到相应耗时 <code>t1 + t2 + t3</code></li>
+</ul>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20220927201407669.png" alt="image-20220927201407669"></p>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>目前本人只能简单地用aop实现注解驱动，但是它还可以扩展出类似 <code>@EnableAsync</code> 的 <code>@EnableVirtual</code>，且没有进行更细致的性能优化</p>
+<p>期待未来不久市场上jdk19的虚拟编程能够普及</p>
+<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a target="_blank" rel="noopener" href="https://www.yumoyumo.top/virtual-threads/">羽墨的个人博客 (yumoyumo.top)</a></p>
+<p><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/425">JEP 425: Virtual Threads (Preview) (openjdk.org)</a></p>
+<p>可以使用github action来进行cicd，这样每次只需要push后即可自动重新部署</p>
+<p><code>cicd.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">CI</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span> [ <span class="string">&quot;master&quot;</span> ]</span><br><span class="line">  <span class="attr">pull_request:</span></span><br><span class="line">    <span class="attr">branches:</span> [ <span class="string">&quot;master&quot;</span> ]</span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-20.04</span></span><br><span class="line">    </span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@main</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v3</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&#x27;Set up Oracle JDK 19&#x27;</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">oracle-actions/setup-java@v1</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">website:</span> <span class="string">oracle.com</span></span><br><span class="line">          <span class="attr">release:</span> <span class="number">19</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Build</span> <span class="string">with</span> <span class="string">Maven</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">mvn</span> <span class="string">-B</span> <span class="string">package</span> <span class="string">--file</span> <span class="string">pom.xml</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Rename</span> <span class="string">target</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">mv</span> <span class="string">target/*.jar</span> <span class="string">target/QQBot.jar</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Upload</span> <span class="string">to</span> <span class="string">server</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">easingthemes/ssh-deploy@main</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">          <span class="attr">ARGS:</span> <span class="string">&#x27;-avz --delete&#x27;</span></span><br><span class="line">          <span class="attr">SOURCE:</span> <span class="string">&#x27;target/QQBot.jar&#x27;</span></span><br><span class="line">          <span class="attr">TARGET:</span> <span class="string">&#x27;/home/ubuntu/qqbot&#x27;</span></span><br><span class="line">          <span class="attr">REMOTE_HOST:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.SERVER_HOST</span> <span class="string">&#125;&#125;</span></span><br><span class="line">          <span class="attr">REMOTE_USER:</span> <span class="string">ubuntu</span></span><br><span class="line">          <span class="attr">SSH_PRIVATE_KEY:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.SERVER_ACCESS_KEY</span> <span class="string">&#125;&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Restart</span> <span class="string">Docker</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">appleboy/ssh-action@v0.1.4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">key:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.SERVER_ACCESS_KEY</span> <span class="string">&#125;&#125;</span></span><br><span class="line">          <span class="attr">host:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.SERVER_HOST</span> <span class="string">&#125;&#125;</span></span><br><span class="line">          <span class="attr">username:</span> <span class="string">ubuntu</span></span><br><span class="line">          <span class="attr">script_stop:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">script:</span> <span class="string">|</span></span><br><span class="line"><span class="string">            docker stop qqbot</span></span><br><span class="line"><span class="string">            docker rm qqbot</span></span><br><span class="line"><span class="string">            docker rmi yumoyumoyumo/qqbot:1.0</span></span><br><span class="line"><span class="string">            docker build -t yumoyumoyumo/qqbot:1.0 /home/ubuntu/qqbot/</span></span><br><span class="line"><span class="string">            docker run -d -p 8088:8088 --name qqbot yumoyumoyumo/qqbot:1.0</span></span><br></pre></td></tr></table></figure>
+
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%90%86%E8%AE%BA"><span class="toc-number">1.</span> <span class="toc-text">理论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.0.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E5%B9%B6%E5%8F%91%E9%A3%8E%E6%A0%BC"><span class="toc-number">1.0.2.</span> <span class="toc-text">两种并发风格</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#thread-per-request-style"><span class="toc-number">1.0.2.1.</span> <span class="toc-text">**thread-per-request  style **</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#thread-sharing-style"><span class="toc-number">1.0.2.2.</span> <span class="toc-text">**thread-sharing  style **</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94"><span class="toc-number">1.0.2.3.</span> <span class="toc-text">对比</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E4%BF%9D%E7%95%99thread-per-request-style"><span class="toc-number">1.0.3.</span> <span class="toc-text">使用虚拟线程保留thread-per-request style</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%84%8F%E4%B9%89"><span class="toc-number">1.0.4.</span> <span class="toc-text">虚拟线程的意义</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E8%B7%B5"><span class="toc-number">2.</span> <span class="toc-text">实践</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.</span> <span class="toc-text">环境配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IDEA"><span class="toc-number">2.1.1.</span> <span class="toc-text">IDEA</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Project-Structure"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">Project Structure</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Settings"><span class="toc-number">2.1.1.2.</span> <span class="toc-text">Settings</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Maven"><span class="toc-number">2.1.2.</span> <span class="toc-text">Maven</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%94%9FAPI"><span class="toc-number">2.2.</span> <span class="toc-text">原生API</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">2.2.1.</span> <span class="toc-text">使用方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94%E5%AE%9E%E9%AA%8C"><span class="toc-number">2.2.2.</span> <span class="toc-text">对比实验</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%80%EF%BC%9A%E6%B5%8B%E8%AF%95n%E4%B8%AA%E6%89%A7%E8%A1%8C1s%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%80%BB%E8%BF%90%E8%A1%8C%E6%97%B6%E9%97%B4"><span class="toc-number">2.2.2.1.</span> <span class="toc-text">实验一：测试n个执行1s的线程总运行时间</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%85%B1%E4%BA%AB%E5%B9%B3%E5%8F%B0%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.2.2.1.1.</span> <span class="toc-text">线程池共享平台线程</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">2.2.2.1.1.1.</span> <span class="toc-text">代码</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C"><span class="toc-number">2.2.2.1.1.2.</span> <span class="toc-text">结果</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.2.2.1.2.</span> <span class="toc-text">虚拟线程</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-1"><span class="toc-number">2.2.2.1.2.1.</span> <span class="toc-text">代码</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C-1"><span class="toc-number">2.2.2.1.2.2.</span> <span class="toc-text">结果</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%9F%E8%AE%A1%E7%BB%93%E6%9E%9C"><span class="toc-number">2.2.2.1.3.</span> <span class="toc-text">统计结果</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E5%90%88SpringBoot"><span class="toc-number">2.3.</span> <span class="toc-text">整合SpringBoot</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bean%E5%88%9B%E5%BB%BA"><span class="toc-number">2.3.1.</span> <span class="toc-text">Bean创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AOP%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91"><span class="toc-number">2.3.2.</span> <span class="toc-text">AOP注解驱动开发</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E4%BC%A0%E5%85%A5%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%BC%8A%E7%AB%AF"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">手动传入任务的弊端</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%80%9D%E8%B7%AF"><span class="toc-number">2.3.2.2.</span> <span class="toc-text">优化思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%B3%A8%E8%A7%A3"><span class="toc-number">2.3.2.3.</span> <span class="toc-text">创建注解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAAOP"><span class="toc-number">2.3.2.4.</span> <span class="toc-text">创建AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%BA%8C%EF%BC%9A%E9%AA%8C%E8%AF%81AOP%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E8%83%BD%E5%A4%9F%E5%BA%94%E7%94%A8%E4%BA%8E%E5%B9%B6%E5%8F%91%E8%AF%B7%E6%B1%82%E6%89%A7%E8%A1%8C"><span class="toc-number">2.3.2.4.1.</span> <span class="toc-text">实验二：验证AOP注解驱动开发能够应用于并发请求执行</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">2.3.2.5.</span> <span class="toc-text">注意事项</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8E%A8%E5%B9%BF"><span class="toc-number">3.</span> <span class="toc-text">推广</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%93%E8%AF%AD"><span class="toc-number">4.</span> <span class="toc-text">结语</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="toc-number">5.</span> <span class="toc-text">参考文章</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&text=虚拟线程原理及实战"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&is_video=false&description=虚拟线程原理及实战"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=虚拟线程原理及实战&body=Check out this article: https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&title=虚拟线程原理及实战"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&name=虚拟线程原理及实战&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/09/27/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E6%88%98/&t=虚拟线程原理及实战"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

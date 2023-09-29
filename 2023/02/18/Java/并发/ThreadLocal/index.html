@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="ThreadLocal简介大厂面试题 ThreadLocal中ThreadLocalMap的数据结构和关系？ ThreadLocal的key是弱引用，这是为什么？ ThreadLocal内存泄漏问题你知道吗？ ThreadLocal中最后为什么要加remove方法？  是什么ThreadLocal提供线程局部变量。这些变量与正常的变量不同，因为每一个线程在访问ThreadLocal实例的时候（通过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ThreadLocal基础及源码分析">
+<meta property="og:url" content="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="ThreadLocal简介大厂面试题 ThreadLocal中ThreadLocalMap的数据结构和关系？ ThreadLocal的key是弱引用，这是为什么？ ThreadLocal内存泄漏问题你知道吗？ ThreadLocal中最后为什么要加remove方法？  是什么ThreadLocal提供线程局部变量。这些变量与正常的变量不同，因为每一个线程在访问ThreadLocal实例的时候（通过">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/21fe6bf32e794ab394b68b02b5194da4.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/fe36a903d32947a1b20876c425688a98.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218174329897.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/49d1e0a8d0754e5e895ca32b07180331.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/b68c74cb5ce84783a0eed487e095b7f3.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/2fb87f5db9784aacb4854f75f25cce5f.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218185002432.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/96ab0b2e0b6849dab8b3085a792ee495.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/25aaa849e47b4505bc11a4437556f7e6.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/0afe6319d72146ad8a172b1cec5436b5.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/8536349d85c74b2aaec139257d57c77a.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218194138233.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218194602837.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218194841415.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6fc0f340e4bd4d6aa3065908badd1ce7.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218201108993.png">
+<meta property="article:published_time" content="2023-02-18T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-28T08:07:08.876Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="并发">
+<meta property="article:tag" content="JUC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/21fe6bf32e794ab394b68b02b5194da4.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>ThreadLocal基础及源码分析</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/01/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&text=ThreadLocal基础及源码分析"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&is_video=false&description=ThreadLocal基础及源码分析"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=ThreadLocal基础及源码分析&body=Check out this article: https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&name=ThreadLocal基础及源码分析&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&t=ThreadLocal基础及源码分析"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">ThreadLocal简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%A7%E5%8E%82%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="toc-number">1.1.</span> <span class="toc-text">大厂面试题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.2.</span> <span class="toc-text">是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%BD%E5%B9%B2%E5%98%9B"><span class="toc-number">1.3.</span> <span class="toc-text">能干嘛</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#api%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.4.</span> <span class="toc-text">api介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B0%B8%E8%BF%9C%E9%83%BDhelloworld%E8%AE%B2%E8%B5%B7"><span class="toc-number">1.5.</span> <span class="toc-text">永远都helloworld讲起</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9C%80%E6%B1%82"><span class="toc-number">1.5.1.</span> <span class="toc-text">需求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9C%80%E6%B1%82%E5%8F%98%E5%8C%96%E4%BA%86"><span class="toc-number">1.5.2.</span> <span class="toc-text">需求变化了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8A%E8%BF%B0%E9%9C%80%E6%B1%82%E8%AF%A5%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86"><span class="toc-number">1.5.3.</span> <span class="toc-text">上述需求该如何处理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E4%B8%8A%E9%9D%A2%E4%BB%A3%E7%A0%81%E6%80%BB%E7%BB%93"><span class="toc-number">1.6.</span> <span class="toc-text">通过上面代码总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">ThreadLocal源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB"><span class="toc-number">2.1.</span> <span class="toc-text">源码解读</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread%EF%BC%8CThreadLocal%EF%BC%8CThreadLocalMap%E5%85%B3%E7%B3%BB"><span class="toc-number">2.2.</span> <span class="toc-text">Thread，ThreadLocal，ThreadLocalMap关系</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E6%80%BB%E7%BB%93"><span class="toc-number">2.3.</span> <span class="toc-text">小总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E9%97%AE%E9%A2%98-%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81"><span class="toc-number">3.</span> <span class="toc-text">ThreadLocal内存泄漏问题-非常重要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E9%98%BF%E9%87%8C%E9%9D%A2%E8%AF%95%E9%A2%98%E5%BC%80%E5%A7%8B%E8%AE%B2%E8%B5%B7"><span class="toc-number">3.1.</span> <span class="toc-text">从阿里面试题开始讲起</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2"><span class="toc-number">3.2.</span> <span class="toc-text">什么是内存泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%81%E6%83%B9%E7%9A%84%E7%A5%B8"><span class="toc-number">3.3.</span> <span class="toc-text">谁惹的祸</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#why"><span class="toc-number">3.3.1.</span> <span class="toc-text">why?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%BA%E5%BC%95%E7%94%A8%EF%BC%8C%E8%BD%AF%E5%BC%95%E7%94%A8%EF%BC%8C%E5%BC%B1%E5%BC%95%E7%94%A8%E5%88%86%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">3.3.2.</span> <span class="toc-text">强引用，软引用，弱引用分别是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="toc-number">3.3.2.1.</span> <span class="toc-text">整体架构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%BE%85finalize-%E6%96%B9%E6%B3%95%E7%9A%84%E5%AF%B9%E8%B1%A1MyObject"><span class="toc-number">3.3.2.2.</span> <span class="toc-text">新建一个待finalize()方法的对象MyObject</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%BA%E5%BC%95%E7%94%A8%EF%BC%88%E9%BB%98%E8%AE%A4%E6%94%AF%E6%8C%81%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="toc-number">3.3.2.3.</span> <span class="toc-text">强引用（默认支持模式）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BD%AF%E5%BC%95%E7%94%A8"><span class="toc-number">3.3.2.4.</span> <span class="toc-text">软引用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%B1%E5%BC%95%E7%94%A8"><span class="toc-number">3.3.2.5.</span> <span class="toc-text">弱引用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%99%9A%E5%BC%95%E7%94%A8"><span class="toc-number">3.3.2.6.</span> <span class="toc-text">虚引用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#GCRoots%E5%92%8C%E5%9B%9B%E5%A4%A7%E5%BC%95%E7%94%A8%E5%B0%8F%E6%80%BB%E7%BB%93"><span class="toc-number">3.3.2.7.</span> <span class="toc-text">GCRoots和四大引用小总结</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E7%B3%BB"><span class="toc-number">3.3.3.</span> <span class="toc-text">关系</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E5%BC%B1%E5%BC%95%E7%94%A8%EF%BC%9F%E4%B8%8D%E7%94%A8%E5%A6%82%E4%BD%95%EF%BC%9F"><span class="toc-number">3.4.</span> <span class="toc-text">为什么要用弱引用？不用如何？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%BA%90%E4%BB%A3%E7%A0%81%E7%94%A8%E5%BC%B1%E5%BC%95%E7%94%A8"><span class="toc-number">3.4.1.</span> <span class="toc-text">为什么源代码用弱引用?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%B1%E5%BC%95%E7%94%A8%E5%B0%B1%E4%B8%87%E4%BA%8B%E5%A4%A7%E5%90%89%E4%BA%86%E5%90%97%EF%BC%9F"><span class="toc-number">3.4.2.</span> <span class="toc-text">弱引用就万事大吉了吗？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9F%8B%E9%9B%B7%E4%BA%8C%E5%8F%B7%E5%9D%91"><span class="toc-number">3.4.2.1.</span> <span class="toc-text">埋雷二号坑</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#key%E4%B8%BAnull%E7%9A%84entry%EF%BC%8C%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90"><span class="toc-number">3.4.2.2.</span> <span class="toc-text">key为null的entry，原理解析.</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#set%E3%80%81get%E6%96%B9%E6%B3%95%E4%BC%9A%E5%8E%BB%E6%A3%80%E6%9F%A5%E6%89%80%E6%9C%89%E9%94%AE%E4%B8%BAnull%E7%9A%84Entry%E5%AF%B9%E8%B1%A1"><span class="toc-number">3.4.2.3.</span> <span class="toc-text">set、get方法会去检查所有键为null的Entry对象</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E8%AE%BA"><span class="toc-number">3.4.3.</span> <span class="toc-text">结论</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="toc-number">3.5.</span> <span class="toc-text">最佳实践</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E6%80%BB%E7%BB%93-1"><span class="toc-number">4.</span> <span class="toc-text">小总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number"></span> <span class="toc-text">参考</span></a>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        ThreadLocal基础及源码分析
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-02-18T08:51:33.000Z" class="dt-published" itemprop="datePublished">2023-02-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/JUC/" rel="tag">JUC</a>, <a class="p-category" href="/tags/Java/" rel="tag">Java</a>, <a class="p-category" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="ThreadLocal简介"><a href="#ThreadLocal简介" class="headerlink" title="ThreadLocal简介"></a>ThreadLocal简介</h2><h3 id="大厂面试题"><a href="#大厂面试题" class="headerlink" title="大厂面试题"></a>大厂面试题</h3><ul>
+<li>ThreadLocal中ThreadLocalMap的数据结构和关系？</li>
+<li>ThreadLocal的key是弱引用，这是为什么？</li>
+<li>ThreadLocal内存泄漏问题你知道吗？</li>
+<li>ThreadLocal中最后为什么要加remove方法？</li>
+</ul>
+<h3 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h3><p>ThreadLocal提供线程局部变量。这些变量与正常的变量不同，因为每一个线程在访问ThreadLocal实例的时候（通过其get或set方法）<strong>都有自己的、独立初始化的变量副本</strong>。 ThreadLocal实例通常是类中的私有静态字段，使用它的目的是希望将状态（例如，用户ID或事务ID）与线程关联起来。</p>
+<h3 id="能干嘛"><a href="#能干嘛" class="headerlink" title="能干嘛"></a>能干嘛</h3><p>实现<strong>每一个线程都有自己专属的本地变量副本</strong>(自己用自己的变量不麻烦别人，不和其他人共享，人人有份，人各一份)，</p>
+<p>主要解决了让每个线程绑定自己的值，通过使用get()和set()方法，获取默认值或将其值更改为当前线程所存的副本的值从而<strong>避免了线程安全问题</strong>。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/21fe6bf32e794ab394b68b02b5194da4.png" alt="[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-DBnDR4KG-1658104603186)(image/image_ryBEweWqQb.png)]"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/fe36a903d32947a1b20876c425688a98.png" alt="在这里插入图片描述"></p>
+<h3 id="api介绍"><a href="#api介绍" class="headerlink" title="api介绍"></a>api介绍</h3><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218174329897.png" alt="image-20230218174329897"></p>
+<h3 id="永远都helloworld讲起"><a href="#永远都helloworld讲起" class="headerlink" title="永远都helloworld讲起"></a>永远都helloworld讲起</h3><h4 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h4><p>5个销售卖房子，集团高层只关心<strong>销售总量</strong>的准确统计数，按照总销售额统计，方便集团公司发奖金</p>
+<p>群雄逐鹿起纷争—为了数据安全只能加锁</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//代码样例</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">House</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">saleCount</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">saleHouse</span><span class="params">()</span>&#123;</span><br><span class="line">        ++ saleCount;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadLocalDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">House</span> <span class="variable">house</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">House</span>();</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>;i &lt;= <span class="number">5</span>;i ++)&#123;</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">Thread</span>(()-&gt;&#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>().nextInt(<span class="number">5</span>) + <span class="number">1</span>;</span><br><span class="line">                System.out.println(size);</span><br><span class="line">                <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>;j &lt;= size;j ++)&#123;</span><br><span class="line">                    house.saleHouse();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,String.valueOf(i)).start();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            TimeUnit.MILLISECONDS.sleep(<span class="number">300</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+<span class="string">&quot;共计卖出多少套：&quot;</span>+ house.saleCount);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//2</span></span><br><span class="line"><span class="comment">//3</span></span><br><span class="line"><span class="comment">//1</span></span><br><span class="line"><span class="comment">//5</span></span><br><span class="line"><span class="comment">//4</span></span><br><span class="line"><span class="comment">//main  共计卖出多少套：15</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="需求变化了"><a href="#需求变化了" class="headerlink" title="需求变化了"></a>需求变化了</h4><ul>
+<li>希望各自分灶吃饭，各凭销售本事提成，按照出单数各自统计<ul>
+<li>比如某房产中介销售都有自己的销售额指标，自己专属于自己的，不和别人掺和</li>
+</ul>
+</li>
+</ul>
+<p>正好对应了前面的【每个线程都有自己专属的本地变量副本】</p>
+<h4 id="上述需求该如何处理"><a href="#上述需求该如何处理" class="headerlink" title="上述需求该如何处理"></a>上述需求该如何处理</h4><ul>
+<li>利用ThreadLocal</li>
+<li>先初始化，给个0值</li>
+<li>利用set get方法</li>
+<li>——注意，也要调用<strong>remove(）</strong> 接口，不然容易导致内存泄漏<ul>
+<li>阿里巴巴手册：必须回收自定义的ThreadLocal变量，尤其在<strong>线程池场景</strong>下，线程经常会被<strong>复用</strong>，如果不清理自定义的ThreadLocal变量，可能会影像后序业务逻辑和造成<strong>内存泄露</strong>等问题。尽量在代理中使用try-finally块进行回收。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Demo1</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">House</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">saleCount</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">saleHouse</span><span class="params">()</span>&#123;</span><br><span class="line">        ++ saleCount;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"><span class="comment">//两个都是创建一个线程局部变量并返回初始值</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 一个比较老式的写法（这个阿里巴巴手册里也也有），initialValue()这个api已经淘汰了</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="comment">/*ThreadLocal&lt;Integer&gt; saleVolume =  new ThreadLocal&lt;Integer&gt;()&#123;</span></span><br><span class="line"><span class="comment">        @Override</span></span><br><span class="line"><span class="comment">        protected Integer initialValue()&#123;</span></span><br><span class="line"><span class="comment">            return 0;</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">    &#125;;*/</span></span><br><span class="line"><span class="comment">//java8之后带来的新写法</span></span><br><span class="line">    ThreadLocal&lt;Integer&gt; saleVolume = ThreadLocal.withInitial(() -&gt; <span class="number">0</span>);<span class="comment">//withInitial当前常被用来初始化</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">saleVolumeByThreadLocal</span><span class="params">()</span>&#123;</span><br><span class="line">        saleVolume.set(<span class="number">1</span>+saleVolume.get());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadLocalDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">House</span> <span class="variable">house</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">House</span>();</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>;i &lt;= <span class="number">5</span>;i ++)&#123;</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">Thread</span>(()-&gt;&#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>().nextInt(<span class="number">5</span>) + <span class="number">1</span>;</span><br><span class="line">                <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>;j &lt;= size;j ++)&#123;</span><br><span class="line">                    house.saleHouse();</span><br><span class="line">                    house.saleVolumeByThreadLocal();</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+<span class="string">&quot;号销售卖出：&quot;</span>+house.saleVolume.get());</span><br><span class="line">            &#125;,String.valueOf(i)).start();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            TimeUnit.MILLISECONDS.sleep(<span class="number">300</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(Thread.currentThread().getName()+<span class="string">&quot;\t&quot;</span>+<span class="string">&quot;共计卖出多少套：&quot;</span>+ house.saleCount);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//人手一份，不用加锁也可以实现上述需求</span></span><br><span class="line"><span class="comment">//3  号销售卖出：3</span></span><br><span class="line"><span class="comment">//2  号销售卖出：2</span></span><br><span class="line"><span class="comment">//4  号销售卖出：3</span></span><br><span class="line"><span class="comment">//1  号销售卖出：2</span></span><br><span class="line"><span class="comment">//5  号销售卖出：1</span></span><br><span class="line"><span class="comment">//main  共计卖出多少套：11</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="通过上面代码总结"><a href="#通过上面代码总结" class="headerlink" title="通过上面代码总结"></a>通过上面代码总结</h3><ul>
+<li><p>因为每个Thread内有自己的实例副本并且该副本只由当前线程自己使用</p>
+</li>
+<li><p>既然其他Thread不可访问，那就不存在多线程间共享的问题。</p>
+</li>
+<li><p>统一设置初始值，但是每个线程对这个值的修改都是各自线程相互独立的</p>
+</li>
+<li><p>一句话</p>
+<ul>
+<li>如何才能不争抢<ul>
+<li>假如synchronized或者Lock控制资源的访问顺序</li>
+<li>利用ThreadLocal人手一份，大家各自安好，没必要抢夺</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="ThreadLocal源码分析"><a href="#ThreadLocal源码分析" class="headerlink" title="ThreadLocal源码分析"></a>ThreadLocal源码分析</h2><h3 id="源码解读"><a href="#源码解读" class="headerlink" title="源码解读"></a>源码解读</h3><h3 id="Thread，ThreadLocal，ThreadLocalMap关系"><a href="#Thread，ThreadLocal，ThreadLocalMap关系" class="headerlink" title="Thread，ThreadLocal，ThreadLocalMap关系"></a>Thread，ThreadLocal，ThreadLocalMap关系</h3><ul>
+<li><p>根据官方API，Thread是程序中执行的<strong>线程；</strong>ThreadLocal类提供<strong>线程局部变量</strong>。</p>
+</li>
+<li><p>先打开<code>Thread.java</code>类，发现每个Thread类里面有一个<code>ThreadLocal</code>类</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/49d1e0a8d0754e5e895ca32b07180331.png" alt="在这里插入图片描述"></p>
+</li>
+<li><p>而<code>ThreadLocalMap</code>是<code>ThreadLocal</code>的一个静态内部类</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/b68c74cb5ce84783a0eed487e095b7f3.png" alt="在这里插入图片描述"></p>
+</li>
+<li><p>All三者总概括脑图</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/2fb87f5db9784aacb4854f75f25cce5f.png" alt="在这里插入图片描述"></p>
+<p><code>threadLocalMap</code>实际上就是一个以<code>threadLocal</code>实例为<strong>key</strong>，任意对象为<strong>value</strong>的<code>Entry对象</code>。<br>当我们为threadLocal变量赋值，实际上就是以当前threadLocal实例为key，值为value的Entry往这个threadLocalMap中存放</p>
+</li>
+</ul>
+<h3 id="小总结"><a href="#小总结" class="headerlink" title="小总结"></a>小总结</h3><p>近似可以理解为:</p>
+<p>ThreadLocalMap从字面上就可以看出这是一个保存ThreadLocal对象的map(其实是以ThreadLocal为Key)，不过是经过了<strong>两层包装</strong>的ThreadLocal对象：（两层包装可以看下面的解释）</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218185002432.png" alt="image-20230218185002432"></p>
+<p>**JVM内部维护了一个线程版的Map&lt;Thread,T&gt;**，通过ThreadLocal对象的set方法，结果把ThreadLocal对象自己当做key，放进了ThreadLoalMap中</p>
+<p>每个线程要用到这个T的时候，用当前的线程去Map里面获取，，人手一份，竞争条件被彻底消除，在并发模式下是绝对安全的变量。</p>
+<h2 id="ThreadLocal内存泄漏问题-非常重要"><a href="#ThreadLocal内存泄漏问题-非常重要" class="headerlink" title="ThreadLocal内存泄漏问题-非常重要"></a>ThreadLocal内存泄漏问题-非常重要</h2><h3 id="从阿里面试题开始讲起"><a href="#从阿里面试题开始讲起" class="headerlink" title="从阿里面试题开始讲起"></a>从阿里面试题开始讲起</h3><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/96ab0b2e0b6849dab8b3085a792ee495.png" alt="在这里插入图片描述"></p>
+<ul>
+<li><p>看着阿里规范，引出三个问题</p>
+<ul>
+<li><p>什么是内存泄露?</p>
+</li>
+<li><p>为什么要用弱引用？</p>
+</li>
+<li><p>不用如何？</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="什么是内存泄露"><a href="#什么是内存泄露" class="headerlink" title="什么是内存泄露"></a>什么是内存泄露</h3><p>不再会被使用的对象或者变量占用的内存不能被回收，就是<strong>内存泄露</strong></p>
+<h3 id="谁惹的祸"><a href="#谁惹的祸" class="headerlink" title="谁惹的祸"></a>谁惹的祸</h3><h4 id="why"><a href="#why" class="headerlink" title="why?"></a>why?</h4><ul>
+<li><p>再回首ThreadLocalMap</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/25aaa849e47b4505bc11a4437556f7e6.png" alt="在这里插入图片描述"></p>
+<p>ThreadLocalMap从字面上就可以看出这是一个保存ThreadlLocal对象的map(以ThreadLocal为Key，不过是经过了<strong>两层包装</strong>的 ThreadLocal对象：</p>
+<ul>
+<li>第一层包装是使用 <code>WeakReference&lt;ThreadLocal&lt;?&gt;&gt;</code> 将ThreadLocal对象变成一个弱引用的对象。</li>
+<li>第二层包裝是定义了一个专门的类 <code>Entry</code> 来扩展 WeakReference&lt;ThreadLocals?&gt;&gt;。</li>
+</ul>
+</li>
+</ul>
+<h4 id="强引用，软引用，弱引用分别是什么？"><a href="#强引用，软引用，弱引用分别是什么？" class="headerlink" title="强引用，软引用，弱引用分别是什么？"></a>强引用，软引用，弱引用分别是什么？</h4><h5 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h5><p>Java技术允许使用<code>finalize()</code>方法在垃圾收集器将对象从内存中清除出去之前做必要的<strong>清理工作</strong>。</p>
+<p>官方API:<code>finalize()</code>的通常目的是在对象被不可撤销地丢弃之前执行清理操作。</p>
+<ul>
+<li>Reference是强引用</li>
+<li>SoftReference是软引用</li>
+<li>WeakReference是弱引用</li>
+<li>PhantomReference是虚引用</li>
+</ul>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/0afe6319d72146ad8a172b1cec5436b5.png" alt="在这里插入图片描述"></p>
+<h5 id="新建一个待finalize-方法的对象MyObject"><a href="#新建一个待finalize-方法的对象MyObject" class="headerlink" title="新建一个待finalize()方法的对象MyObject"></a>新建一个待finalize()方法的对象MyObject</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyObject</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">finalize</span><span class="params">()</span> <span class="keyword">throws</span> Throwable&#123;</span><br><span class="line">        <span class="comment">//finalize的通常目的是在对象被不可撤销的丢弃之前进行清理操作</span></span><br><span class="line">        System.out.println(<span class="string">&quot;finalize()被调用-------invoke finalize&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="强引用（默认支持模式）"><a href="#强引用（默认支持模式）" class="headerlink" title="强引用（默认支持模式）"></a>强引用（默认支持模式）</h5><ul>
+<li>当内存不足，JVM开始垃圾回收，对于强引用的对象，<strong>就算是出现了OOM也不会对该对象进行回收</strong>，<strong>死都不收</strong>。</li>
+<li>强引用是我们最常见的普通对象引用，只要还有强引用指向一个对象，就能表明对象还“活着”，垃圾收集器不会碰这种对象。在 Java 中最常见的就是强引用，把一个对象赋给一个引用变量，这个引用变量就是一个强引用。当一个对象被强引用变量引用时，它处于可达状态，它是不可能被垃圾回收机制回收的，<strong>即使该对象以后永远都不会被用到JVM也不会回收</strong>。因此强引用是造成Java内存泄漏的主要原因之一。</li>
+<li>对于一个普通的对象，如果没有其他的引用关系，只要超过了引用的作用域或者显式地将相应（强）引用赋值为 <strong>null</strong>，一般认为就是<strong>可以被垃圾收集的了</strong>(当然具体回收时机还是要看垃圾收集策略)。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">referenceDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">MyObject</span> <span class="variable">myObject</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyObject</span>();</span><br><span class="line">        System.out.println(<span class="string">&quot;gc before&quot;</span>+myObject);</span><br><span class="line"></span><br><span class="line">        myObject = <span class="literal">null</span>;<span class="comment">//new 一个对象是一个强引用，如果不把他指为null，垃圾回收回收不了他</span></span><br><span class="line">        System.gc();<span class="comment">//人工开启gc 一般不用</span></span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;gc after &quot;</span>+myObject);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//gc beforecom.zhang.admin.controller.MyObject@2f4d3709</span></span><br><span class="line"><span class="comment">//gc after null</span></span><br><span class="line"><span class="comment">//finalize()被调用-------invoke finalize      -------这不就是在对象丢弃之前进行一个清理操作，这里确实清理了</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="软引用"><a href="#软引用" class="headerlink" title="软引用"></a>软引用</h5><p>软引用是一种相对强引用弱化了一些的引用，需要用java.lang.ref.SoftReference类来实现，可以让对象豁免一些垃圾收集。</p>
+<p>对于只有软引用的对象来说，</p>
+<p>当系统内存充足时它 不会 被回收，</p>
+<p>当系统内存不足时它 会 被回收。</p>
+<p>软引用通常用在对内存敏感的程序中，比如高速缓存就有用到软引用，内存够用的时候就保留，不够用就回收！</p>
+<ul>
+<li><p>先调整JVM参数 <code>-Xms10m -Xmx10m</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">referenceDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SoftReference&lt;MyObject&gt; softReference = <span class="keyword">new</span> <span class="title class_">SoftReference</span>&lt;&gt;(<span class="keyword">new</span> <span class="title class_">MyObject</span>());</span><br><span class="line">        System.gc();</span><br><span class="line">        <span class="keyword">try</span> &#123;TimeUnit.SECONDS.sleep(<span class="number">1</span>);&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;e.printStackTrace();&#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;-------gc after内存够用&quot;</span>+softReference.get());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">byte</span>[] bytes = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">20</span> * <span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;---------gc after内存不够&quot;</span>+softReference.get());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//-------gc after内存够用com.zhang.admin.controller.MyObject@2f4d3709</span></span><br><span class="line"><span class="comment">//---------gc after内存不够null，（因为是软引用，在内存不足时被清理了）</span></span><br><span class="line"><span class="comment">//finalize()被调用-------invoke finalize</span></span><br><span class="line"><span class="comment">//Exception in thread &quot;main&quot; java.lang.OutOfMemoryError: Java heap space</span></span><br><span class="line"><span class="comment">//  at com.zhang.admin.controller.referenceDemo.main(referenceDemo.java:22)</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h5 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h5><p><strong>弱引用</strong>需要用java.lang.ref.WeakReference类来实现，它比软引用的生存期更短，</p>
+<p>对于只有弱引用的对象来说，只要垃圾回收机制一运行，不管JVM的内存空间是否足够，都会回收该对象占用的内存。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">referenceDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        WeakReference&lt;MyObject&gt; weakReference = <span class="keyword">new</span> <span class="title class_">WeakReference</span>&lt;&gt;(<span class="keyword">new</span> <span class="title class_">MyObject</span>());</span><br><span class="line">        System.out.println(<span class="string">&quot;-----gc before 内存够用 &quot;</span>+ weakReference.get());</span><br><span class="line"></span><br><span class="line">        System.gc();</span><br><span class="line">        <span class="keyword">try</span> &#123;TimeUnit.SECONDS.sleep(<span class="number">1</span>);&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;e.printStackTrace();&#125;</span><br><span class="line">        <span class="comment">//暂停几秒钟线程</span></span><br><span class="line">        System.out.println(<span class="string">&quot;----gc after内存够用 &quot;</span>+weakReference.get());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//-----gc before 内存够用 com.zhang.admin.controller.MyObject@2f4d3709</span></span><br><span class="line"><span class="comment">//finalize()被调用-------invoke finalize</span></span><br><span class="line"><span class="comment">//----gc after内存够用 null ------- (不管怎么样都会清楚，这即是弱引用)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>适用场景</p>
+<p>假如有一个应用需要读取大量的本地图片:</p>
+<ul>
+<li>如果每次读取图片都从硬盘读取则会严重影响性能,</li>
+<li>如果一次性全部加载到内存中又可能造成内存溢出。</li>
+</ul>
+</li>
+<li><p>此时使用软引用可以解决这个问题。</p>
+<ul>
+<li>设计思路是：用一个HashMap来保存图片的路径和相应图片对象关联的软引用之间的映射关系，在内存不足时，JVM会自动回收这些缓存图片对象所占用的空间，从而有效地避免了OOM的问题。</li>
+<li>Map&lt;String, SoftReference<Bitmap>&gt; imageCache &#x3D; new HashMap&lt;String, SoftReference<Bitmap>&gt;();</li>
+</ul>
+</li>
+</ul>
+<h5 id="虚引用"><a href="#虚引用" class="headerlink" title="虚引用"></a>虚引用</h5><ul>
+<li><p>定义</p>
+<ul>
+<li><p>虚引用必须和引用队列 (ReferenceQueue<strong>联合使用</strong></p>
+<p><strong>虚引用需要java.lang.ret.PhantomReterence类来实现,顾名思义， 就是形同虚设</strong>，与其他几种引用都不同，虚引用并不会决定对象的生命周期。<strong>如果一个对象仅持有虚引用，那么它就和没有任何引用一样，在任何时候都可能被垃圾回收器回收</strong>，它不能单独使用也不能通过它访问对象，虚引用必须和引用队列(ReferenceQueue)联合使用。</p>
+</li>
+<li><p><strong>PhantomReference的get方法总是返回null</strong></p>
+<p>虚引用的主要作用是跟踪对象被垃圾回收的状态。<strong>仅仅是提供了一和确保对象被 finalize以后，做某些事情的通知机制</strong>。<br>PhantomReference的get方法总是返回<strong>null</strong>，因此无法访问对应的引用对象。</p>
+</li>
+<li><p><strong>处理监控通知使用</strong></p>
+<p>换句话说，设置虚引用关联对象的唯一目的，就是在这个对象被收集器回收的时候收到一个系统通知或者后续添加进一步的处理，用来实现比finalize机制更灵活的回收操作。</p>
+</li>
+</ul>
+</li>
+<li><p>构造方法<br><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/8536349d85c74b2aaec139257d57c77a.png" alt="在这里插入图片描述"></p>
+</li>
+<li><p>引用队列</p>
+<p>我被回收前需要被<strong>引用队列</strong>保存下</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218194138233.png" alt="image-20230218194138233"></p>
+</li>
+<li><p>case</p>
+<p>记得先给设置成<code>-Xms10m -Xmx10m</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyObject</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">finalize</span><span class="params">()</span> <span class="keyword">throws</span> Throwable&#123;</span><br><span class="line">        <span class="comment">//finalize的通常目的是在对象被不可撤销的丢弃之前进行清理操作</span></span><br><span class="line">        System.out.println(<span class="string">&quot;finalize()被调用-------invoke finalize&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">referenceDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">MyObject</span> <span class="variable">myObject</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyObject</span>();</span><br><span class="line">        ReferenceQueue&lt;MyObject&gt; referenceQueue = <span class="keyword">new</span> <span class="title class_">ReferenceQueue</span>&lt;&gt;();</span><br><span class="line">        PhantomReference&lt;MyObject&gt; phantomReference = <span class="keyword">new</span> <span class="title class_">PhantomReference</span>&lt;&gt;(myObject, referenceQueue);</span><br><span class="line">       <span class="comment">// System.out.println(phantomReference.get());//这里就是个null--虚引用的get()就是null</span></span><br><span class="line"></span><br><span class="line">        List&lt;<span class="type">byte</span>[]&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">while</span> (<span class="literal">true</span>)<span class="comment">//模拟一个无限循环</span></span><br><span class="line">            &#123;</span><br><span class="line">                list.add(<span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">1</span> * <span class="number">1024</span> * <span class="number">1024</span>]);</span><br><span class="line">                <span class="keyword">try</span> &#123; TimeUnit.MILLISECONDS.sleep(<span class="number">600</span>); &#125; <span class="keyword">catch</span> (InterruptedException e) &#123; e.printStackTrace(); &#125;</span><br><span class="line">                System.out.println(phantomReference.get());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,<span class="string">&quot;t1&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                Reference&lt;? <span class="keyword">extends</span> <span class="title class_">MyObject</span>&gt; reference = referenceQueue.poll();</span><br><span class="line">                <span class="keyword">if</span> (reference != <span class="literal">null</span>) &#123;</span><br><span class="line">                    System.out.println(<span class="string">&quot;有虚对象加入队列了&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,<span class="string">&quot;t2&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//null</span></span><br><span class="line"><span class="comment">//finalize()被调用-------invoke finalize</span></span><br><span class="line"><span class="comment">//null</span></span><br><span class="line"><span class="comment">//null</span></span><br><span class="line"><span class="comment">//null</span></span><br><span class="line"><span class="comment">//null</span></span><br><span class="line"><span class="comment">//null</span></span><br><span class="line"><span class="comment">//有虚对象加入队列了  ------(说明被干掉之后进入了这个引用队列)</span></span><br><span class="line"><span class="comment">//Exception in thread &quot;t1&quot; java.lang.OutOfMemoryError: Java heap space</span></span><br><span class="line"><span class="comment">//  at com.zhang.admin.controller.referenceDemo.lambda$main$0(referenceDemo.java:30)</span></span><br><span class="line"><span class="comment">//  at com.zhang.admin.controller.referenceDemo$$Lambda$1/1108411398.run(Unknown Source)</span></span><br><span class="line"><span class="comment">//  at java.lang.Thread.run(Thread.java:748)</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h5 id="GCRoots和四大引用小总结"><a href="#GCRoots和四大引用小总结" class="headerlink" title="GCRoots和四大引用小总结"></a>GCRoots和四大引用小总结</h5><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218194602837.png" alt="image-20230218194602837"></p>
+<h4 id="关系"><a href="#关系" class="headerlink" title="关系"></a>关系</h4><p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218194841415.png" alt="image-20230218194841415"></p>
+<ul>
+<li>每个Thread对象维护着一个ThreadLocalMap的引用</li>
+<li>ThreadLocalMap是ThreadLocal的内部类，用Entry来进行存储</li>
+<li>调用ThreadLocal的set()方法时，实际上就是往ThreadLocalMap设置值，key是ThreadLocal对象，值Value是传递进来的对象</li>
+<li>调用ThreadLocal的get()方法时，实际上就是往ThreadLocalMap获取值，key是ThreadLocal对象</li>
+<li><strong>ThreadLocal本身并不存储值</strong>，它只是自己作为一个<strong>key</strong>来让线程从ThreadLocalMap获取<strong>value</strong>，正因为这个原理，所以ThreadLocal能够实现“数据隔离”，获取当前线程的局部变量值，不受其他线程影响</li>
+</ul>
+<h3 id="为什么要用弱引用？不用如何？"><a href="#为什么要用弱引用？不用如何？" class="headerlink" title="为什么要用弱引用？不用如何？"></a>为什么要用弱引用？不用如何？</h3><h4 id="为什么源代码用弱引用"><a href="#为什么源代码用弱引用" class="headerlink" title="为什么源代码用弱引用?"></a>为什么源代码用弱引用?</h4><p>（Entry类似于key-value键值对）</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/6fc0f340e4bd4d6aa3065908badd1ce7.png" alt="在这里插入图片描述"></p>
+<ul>
+<li><p>当function01方法执行完毕后，栈帧销毁强引用 tl 也就没有了。但此时线程的ThreadLocalMap里某个entry的key引用还指向这个对象</p>
+</li>
+<li><p>若这个key引用是<strong>强引用</strong>，就会导致<strong>key指向的ThreadLocal对象</strong>及<strong>v指向的对象</strong>不能被gc回收，<strong>造成内存泄漏</strong>；</p>
+</li>
+<li><p>若这个key引用是<strong>弱引用</strong>，就<strong>大概率</strong>会减少内存泄漏的问题(还有一个key为null的雷，后面讲)</p>
+<p>使用弱引用，就可以使ThreadLocal对象在方法执行完毕后顺利被回收且<strong>Entry的key引用指向为null</strong>。</p>
+</li>
+</ul>
+<h4 id="弱引用就万事大吉了吗？"><a href="#弱引用就万事大吉了吗？" class="headerlink" title="弱引用就万事大吉了吗？"></a>弱引用就万事大吉了吗？</h4><h5 id="埋雷二号坑"><a href="#埋雷二号坑" class="headerlink" title="埋雷二号坑"></a>埋雷二号坑</h5><ul>
+<li><p>其实主要就是线程池线程复用情况下的问题</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230218201108993.png" alt="image-20230218201108993"></p>
+</li>
+<li><p>当我们为threadLocal变量赋值，实际上就是当前的Entry(threadLocal实例为key，值为value)往这个threadLocalMap中存放。Entry中的key是弱引用，当threadLocal外部强引用被置为null(tl&#x3D;null),那么系统 GC 的时候，根据可达性分析，这个threadLocal实例就没有任何一条链路能够引用到它，这个ThreadLocal势必会被回收，这样一来，ThreadLocalMap中就会出现<strong>key为null的Entry</strong>，就没有办法访问这些key为null的Entry的value，如果<strong>当前线程再迟迟不结束的话</strong>（这个tl就不会被干掉），这些key为null的Entry的value就会一直存在一条强引用链：Thread Ref -&gt; Thread -&gt; ThreaLocalMap -&gt; Entry -&gt; value<strong>永远无法回收</strong>，造成内存泄漏。</p>
+</li>
+<li><p>当然，如果当前thread运行结束，threadLocal，threadLocalMap,Entry没有引用链可达，在垃圾回收的时候都会被系统进行回收。</p>
+</li>
+<li><p>但在实际使用中我们有时候会用线程池去维护我们的线程，比如在Executors.newFixedThreadPool()时创建线程的时候，为了复用线程是不会结束的，所以threadLocal内存泄漏就值得我们小心</p>
+</li>
+</ul>
+<h5 id="key为null的entry，原理解析"><a href="#key为null的entry，原理解析" class="headerlink" title="key为null的entry，原理解析."></a>key为null的entry，原理解析.</h5><ul>
+<li>结论：在<strong>不使用某个ThreadLocal对象后，手动调用remove方法来删除它</strong>（尤其是防止线程池下的复用）</li>
+<li>ThreadLocalMap使用ThreadLocal的弱引用作为key，如果一个ThreadLocal没有外部强引用引用他，那么系统gc的时候，这个ThreadLocal势必会被回收，这样一来，ThreadLocalMap中就会出现key为null的Entry，就没有办法访问这些key为null的Entry的value，如果当前线程再迟迟不结束的话(比如正好用在线程池)，这些key为null的Entry的value就会一直存在一条强引用链。</li>
+<li>虽然弱引用，保证了key指向的ThreadLocal对象能被及时回收，但是v指向的value对象是需要ThreadLocalMap调用get、set时发现key为null时才会去回收整个entry、value，因此<strong>弱引用不能100%保证内存不泄露</strong>。<strong>我们要在不使用某个ThreadLocal对象后，手动调用方法来删除它</strong>，尤其是在线程池中，不仅仅是内存泄露的问题，因为线程池中的线程是重复使用的，意味着这个线程的ThreadLocalMap对象也是重复使用的，如果我们不手动调用remove方法，那么后面的线程就有可能获取到上个线程遗留下来的value值，造成bug。</li>
+</ul>
+<h5 id="set、get方法会去检查所有键为null的Entry对象"><a href="#set、get方法会去检查所有键为null的Entry对象" class="headerlink" title="set、get方法会去检查所有键为null的Entry对象"></a>set、get方法会去检查所有键为null的Entry对象</h5><blockquote>
+<p>这些方法都对key&#x3D;&#x3D; null 也就是脏Entry进行了处理，防止内存泄漏</p>
+</blockquote>
+<ul>
+<li>expungeStaleEntry（清除ThreadLocal中的脏Entry）</li>
+<li>set()</li>
+<li>get()</li>
+<li>remove()</li>
+</ul>
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><p>从前面的set,getEntry,remove方法看出，在threadLocal的生命周期里，针对threadLocal存在的内存泄漏的问题，</p>
+<p>都会通过**<code>expungeStaleEntry</code>**，<code>cleanSomeSlots</code>,<code>replaceStaleEntry</code>这三个方法清理掉key为null的脏entry。</p>
+<h3 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h3><ol>
+<li>一定要进行初始化避免<strong>空指针问题</strong>ThreadLocal.withInitial(()- &gt; 初始化值);</li>
+<li>建议把ThreadLocal修饰为static</li>
+<li>用完记得手动remove</li>
+</ol>
+<h2 id="小总结-1"><a href="#小总结-1" class="headerlink" title="小总结"></a>小总结</h2><ul>
+<li>ThreadLocal 并不解决线程间共享数据的问题</li>
+<li>ThreadLocal 适用于变量在线程间隔离且在方法间共享的场景</li>
+<li>ThreadLocal 通过隐式的在不同线程内创建独立实例副本避免了实例线程安全的问题</li>
+<li>每个线程持有一个只属于自己的专属Map并维护了ThreadLocal对象与具体实例的映射，</li>
+<li>该Map由于只被持有它的线程访问，故不存在线程安全以及锁的问题</li>
+<li>ThreadLocalMap的Entry对ThreadLocal的引用为弱引用，避免了ThreadLocal对象无法被回收的问题</li>
+<li>都会通过expungeStaleEntry, cleanSome Slots,replaceStaleEntry这三个方法回收键为 null 的 Entry</li>
+<li>对象的值（即为具体实例）以及 Entry 对象本身从而防止内存证漏，属手安全加固的方法</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/dolpin_ink/category_11847910.html"> JUC并发编程_乘风会落雨的博客-CSDN博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1ar4y1x727/?share_source=copy_web&vd_source=86f8e926c9d2c35b769303296d546f4e">尚硅谷JUC并发编程</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Yumoyum0/">Yumoyum0 (羽墨) (github.com)</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">ThreadLocal简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%A7%E5%8E%82%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="toc-number">1.1.</span> <span class="toc-text">大厂面试题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.2.</span> <span class="toc-text">是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%BD%E5%B9%B2%E5%98%9B"><span class="toc-number">1.3.</span> <span class="toc-text">能干嘛</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#api%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.4.</span> <span class="toc-text">api介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B0%B8%E8%BF%9C%E9%83%BDhelloworld%E8%AE%B2%E8%B5%B7"><span class="toc-number">1.5.</span> <span class="toc-text">永远都helloworld讲起</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9C%80%E6%B1%82"><span class="toc-number">1.5.1.</span> <span class="toc-text">需求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9C%80%E6%B1%82%E5%8F%98%E5%8C%96%E4%BA%86"><span class="toc-number">1.5.2.</span> <span class="toc-text">需求变化了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8A%E8%BF%B0%E9%9C%80%E6%B1%82%E8%AF%A5%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86"><span class="toc-number">1.5.3.</span> <span class="toc-text">上述需求该如何处理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E4%B8%8A%E9%9D%A2%E4%BB%A3%E7%A0%81%E6%80%BB%E7%BB%93"><span class="toc-number">1.6.</span> <span class="toc-text">通过上面代码总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">ThreadLocal源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB"><span class="toc-number">2.1.</span> <span class="toc-text">源码解读</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread%EF%BC%8CThreadLocal%EF%BC%8CThreadLocalMap%E5%85%B3%E7%B3%BB"><span class="toc-number">2.2.</span> <span class="toc-text">Thread，ThreadLocal，ThreadLocalMap关系</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E6%80%BB%E7%BB%93"><span class="toc-number">2.3.</span> <span class="toc-text">小总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E9%97%AE%E9%A2%98-%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81"><span class="toc-number">3.</span> <span class="toc-text">ThreadLocal内存泄漏问题-非常重要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E9%98%BF%E9%87%8C%E9%9D%A2%E8%AF%95%E9%A2%98%E5%BC%80%E5%A7%8B%E8%AE%B2%E8%B5%B7"><span class="toc-number">3.1.</span> <span class="toc-text">从阿里面试题开始讲起</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2"><span class="toc-number">3.2.</span> <span class="toc-text">什么是内存泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%81%E6%83%B9%E7%9A%84%E7%A5%B8"><span class="toc-number">3.3.</span> <span class="toc-text">谁惹的祸</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#why"><span class="toc-number">3.3.1.</span> <span class="toc-text">why?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%BA%E5%BC%95%E7%94%A8%EF%BC%8C%E8%BD%AF%E5%BC%95%E7%94%A8%EF%BC%8C%E5%BC%B1%E5%BC%95%E7%94%A8%E5%88%86%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">3.3.2.</span> <span class="toc-text">强引用，软引用，弱引用分别是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="toc-number">3.3.2.1.</span> <span class="toc-text">整体架构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%BE%85finalize-%E6%96%B9%E6%B3%95%E7%9A%84%E5%AF%B9%E8%B1%A1MyObject"><span class="toc-number">3.3.2.2.</span> <span class="toc-text">新建一个待finalize()方法的对象MyObject</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%BA%E5%BC%95%E7%94%A8%EF%BC%88%E9%BB%98%E8%AE%A4%E6%94%AF%E6%8C%81%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="toc-number">3.3.2.3.</span> <span class="toc-text">强引用（默认支持模式）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BD%AF%E5%BC%95%E7%94%A8"><span class="toc-number">3.3.2.4.</span> <span class="toc-text">软引用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%B1%E5%BC%95%E7%94%A8"><span class="toc-number">3.3.2.5.</span> <span class="toc-text">弱引用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%99%9A%E5%BC%95%E7%94%A8"><span class="toc-number">3.3.2.6.</span> <span class="toc-text">虚引用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#GCRoots%E5%92%8C%E5%9B%9B%E5%A4%A7%E5%BC%95%E7%94%A8%E5%B0%8F%E6%80%BB%E7%BB%93"><span class="toc-number">3.3.2.7.</span> <span class="toc-text">GCRoots和四大引用小总结</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E7%B3%BB"><span class="toc-number">3.3.3.</span> <span class="toc-text">关系</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E5%BC%B1%E5%BC%95%E7%94%A8%EF%BC%9F%E4%B8%8D%E7%94%A8%E5%A6%82%E4%BD%95%EF%BC%9F"><span class="toc-number">3.4.</span> <span class="toc-text">为什么要用弱引用？不用如何？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%BA%90%E4%BB%A3%E7%A0%81%E7%94%A8%E5%BC%B1%E5%BC%95%E7%94%A8"><span class="toc-number">3.4.1.</span> <span class="toc-text">为什么源代码用弱引用?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%B1%E5%BC%95%E7%94%A8%E5%B0%B1%E4%B8%87%E4%BA%8B%E5%A4%A7%E5%90%89%E4%BA%86%E5%90%97%EF%BC%9F"><span class="toc-number">3.4.2.</span> <span class="toc-text">弱引用就万事大吉了吗？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9F%8B%E9%9B%B7%E4%BA%8C%E5%8F%B7%E5%9D%91"><span class="toc-number">3.4.2.1.</span> <span class="toc-text">埋雷二号坑</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#key%E4%B8%BAnull%E7%9A%84entry%EF%BC%8C%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90"><span class="toc-number">3.4.2.2.</span> <span class="toc-text">key为null的entry，原理解析.</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#set%E3%80%81get%E6%96%B9%E6%B3%95%E4%BC%9A%E5%8E%BB%E6%A3%80%E6%9F%A5%E6%89%80%E6%9C%89%E9%94%AE%E4%B8%BAnull%E7%9A%84Entry%E5%AF%B9%E8%B1%A1"><span class="toc-number">3.4.2.3.</span> <span class="toc-text">set、get方法会去检查所有键为null的Entry对象</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E8%AE%BA"><span class="toc-number">3.4.3.</span> <span class="toc-text">结论</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="toc-number">3.5.</span> <span class="toc-text">最佳实践</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E6%80%BB%E7%BB%93-1"><span class="toc-number">4.</span> <span class="toc-text">小总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number"></span> <span class="toc-text">参考</span></a>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&text=ThreadLocal基础及源码分析"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&is_video=false&description=ThreadLocal基础及源码分析"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=ThreadLocal基础及源码分析&body=Check out this article: https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&title=ThreadLocal基础及源码分析"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&name=ThreadLocal基础及源码分析&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/&t=ThreadLocal基础及源码分析"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

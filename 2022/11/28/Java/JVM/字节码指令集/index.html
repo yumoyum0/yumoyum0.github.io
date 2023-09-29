@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="概述 ]ava字节码对于虚拟机，就好像汇编语言对于计算机，属于基本执行指令。 ]ava虚拟机的指令由一个字节长度的、代表着某种特定操作含义的数字（操作码，Opcode)以及跟随其后的零至多个代表此操作所需参数（操作数，Operands)而构成。由于Java虚拟机采用面向操作数栈而不是寄存器的结构，所以大多数的指令都不包含操作数，只有一个操作码。 由于限制了]ava虚拟机操作码的长度为一个字节（即0">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM字节码指令集">
+<meta property="og:url" content="https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="概述 ]ava字节码对于虚拟机，就好像汇编语言对于计算机，属于基本执行指令。 ]ava虚拟机的指令由一个字节长度的、代表着某种特定操作含义的数字（操作码，Opcode)以及跟随其后的零至多个代表此操作所需参数（操作数，Operands)而构成。由于Java虚拟机采用面向操作数栈而不是寄存器的结构，所以大多数的指令都不包含操作数，只有一个操作码。 由于限制了]ava虚拟机操作码的长度为一个字节（即0">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125141733680.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125141748265.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125142102258.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125142818963.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125143754871.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/59982d71dc70f7d7b873f50130281c21.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/cd990ebc801bf53b4f7b1966d9974345.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125155644926.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509153829.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509154114.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/256d8a8ec2309b6d396795e9a7e79959.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/58c6064f2d2103610c6e2f9c9472f122.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/d0257760ed00864d7e36421c2df971ca.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/df724aebb307c6dda0780bbf5d4e1f92.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/f2edaef3312398b63decea146718f2d6.gif">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/ce924815ec9c6ddc5cd98f18538c250e.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/918a9850ced5114086db35ce59e651af.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509160352.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509161717.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509163050.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509163346.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509163911.png">
+<meta property="og:image" content="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509164107.png">
+<meta property="article:published_time" content="2022-11-28T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-28T08:17:55.556Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125141733680.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>JVM字节码指令集</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/12/23/linux/Nginx/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&text=JVM字节码指令集"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&is_video=false&description=JVM字节码指令集"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JVM字节码指令集&body=Check out this article: https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&name=JVM字节码指令集&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&t=JVM字节码指令集"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.</span> <span class="toc-text">执行模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.2.</span> <span class="toc-text">字节码与数据类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E5%88%86%E6%9E%90"><span class="toc-number">1.3.</span> <span class="toc-text">指令分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E4%B8%8E%E5%AD%98%E5%82%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">2.</span> <span class="toc-text">加载与存储指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8"><span class="toc-number">2.1.</span> <span class="toc-text">作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">2.2.</span> <span class="toc-text">常用指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%8D%E8%B0%88%E6%93%8D%E4%BD%9C%E6%95%B0%E6%A0%88%E4%B8%8E%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E8%A1%A8"><span class="toc-number">2.3.</span> <span class="toc-text">再谈操作数栈与局部变量表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E5%8E%8B%E6%A0%88%E6%8C%87%E4%BB%A4"><span class="toc-number">2.4.</span> <span class="toc-text">局部变量压栈指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E9%87%8F%E5%85%A5%E6%A0%88%E6%8C%87%E4%BB%A4"><span class="toc-number">2.5.</span> <span class="toc-text">常量入栈指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BA%E6%A0%88%E8%A3%85%E5%85%A5%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E8%A1%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">2.6.</span> <span class="toc-text">出栈装入局部变量表指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E6%9C%AF%E6%8C%87%E4%BB%A4"><span class="toc-number">3.</span> <span class="toc-text">算术指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8-1"><span class="toc-number">3.1.</span> <span class="toc-text">作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E7%B1%BB"><span class="toc-number">3.2.</span> <span class="toc-text">分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#byte%E3%80%81short%E3%80%81char%E5%92%8Cboolean%E7%B1%BB%E5%9E%8B%E8%AF%B4%E6%98%8E"><span class="toc-number">3.3.</span> <span class="toc-text">byte、short、char和boolean类型说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E6%97%B6%E7%9A%84%E6%BA%A2%E5%87%BA"><span class="toc-number">3.4.</span> <span class="toc-text">运算时的溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E6%A8%A1%E5%BC%8F"><span class="toc-number">3.5.</span> <span class="toc-text">运算模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NaN%E5%80%BC%E4%BD%BF%E7%94%A8"><span class="toc-number">3.6.</span> <span class="toc-text">NaN值使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E6%9C%89%E7%AE%97%E6%9C%AF%E6%8C%87%E4%BB%A4"><span class="toc-number">3.7.</span> <span class="toc-text">所有算术指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%8C%87%E4%BB%A4"><span class="toc-number">4.</span> <span class="toc-text">类型转换指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%BD%E5%8C%96%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%8C%87%E4%BB%A4"><span class="toc-number">4.1.</span> <span class="toc-text">宽化类型转换指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AA%84%E5%8C%96%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%8C%87%E4%BB%A4"><span class="toc-number">4.2.</span> <span class="toc-text">窄化类型转换指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA%E4%B8%8E%E8%AE%BF%E9%97%AE%E6%8C%87%E4%BB%A4"><span class="toc-number">5.</span> <span class="toc-text">对象的创建与访问指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%8C%87%E4%BB%A4"><span class="toc-number">5.1.</span> <span class="toc-text">创建指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E6%AE%B5%E8%AE%BF%E9%97%AE%E6%8C%87%E4%BB%A4"><span class="toc-number">5.2.</span> <span class="toc-text">字段访问指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E7%BB%84%E6%93%8D%E4%BD%9C%E6%8C%87%E4%BB%A4"><span class="toc-number">5.3.</span> <span class="toc-text">数组操作指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%9F%A5%E6%8C%87%E4%BB%A4"><span class="toc-number">5.4.</span> <span class="toc-text">类型检查指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BF%94%E5%9B%9E%E6%8C%87%E4%BB%A4"><span class="toc-number">6.</span> <span class="toc-text">方法调用与返回指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">6.1.</span> <span class="toc-text">方法调用指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E8%BF%94%E5%9B%9E%E6%8C%87%E4%BB%A4"><span class="toc-number">6.2.</span> <span class="toc-text">方法返回指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E6%95%B0%E6%A0%88%E7%AE%A1%E7%90%86%E6%8C%87%E4%BB%A4"><span class="toc-number">7.</span> <span class="toc-text">操作数栈管理指令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E8%BD%AC%E7%A7%BB%E6%8C%87%E4%BB%A4"><span class="toc-number">8.</span> <span class="toc-text">控制转移指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AF%94%E8%BE%83%E6%8C%87%E4%BB%A4"><span class="toc-number">8.1.</span> <span class="toc-text">比较指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">8.2.</span> <span class="toc-text">条件跳转指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-3-%E6%AF%94%E8%BE%83%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">8.3.</span> <span class="toc-text">2.8.3. 比较条件跳转指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-4-%E5%A4%9A%E6%9D%A1%E4%BB%B6%E5%88%86%E6%94%AF%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">8.4.</span> <span class="toc-text">2.8.4. 多条件分支跳转指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-5-%E6%97%A0%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">8.5.</span> <span class="toc-text">2.8.5. 无条件跳转指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-9-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%8C%87%E4%BB%A4"><span class="toc-number">9.</span> <span class="toc-text">2.9. 异常处理指令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-10-%E5%90%8C%E6%AD%A5%E6%8E%A7%E5%88%B6%E6%8C%87%E4%BB%A4"><span class="toc-number">10.</span> <span class="toc-text">2.10. 同步控制指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-10-1-%E6%96%B9%E6%B3%95%E7%BA%A7%E7%9A%84%E5%90%8C%E6%AD%A5"><span class="toc-number">10.1.</span> <span class="toc-text">2.10.1. 方法级的同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-10-2-%E6%96%B9%E6%B3%95%E5%86%85%E6%8C%87%E4%BB%A4%E6%8C%87%E4%BB%A4%E5%BA%8F%E5%88%97%E7%9A%84%E5%90%8C%E6%AD%A5"><span class="toc-number">10.2.</span> <span class="toc-text">2.10.2. 方法内指令指令序列的同步</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        JVM字节码指令集
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-11-28T08:51:33.000Z" class="dt-published" itemprop="datePublished">2022-11-28</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/JVM/" rel="tag">JVM</a>, <a class="p-category" href="/tags/Java/" rel="tag">Java</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><ul>
+<li>]ava字节码对于虚拟机，就好像汇编语言对于计算机，属于基本执行指令。</li>
+<li>]ava虚拟机的指令由<strong>一个字节长度</strong>的、代表着某种特定操作含义的数字（<strong>操作码，Opcode</strong>)以及跟随其后的零至多个代表此操作所需参数（<strong>操作数，Operands</strong>)而构成。由于Java虚拟机采用面向操作数栈而不是寄存器的结构，所以大多数的指令都不包含操作数，只有一个操作码。</li>
+<li>由于限制了]ava虚拟机操作码的长度为一个字节（即0~255），这意味着指令集的操作码总数不可能超过256条。</li>
+<li>官方文档：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html">https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html</a></li>
+<li>熟悉虚拟机的指令对于动态字节码生成、反编译c1ass文件、c1ass文件修补都有着非常重要的价值。因此，阅读字节码作为了解Java虚拟机的基础技能，需要熟练掌握常见指令。</li>
+</ul>
+<h3 id="执行模型"><a href="#执行模型" class="headerlink" title="执行模型"></a>执行模型</h3><p>如果不考虑异常处理的话，那么Java虚拟机的解释器可以使用下面这个伪代码当做最基本的执行模型来理解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span>&#123;</span><br><span class="line">    自动计算PC寄存器的值加<span class="number">1</span>;</span><br><span class="line">    根据PC寄存器的指示位置，从字节码流中取出操作码;</span><br><span class="line">    <span class="keyword">if</span>(字节码存在操作数) 从字节码流中取出操作数;</span><br><span class="line">    执行操作码所定义的操作;</span><br><span class="line">&#125;<span class="keyword">while</span>(字节码长度&gt;<span class="number">0</span>)；</span><br></pre></td></tr></table></figure>
+
+<h3 id="字节码与数据类型"><a href="#字节码与数据类型" class="headerlink" title="字节码与数据类型"></a>字节码与数据类型</h3><p>在Java虚拟机的指令集中，大多数的指令都包含了其操作所对应的数据类型信息。例如，iload指令用于从局部变量表中加载int型的数据到操作数栈中，而fload指令加载的则是float类型的数据。</p>
+<p>对于大部分与数据类型相关的字节码指令，<strong>它们的操作码助记符中都有特殊的字符来表明专门为哪种数据类型服务</strong>：</p>
+<ul>
+<li><p>i代表对int类型的数据操作，</p>
+</li>
+<li><p>l代表long</p>
+</li>
+<li><p>s代表short</p>
+</li>
+<li><p>b代表byte</p>
+</li>
+<li><p>c代表char</p>
+</li>
+<li><p>f代表float</p>
+</li>
+<li><p>d代表double</p>
+</li>
+</ul>
+<p>也有一些指令的助记符中<strong>没有明确地指明操作类型的字母</strong>，如arraylength指令，它没有代表数据类型的特殊字符，但操作数永远只能是一个数组类型的对象。</p>
+<p>还有另外一些指令，如无条件跳转指令goto则是与<strong>数据类型无关的</strong>。</p>
+<p>大部分的指令都没有支持整数类型byte、char和short，甚至没有任何指令支持boolean类型。编译器会在编译期或运行期将byte和short类型的数据带符号扩展（Sign-Extend）为相应的int类型数据，将boolean和char类型数据零位扩展（Zero-Extend）为相应的int类型数据。与之类似，在处理boolean、byte、short和char类型的数组时，也会转换为使用对应的int类型的字节码指令来处理。因此，大多数对于boolean、byte、short和char类型数据的操作，实际上都是使用相应的int类型作为运算类型。</p>
+<h3 id="指令分析"><a href="#指令分析" class="headerlink" title="指令分析"></a>指令分析</h3><p>由于完全介绍和学习这些指令需要花费大量时间。为了让大家能够更快地熟悉和了解这些基本指令，这里将JVM中的字节码指令集按用途大致分成9类。</p>
+<ul>
+<li><p>加载与存储指令</p>
+</li>
+<li><p>算术指令</p>
+</li>
+<li><p>类型转换指令</p>
+</li>
+<li><p>对象的创建与访问指令</p>
+</li>
+<li><p>方法调用与返回指令</p>
+</li>
+<li><p>操作数栈管理指令</p>
+</li>
+<li><p>比较控制指令</p>
+</li>
+<li><p>异常处理指令</p>
+</li>
+<li><p>同步控制指令</p>
+</li>
+</ul>
+<p>（说在前面）在做值相关操作时：</p>
+<ul>
+<li><p>一个指令，可以从局部变量表、常量池、堆中对象、方法调用、系统调用中等取得数据，这些数据（可能是值，可能是对象的引用）被压入操作数栈。</p>
+</li>
+<li><p>一个指令，也可以从操作数栈中取出一到多个值（pop多次），完成赋值、加减乘除、方法传参、系统调用等等操作。</p>
+</li>
+</ul>
+<hr>
+<h2 id="加载与存储指令"><a href="#加载与存储指令" class="headerlink" title="加载与存储指令"></a>加载与存储指令</h2><h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>加载和存储指令用于将数据从栈帧的局部变量表和操作数栈之间来回传递。</p>
+<h3 id="常用指令"><a href="#常用指令" class="headerlink" title="常用指令"></a>常用指令</h3><ul>
+<li><p>【局部变量压栈指令】将一个局部变量加载到操作数栈：<code>xload、xload_&lt;n&gt;</code>（其中x为i、l、f、d、a，n为0到3）</p>
+</li>
+<li><p>【常量入栈指令】将一个常量加载到操作数栈：<code>bipush、sipush、ldc、ldc_w、ldc2_w、aconst_null、iconst_m1、iconst_&lt;i&gt;、lconst_&lt;l&gt;）、fconst_&lt;f&gt;、dconst_&lt;d&gt;</code></p>
+</li>
+<li><p>【出栈装入局部变量表指令】将一个数值从操作数栈存储到局部变量表：<code>xstore、xstore_&lt;n&gt;</code>（其中x为i、l、f、d、a，n为0到3）；<code>xastore</code>（其中x为i、l、f、d、a、b、c、s）</p>
+</li>
+<li><p>扩充局部变量表的访问索引的指令：<code>wide</code>。</p>
+</li>
+<li><p>上面所列举的指令助记符中，有一部分是以尖括号结尾的（例如i<code>load_&lt;n&gt;</code>）。</p>
+<p>这些指令助记符实际上代表了一组指令（例如<code>iload_&lt;n&gt;</code>代表了<code>iload_0、iload_1、iload_2</code>和<code>iload_3</code>这几个指令）。</p>
+<p>这几组指令都是某个带有一个操作数的通用指令（例如iload）的特殊形式，<strong>对于这若干组特殊指令来说，它们表面上没有操作数，不需要进行取操作数的动作，但操作数都隐含在指令中</strong>。</p>
+</li>
+<li><p>除此之外，它们的语义与原生的通用指令完全一致（例如<code>iload_0</code>的语义与操作数为0时的iload指令语义完全一致）。在尖括号之间的字母指定了指令隐含操作数的数据类型，<n>代表非负的整数，<i>代表是int类型数据，<l>代表long类型，<f>代表float类型，<d>代表double类型。</p>
+</li>
+<li><p>操作byte、char、short和boolean类型数据时，经常用int类型的指令来表示。</p>
+</li>
+</ul>
+<h3 id="再谈操作数栈与局部变量表"><a href="#再谈操作数栈与局部变量表" class="headerlink" title="再谈操作数栈与局部变量表"></a>再谈操作数栈与局部变量表</h3><p><strong>操作数栈（Operand Stacks）</strong></p>
+<ul>
+<li><p>我们知道，Java字节码是Java虚拟机所使用的指令集。因此，它与Java虚拟机基于栈的计算模型是密不可分的。在解释执行过程中，每当为Java方法分配栈桢时，Java虚拟机往往需要开辟一块额外的空间作为<strong>操作数栈</strong>，<strong>来存放计算的操作数以及返回结果</strong>。</p>
+</li>
+<li><p>具体来说便是：执行每一条指令之前，Java虚拟机要求该指令的操作数已被压入操作数栈中。在执行指令时，Java虚拟机会将该指令所需的操作数弹出，并且将指令的结果重新压入栈中。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125141733680.png" alt="image-20221125141733680"></p>
+</li>
+<li><p>以加法指令iadd为例。假设在执行该指令前，栈顶的两个元素分别为int值1和int值2，那么iadd指令将弹出这两个int，并将求得的和int值3压入栈中。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125141748265.png" alt="image-20221125141748265"></p>
+</li>
+<li><p>由于iadd指令只消耗栈顶的两个元素，因此，对于离栈顶距离为2的元素，即图中的问号，iadd 指令并不关心它是否存在，更加不会对其进行修改。</p>
+</li>
+</ul>
+<p><strong>局部变量表（Local Variables）</strong></p>
+<p>Java方法栈桢的另外一个重要组成部分则是局部变量区，字节码程序可以将计算的结果缓存在局部变量区之中。</p>
+<p>实际上，Java虚拟机将局部变量区<strong>当成一个数组</strong>，依次存放this指针（仅非静态方法），所传入的参数，以及字节码中的局部变量。</p>
+<p>和操作数栈一样，long类型以及double类型的值将占据两个单元，其余类型仅占据一个单元。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125142102258.png" alt="image-20221125142102258"></p>
+<p>举例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">foo</span><span class="params">(<span class="type">long</span> l, <span class="type">float</span> f)</span> &#123;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> e;</span><br><span class="line">    &#125;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;Hello, World&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对应的图示：</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125142818963.png" alt="image-20221125142818963"></p>
+<p>this表示当前类的引用，l和f的类型的值占两个槽位，i和s变量由于分别在各自代码块中，没有共同的生命周期，所以占同一个槽位（即<strong>槽位复用</strong>）</p>
+<p>在栈帧中，与性能调优关系最为密切的部分就是局部变量表。局部变量表中的变量也是重要的垃圾回收根节点，只要被局部变量表中直接或间接引用的对象都不会被回收。</p>
+<hr>
+<h3 id="局部变量压栈指令"><a href="#局部变量压栈指令" class="headerlink" title="局部变量压栈指令"></a>局部变量压栈指令</h3><ul>
+<li>iload 从局部变量中装载int类型值</li>
+<li>lload 从局部变量中装载long类型值</li>
+<li>fload 从局部变量中装载float类型值</li>
+<li>dload 从局部变量中装载double类型值</li>
+<li>aload 从局部变量中装载引用类型值（refernce）</li>
+<li>iload_0 从局部变量0中装载int类型值</li>
+<li>iload_1 从局部变量1中装载int类型值</li>
+<li>iload_2 从局部变量2中装载int类型值</li>
+<li>iload_3 从局部变量3中装载int类型值</li>
+<li>lload_0 从局部变量0中装载long类型值</li>
+<li>lload_1 从局部变量1中装载long类型值</li>
+<li>lload_2 从局部变量2中装载long类型值</li>
+<li>lload_3 从局部变量3中装载long类型值</li>
+<li>fload_0 从局部变量0中装载float类型值</li>
+<li>fload_1 从局部变量1中装载float类型值</li>
+<li>fload_2 从局部变量2中装载float类型值</li>
+<li>fload_3 从局部变量3中装载float类型值</li>
+<li>dload_0 从局部变量0中装载double类型值</li>
+<li>dload_1 从局部变量1中装载double类型值</li>
+<li>dload_2 从局部变量2中装载double类型值</li>
+<li>dload_3 从局部变量3中装载double类型值</li>
+<li>aload_0 从局部变量0中装载引用类型值</li>
+<li>aload_1 从局部变量1中装载引用类型值</li>
+<li>aload_2 从局部变量2中装载引用类型值</li>
+<li>aload_3 从局部变量3中装载引用类型值</li>
+<li>iaload 从数组中装载int类型值</li>
+<li>laload 从数组中装载long类型值</li>
+<li>faload 从数组中装载float类型值</li>
+<li>daload 从数组装载double类型值</li>
+<li>aaload 从数组中装载引用类型值</li>
+<li>baload 从数组中装载byte类型或boolean类型值</li>
+<li>caload 从数组中装载char类型值</li>
+<li>saload 从数组中装载short类型值</li>
+</ul>
+<p><strong>局部变量压栈常用指令集</strong></p>
+<table>
+<thead>
+<tr>
+<th>xload_n</th>
+<th>xload_0</th>
+<th>xload_1</th>
+<th>xload_2</th>
+<th>xload_3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>iload_n</strong></td>
+<td>iload_0</td>
+<td>iload_1</td>
+<td>iload_2</td>
+<td>iload_3</td>
+</tr>
+<tr>
+<td><strong>lload_n</strong></td>
+<td>lload_0</td>
+<td>lload_1</td>
+<td>lload_2</td>
+<td>lload_3</td>
+</tr>
+<tr>
+<td><strong>fload_n</strong></td>
+<td>fload_0</td>
+<td>fload_1</td>
+<td>fload_2</td>
+<td>fload_3</td>
+</tr>
+<tr>
+<td><strong>dload_n</strong></td>
+<td>dload_0</td>
+<td>dload_1</td>
+<td>dload_2</td>
+<td>dload_3</td>
+</tr>
+<tr>
+<td><strong>aload_n</strong></td>
+<td>aload_0</td>
+<td>aload_1</td>
+<td>aload_2</td>
+<td>aload_3</td>
+</tr>
+</tbody></table>
+<p><strong>局部变量压栈指令剖析</strong></p>
+<p>局部变量压栈指令将给定的局部变量表中的数据压入操作数栈。</p>
+<p>这类指令大体可以分为：</p>
+<ul>
+<li><p><code>xload_&lt;n&gt;</code>（x为i、l、f、d、a，n为0到3）</p>
+</li>
+<li><p><code>xload</code>（x为i、l、f、d、a）</p>
+</li>
+</ul>
+<p>说明：在这里，x的取值表示数据类型。</p>
+<p>指令xload_n表示将第n个局部变量压入操作数栈，比如iload_1、fload_0、aload_0等指令。其中aload_n表示将一个对象引用压栈。</p>
+<p>指令xload通过指定参数的形式，把局部变量压入操作数栈，当使用这个命令时，表示局部变量的数量可能超过了4个，比如指令iload、fload等。</p>
+<p>举例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">load</span><span class="params">(<span class="type">int</span> num, Object obj, <span class="type">long</span> count, <span class="type">boolean</span> flag, <span class="type">short</span>[] arr)</span> &#123;</span><br><span class="line">    System.out.println(num);</span><br><span class="line">    System.out.println(obj);</span><br><span class="line">    System.out.println(count);</span><br><span class="line">    System.out.println(flag);</span><br><span class="line">    System.out.println(arr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>字节码执行过程：</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125143754871.png" alt="image-20221125143754871"></p>
+<hr>
+<h3 id="常量入栈指令"><a href="#常量入栈指令" class="headerlink" title="常量入栈指令"></a>常量入栈指令</h3><ul>
+<li>aconst_null 将null对象引用压入栈</li>
+<li>iconst_m1 将int类型常量-1压入栈</li>
+<li>iconst_0 将int类型常量0压入栈</li>
+<li>iconst_1 将int类型常量1压入栈</li>
+<li>iconst_2 将int类型常量2压入栈</li>
+<li>iconst_3 将int类型常量3压入栈</li>
+<li>iconst_4 将int类型常量4压入栈</li>
+<li>iconst_5 将int类型常量5压入栈</li>
+<li>lconst_0 将long类型常量0压入栈</li>
+<li>lconst_1 将long类型常量1压入栈</li>
+<li>fconst_0 将float类型常量0压入栈</li>
+<li>fconst_1 将float类型常量1压入栈</li>
+<li>dconst_0 将double类型常量0压入栈</li>
+<li>dconst_1 将double类型常量1压入栈</li>
+<li>bipush 将一个8位带符号整数压入栈</li>
+<li>sipush 将16位带符号整数压入栈</li>
+<li>ldc 把常量池中的项压入栈</li>
+<li>ldc_w 把常量池中的项压入栈（使用宽索引）</li>
+<li>ldc2_w 把常量池中long类型或者double类型的项压入栈（使用宽索引）</li>
+</ul>
+<p><strong>常量入栈常用指令集</strong></p>
+<table>
+<thead>
+<tr>
+<th>xconst_n</th>
+<th>范围</th>
+<th>xconst_null</th>
+<th>xconst_m1</th>
+<th>xconst_0</th>
+<th>xconst_1</th>
+<th>xconst_2</th>
+<th>xconst_3</th>
+<th>xconst_4</th>
+<th>xconst_5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>iconst_n</strong></td>
+<td>[-1, 5]</td>
+<td></td>
+<td>iconst_m1</td>
+<td>iconst_0</td>
+<td>iconst_1</td>
+<td>iconst_2</td>
+<td>iconst_3</td>
+<td>iconst_4</td>
+<td>iconst_5</td>
+</tr>
+<tr>
+<td><strong>lconst_n</strong></td>
+<td>0, 1</td>
+<td></td>
+<td></td>
+<td>lconst_0</td>
+<td>lconst_1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>fconst_n</strong></td>
+<td>0, 1, 2</td>
+<td></td>
+<td></td>
+<td>fconst_0</td>
+<td>fconst_1</td>
+<td>fconst_2</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>dconst_n</strong></td>
+<td>0, 1</td>
+<td></td>
+<td></td>
+<td>dconst_0</td>
+<td>dconst_1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>aconst_n</strong></td>
+<td>null, String literal, Class literal</td>
+<td>aconst_null</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>bipush</strong></td>
+<td>一个字节，28，[-27, 27 - 1]，即[-128, 127]</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>sipush</strong></td>
+<td>两个字节，216，[-215, 215 - 1]，即[-32768, 32767]</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>ldc</strong></td>
+<td>四个字节，232，[-231, 231 - 1]</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>ldc_w</strong></td>
+<td>宽索引</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>ldc2_w</strong></td>
+<td>宽索引，long或double</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><strong>常量入栈指令剖析</strong></p>
+<ul>
+<li><p>常量入栈指令的功能是将常数压入操作数栈，根据数据类型和入栈内容的不同，又可以分为const系列、push系列和ldc指令。</p>
+</li>
+<li><p><strong>指令const系列</strong>：用于对特定的常量入栈，入栈的常量隐含在指令本身里。指令有：<code>iconst_&lt;i&gt;（i从-1到5）、lconst_&lt;l&gt;（1从0到1）、fconst_&lt;f&gt;（f从0到2）、dconst_&lt;d&gt;（d从0到1）、aconst_null</code>。比如，</p>
+<ul>
+<li>iconst_m1将-1压入操作数栈；</li>
+<li>iconst_x（x为0到5）将x压入栈；</li>
+<li>lconst_0、lconst_1分别将长整数0和1压入栈；</li>
+<li>fconst_0、fconst_1、fconst_2分别将浮点数0、1、2压入栈；</li>
+<li>dconst_0和dconst_1分别将double型0和1压入栈；</li>
+<li>aconst_null将null压入操作数栈；</li>
+</ul>
+<p>从指令的命名上不难找出规律，指令助记符的第一个字符总是喜欢表示数据类型，i表示整数，l表示长整数，f表示浮点数，d表示双精度浮点，习惯上用a表示对象引用。如果指令隐含操作的参数，会以下划线形式给出。</p>
+</li>
+<li><p><strong>指令push系列</strong>：主要包括bipush和sipush。它们的区别在于接收数据类型的不同，bipush接收8位整数作为参数，sipush接收16位整数，它们都将参数压入栈。</p>
+</li>
+<li><p><strong>指令ldc系列</strong>：如果以上指令都不能满足需求，那么可以使用万能的</p>
+<ul>
+<li>ldc指令，它可以接收一个8位的参数，该参数指向常量池中的int、float或者String的索引，将指定的内容压入堆栈。</li>
+<li>类似的还有ldc_w，它接收两个8位参数，能支持的索引范围大于ldc。</li>
+<li>如果要压入的元素是long或者double类型的，则使用ldc2_w指令，使用方式都是类似的</li>
+</ul>
+</li>
+</ul>
+<p>总结如下：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>常数指令</th>
+<th>范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>int(boolean,byte,char,short)</td>
+<td>iconst</td>
+<td>[-1, 5]</td>
+</tr>
+<tr>
+<td>bipush</td>
+<td>[-128, 127]</td>
+<td></td>
+</tr>
+<tr>
+<td>sipush</td>
+<td>[-32768, 32767]</td>
+<td></td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>any int value</td>
+<td></td>
+</tr>
+<tr>
+<td>long</td>
+<td>lconst</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>any long value</td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td>fconst</td>
+<td>0, 1, 2</td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>any float value</td>
+<td></td>
+</tr>
+<tr>
+<td>double</td>
+<td>dconst</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>any double value</td>
+<td></td>
+</tr>
+<tr>
+<td>reference</td>
+<td>aconst</td>
+<td>null</td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>String literal, Class literal</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/59982d71dc70f7d7b873f50130281c21.png" alt="img"><br><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/cd990ebc801bf53b4f7b1966d9974345.png" alt="img"></p>
+<hr>
+<h3 id="出栈装入局部变量表指令"><a href="#出栈装入局部变量表指令" class="headerlink" title="出栈装入局部变量表指令"></a>出栈装入局部变量表指令</h3><p>istore 将int类型值存入局部变量</p>
+<p>lstore 将long类型值存入局部变量</p>
+<p>fstore 将float类型值存入局部变量</p>
+<p>dstore 将double类型值存入局部变量</p>
+<p>astore 将将引用类型或returnAddress类型值存入局部变量</p>
+<p>istore_0 将int类型值存入局部变量0</p>
+<p>istore_1 将int类型值存入局部变量1</p>
+<p>istore_2 将int类型值存入局部变量2</p>
+<p>istore_3 将int类型值存入局部变量3</p>
+<p>lstore_0 将long类型值存入局部变量0</p>
+<p>lstore_1 将long类型值存入局部变量1</p>
+<p>lstore_2 将long类型值存入局部变量2</p>
+<p>lstore_3 将long类型值存入局部变量3</p>
+<p>fstore_0 将float类型值存入局部变量0</p>
+<p>fstore_1 将float类型值存入局部变量1</p>
+<p>fstore_2 将float类型值存入局部变量2</p>
+<p>fstore_3 将float类型值存入局部变量3</p>
+<p>dstore_0 将double类型值存入局部变量0</p>
+<p>dstore_1 将double类型值存入局部变量1</p>
+<p>dstore_2 将double类型值存入局部变量2</p>
+<p>dstore_3 将double类型值存入局部变量3</p>
+<p>astore_0 将引用类型或returnAddress类型值存入局部变量0</p>
+<p>astore_1 将引用类型或returnAddress类型值存入局部变量1</p>
+<p>astore_2 将引用类型或returnAddress类型值存入局部变量2</p>
+<p>astore_3 将引用类型或returnAddress类型值存入局部变量3</p>
+<p>iastore 将int类型值存入数组中</p>
+<p>lastore 将long类型值存入数组中</p>
+<p>fastore 将float类型值存入数组中</p>
+<p>dastore 将double类型值存入数组中</p>
+<p>aastore 将引用类型值存入数组中</p>
+<p>bastore 将byte类型或者boolean类型值存入数组中</p>
+<p>castore 将char类型值存入数组中</p>
+<p>sastore 将short类型值存入数组中</p>
+<p>wide指令</p>
+<p>wide 使用附加字节扩展局部变量索引</p>
+<p><strong>出栈装入局部变量表常用指令集</strong></p>
+<table>
+<thead>
+<tr>
+<th>xstore_n</th>
+<th>xstore_0</th>
+<th>xstore_1</th>
+<th>xstore_2</th>
+<th>xstore_3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>istore_n</strong></td>
+<td>istore_0</td>
+<td>istore_1</td>
+<td>istore_2</td>
+<td>istore_3</td>
+</tr>
+<tr>
+<td><strong>lstore_n</strong></td>
+<td>lstore_0</td>
+<td>lstore_1</td>
+<td>lstore_2</td>
+<td>lstore_3</td>
+</tr>
+<tr>
+<td><strong>fstore_n</strong></td>
+<td>fstore_0</td>
+<td>fstore_1</td>
+<td>fstore_2</td>
+<td>fstore_3</td>
+</tr>
+<tr>
+<td><strong>dstore_n</strong></td>
+<td>dstore_0</td>
+<td>dstore_1</td>
+<td>dstore_2</td>
+<td>dstore_3</td>
+</tr>
+<tr>
+<td><strong>astore_n</strong></td>
+<td>astore_0</td>
+<td>astore_1</td>
+<td>astore_2</td>
+<td>astore_3</td>
+</tr>
+</tbody></table>
+<p><strong>出栈装入局部变量表指令剖析</strong></p>
+<p>出栈装入局部变量表指令用于将<strong>操作数栈</strong>中栈顶元素弹出后，装入<strong>局部变量表</strong>的指定位置，用于给局部变量赋值。这类指令主要以store的形式存在，比如<code>xstore（x为i、l、f、d、a）、xstore_n（x为i、l、f、d、a，n为0至3）</code>。</p>
+<ul>
+<li><p>其中，指令istore_n将从操作数栈中弹出一个整数，并把它值给局部变量<strong>索引n</strong>位置。</p>
+</li>
+<li><p>指令xstore由于没有隐含参数信息，故需要提供一个byte类型的参数类指定目标局部变量表的位置。</p>
+</li>
+</ul>
+<p>说明：</p>
+<ul>
+<li><strong>一般说来，类似像store这样的命令需要带一个参数，用来指明将弹出的元素放在局部变量表的第几个位置</strong>。但是，为了尽可能压缩指令大小，使用专门的istore_1指令表示将弹出的元素放置在局部变量表第1个位置。类似的还有istore_0、istore_2、istore_3，它们分别表示从操作数栈顶弹出一个元素，存放在局部变量表第0、2、3个位置。</li>
+<li>由于局部变量表前几个位置总是非常常用，因此<strong>这种做法虽然增加了指令数量，但是可以大大压缩生成的字节码的体积</strong>。如果局部变量表很大，需要存储的槽位大于3，那么可以使用istore指令，外加一个参数，用来表示需要存放的槽位位置。</li>
+</ul>
+<p>举例：</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221125155644926.png" alt="image-20221125155644926"></p>
+<hr>
+<h2 id="算术指令"><a href="#算术指令" class="headerlink" title="算术指令"></a>算术指令</h2><h3 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h3><p>算术指令用于对两个操作数栈上的值进行某种特定运算，并把结果重新压入操作数栈。</p>
+<h3 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h3><p>大体上算术指令可以分为两种：对整型数据进行运算的指令与对浮点类型数据进行运算的指令。</p>
+<h3 id="byte、short、char和boolean类型说明"><a href="#byte、short、char和boolean类型说明" class="headerlink" title="byte、short、char和boolean类型说明"></a>byte、short、char和boolean类型说明</h3><p>在每一大类中，都有针对Java虚拟机具体数据类型的专用算术指令。但没有直接支持byte、short、char和boolean类型的算术指令，对于这些数据的运算，都使用int类型的指令来处理。此外，在处理boolean、byte、short和char类型的数组时，也会转换为使用对应的int类型的字节码指令来处理。</p>
+<p><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509153829.png" alt="img"></p>
+<h3 id="运算时的溢出"><a href="#运算时的溢出" class="headerlink" title="运算时的溢出"></a>运算时的溢出</h3><p>数据运算可能会导致溢出，例如两个很大的正整数相加，结果可能是一个负数。其实Java虚拟机规范并无明确规定过整型数据溢出的具体结果，仅规定了在处理整型数据时，只有除法指令以及求余指令中当出现除数为0时会导致虚拟机抛出异常ArithmeticException。</p>
+<h3 id="运算模式"><a href="#运算模式" class="headerlink" title="运算模式"></a>运算模式</h3><p><strong>向最接近数舍入模式</strong>：JVM要求在进行浮点数计算时，所有的运算结果都必须舍入到适当的精度，非精确结果必须舍入为可被表示的最接近的精确值，如果有两种可表示的形式与该值一样接近，将优先选择最低有效位为零的；</p>
+<p><strong>向零舍入模式</strong>：将浮点数转换为整数时，采用该模式，该模式将在目标数值类型中选择一个最接近但是不大于原值的数字作为最精确的舍入结果；</p>
+<h3 id="NaN值使用"><a href="#NaN值使用" class="headerlink" title="NaN值使用"></a>NaN值使用</h3><p>当一个操作产生溢出时，将会使用有符号的无穷大表示，如果某个操作结果没有明确的数学定义的话，将会使用NaN值来表示。而且所有使用NaN值作为操作数的算术操作，结果都会返回NaN；</p>
+<p><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509154114.png" alt="img"></p>
+<h3 id="所有算术指令"><a href="#所有算术指令" class="headerlink" title="所有算术指令"></a>所有算术指令</h3><p><strong>整数运算</strong></p>
+<p>iadd 执行int类型的加法</p>
+<p>ladd 执行long类型的加法</p>
+<p>isub 执行int类型的减法</p>
+<p>lsub 执行long类型的减法</p>
+<p>imul 执行int类型的乘法</p>
+<p>lmul 执行long类型的乘法</p>
+<p>idiv 执行int类型的除法</p>
+<p>ldiv 执行long类型的除法</p>
+<p>irem 计算int类型除法的余数</p>
+<p>lrem 计算long类型除法的余数</p>
+<p>ineg 对一个int类型值进行取反操作</p>
+<p>lneg 对一个long类型值进行取反操作</p>
+<p>iinc 把一个常量值加到一个int类型的局部变量上</p>
+<p><strong>逻辑运算</strong></p>
+<p><strong>移位操作</strong></p>
+<p>ishl 执行int类型的向左移位操作</p>
+<p>lshl 执行long类型的向左移位操作</p>
+<p>ishr 执行int类型的向右移位操作</p>
+<p>lshr 执行long类型的向右移位操作</p>
+<p>iushr 执行int类型的向右逻辑移位操作</p>
+<p>lushr 执行long类型的向右逻辑移位操作</p>
+<p><strong>按位布尔运算</strong></p>
+<p>iand 对int类型值进行“逻辑与”操作</p>
+<p>land 对long类型值进行“逻辑与”操作</p>
+<p>ior 对int类型值进行“逻辑或”操作</p>
+<p>lor 对long类型值进行“逻辑或”操作</p>
+<p>ixor 对int类型值进行“逻辑异或”操作</p>
+<p>lxor 对long类型值进行“逻辑异或”操作</p>
+<p><strong>浮点运算</strong></p>
+<p>fadd 执行float类型的加法</p>
+<p>dadd 执行double类型的加法</p>
+<p>fsub 执行float类型的减法</p>
+<p>dsub 执行double类型的减法</p>
+<p>fmul 执行float类型的乘法</p>
+<p>dmul 执行double类型的乘法</p>
+<p>fdiv 执行float类型的除法</p>
+<p>ddiv 执行double类型的除法</p>
+<p>frem 计算float类型除法的余数</p>
+<p>drem 计算double类型除法的余数</p>
+<p>fneg 将一个float类型的数值取反</p>
+<p>dneg 将一个double类型的数值取反</p>
+<p><strong>算术指令集</strong></p>
+<table>
+<thead>
+<tr>
+<th>算数指令</th>
+<th>int(boolean,byte,char,short)</th>
+<th>long</th>
+<th>float</th>
+<th>double</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>加法指令</td>
+<td>iadd</td>
+<td>ladd</td>
+<td>fadd</td>
+<td>dadd</td>
+<td></td>
+</tr>
+<tr>
+<td>减法指令</td>
+<td>isub</td>
+<td>lsub</td>
+<td>fsub</td>
+<td>dsub</td>
+<td></td>
+</tr>
+<tr>
+<td>乘法指令</td>
+<td>imul</td>
+<td>lmul</td>
+<td>fmul</td>
+<td>dmul</td>
+<td></td>
+</tr>
+<tr>
+<td>除法指令</td>
+<td>idiv</td>
+<td>ldiv</td>
+<td>fdiv</td>
+<td>ddiv</td>
+<td></td>
+</tr>
+<tr>
+<td>求余指令</td>
+<td>irem</td>
+<td>lrem</td>
+<td>frem</td>
+<td>drem</td>
+<td></td>
+</tr>
+<tr>
+<td>取反指令</td>
+<td>ineg</td>
+<td>lneg</td>
+<td>fneg</td>
+<td>dneg</td>
+<td></td>
+</tr>
+<tr>
+<td>自增指令</td>
+<td>iinc</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>位运算指令</td>
+<td>按位或指令</td>
+<td>ior</td>
+<td>lor</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>按位或指令</td>
+<td>ior</td>
+<td>lor</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>按位与指令</td>
+<td>iand</td>
+<td>land</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>按位异或指令</td>
+<td>ixor</td>
+<td>lxor</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>比较指令</td>
+<td></td>
+<td>lcmp</td>
+<td>fcmpg &#x2F; fcmpl</td>
+<td>dcmpg &#x2F; dcmpl</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>举例1</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">bar</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> ((i + <span class="number">1</span>) - <span class="number">2</span>) * <span class="number">3</span> / <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/256d8a8ec2309b6d396795e9a7e79959.png" alt="img"></p>
+<p>举例2</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="type">byte</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">15</span>;</span><br><span class="line">	<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">8</span>;</span><br><span class="line">	<span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> i + j;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/58c6064f2d2103610c6e2f9c9472f122.png" alt="img"><br><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/d0257760ed00864d7e36421c2df971ca.png" alt="img"><br><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/df724aebb307c6dda0780bbf5d4e1f92.png" alt="img"></p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/f2edaef3312398b63decea146718f2d6.gif" alt="img"></p>
+<p>举例3</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">	<span class="type">int</span> <span class="variable">x</span> <span class="operator">=</span> <span class="number">500</span>;</span><br><span class="line">	<span class="type">int</span> <span class="variable">y</span> <span class="operator">=</span> <span class="number">100</span>;</span><br><span class="line">	<span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> x / y;</span><br><span class="line">	<span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> <span class="number">50</span>;</span><br><span class="line">	System.out.println(a + b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/ce924815ec9c6ddc5cd98f18538c250e.png" alt="img"><br><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/918a9850ced5114086db35ce59e651af.png" alt="img"></p>
+<h2 id="类型转换指令"><a href="#类型转换指令" class="headerlink" title="类型转换指令"></a>类型转换指令</h2><p>类型转换指令可以将两种不同的数值类型进行相互转换。</p>
+<p>这些转换操作一般用于实现用户代码中的显式类型转换操作，或者用来处理字节码指令集中数据类型相关指令无法与数据类型一一对应的问题。</p>
+<p><strong>宽化类型转换</strong></p>
+<p>i2l 把int类型的数据转化为long类型</p>
+<p>i2f 把int类型的数据转化为float类型</p>
+<p>i2d 把int类型的数据转化为double类型</p>
+<p>l2f 把long类型的数据转化为float类型</p>
+<p>l2d 把long类型的数据转化为double类型</p>
+<p>f2d 把float类型的数据转化为double类型</p>
+<p><strong>窄化类型转换</strong></p>
+<p>i2b 把int类型的数据转化为byte类型</p>
+<p>i2c 把int类型的数据转化为char类型</p>
+<p>i2s 把int类型的数据转化为short类型</p>
+<p>l2i 把long类型的数据转化为int类型</p>
+<p>f2i 把float类型的数据转化为int类型</p>
+<p>f2l 把float类型的数据转化为long类型</p>
+<p>d2i 把double类型的数据转化为int类型</p>
+<p>d2l 把double类型的数据转化为long类型</p>
+<p>d2f 把double类型的数据转化为float类型</p>
+<p><strong>类型转换指令集</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>byte</strong></th>
+<th><strong>char</strong></th>
+<th><strong>short</strong></th>
+<th><strong>int</strong></th>
+<th><strong>long</strong></th>
+<th><strong>float</strong></th>
+<th><strong>double</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>int</strong></td>
+<td>i2b</td>
+<td>i2c</td>
+<td>i2s</td>
+<td>○</td>
+<td>i2l</td>
+<td>i2f</td>
+<td>i2d</td>
+</tr>
+<tr>
+<td><strong>long</strong></td>
+<td>l2i i2b</td>
+<td>l2i i2c</td>
+<td>l2i i2s</td>
+<td>l2i</td>
+<td>○</td>
+<td>l2f</td>
+<td>l2d</td>
+</tr>
+<tr>
+<td><strong>float</strong></td>
+<td>f2i i2b</td>
+<td>f2i i2c</td>
+<td>f2i i2s</td>
+<td>f2i</td>
+<td>f2l</td>
+<td>○</td>
+<td>f2d</td>
+</tr>
+<tr>
+<td><strong>double</strong></td>
+<td>d2i i2b</td>
+<td>d2i i2c</td>
+<td>d2i i2s</td>
+<td>d2i</td>
+<td>d2l</td>
+<td>d2f</td>
+<td>○</td>
+</tr>
+</tbody></table>
+<h3 id="宽化类型转换指令"><a href="#宽化类型转换指令" class="headerlink" title="宽化类型转换指令"></a>宽化类型转换指令</h3><p><strong>宽化类型转换( Widening Numeric Conversions)</strong></p>
+<ol>
+<li>转换规则</li>
+</ol>
+<p>Java虚拟机直接支持以下数值的宽化类型转换（ widening numeric conversion,小范围类型向大范围类型的安全转换）。也就是说，并不需要指令执行，包括</p>
+<ul>
+<li><p>从int类型到long、float或者 double类型。对应的指令为：i21、i2f、i2d </p>
+</li>
+<li><p>从long类型到float、 double类型。对应的指令为：i2f、i2d </p>
+</li>
+<li><p>从float类型到double类型。对应的指令为：f2d</p>
+</li>
+</ul>
+<p>简化为：int–&gt;long–&gt;float-&gt; double</p>
+<ol>
+<li>精度损失问题</li>
+</ol>
+<ul>
+<li><p>宽化类型转换是不会因为超过目标类型最大值而丢失信息的，例如，从int转换到long,或者从int转换到double,都不会丢失任何信息，转换前后的值是精确相等的。 </p>
+</li>
+<li><p>从int、long类型数值转换到float，或者long类型数值转换到double时，将可能发生精度丢失一一可能丢失掉几个最低有效位上的值，转换后的浮点数值是根据IEEE754最接近含入模式所得到的正确整数值。</p>
+</li>
+</ul>
+<p>尽管宽化类型转换实际上是可能发生精度丢失的，但是这种转换永远不会导致Java虚拟机抛出运行时异常</p>
+<ol>
+<li>补充说明</li>
+</ol>
+<p>从byte、char和 short类型到int类型的宽化类型转换实际上是不存在的。对于byte类型转为int,拟机并没有做实质性的转化处理，只是简单地通过操作数栈交換了两个数据。而将byte转为long时，使用的是i2l,可以看到在内部，byte在这里已经等同于int类型处理，类似的还有 short类型，这种处理方式有两个特点：</p>
+<p>一方面可以减少实际的数据类型，如果为 short和byte都准备一套指令，那么指令的数量就会大増，而虚拟机目前的设计上，只愿意使用一个字节表示指令，因此指令总数不能超过256个，为了节省指令资源，将 short和byte当做int处理也在情理之中。</p>
+<p>另一方面，由于局部变量表中的槽位固定为32位，无论是byte或者 short存入局部变量表，都会占用32位空间。从这个角度说，也没有必要特意区分这几种数据类型。</p>
+<h3 id="窄化类型转换指令"><a href="#窄化类型转换指令" class="headerlink" title="窄化类型转换指令"></a>窄化类型转换指令</h3><p><strong>窄化类型转换( Narrowing Numeric Conversion)</strong></p>
+<ol>
+<li>转换规则</li>
+</ol>
+<p>Java虚拟机也直接支持以下窄化类型转换：</p>
+<ul>
+<li><p>从主int类型至byte、 short或者char类型。对应的指令有：i2b、i2c、i2s </p>
+</li>
+<li><p>从long类型到int类型。对应的指令有：l2i </p>
+</li>
+<li><p>从float类型到int或者long类型。对应的指令有：f2i、f2l </p>
+</li>
+<li><p>从double类型到int、long或者float类型。对应的指令有：d2i、d2l、d2f</p>
+</li>
+</ul>
+<ol>
+<li>精度损失问题</li>
+</ol>
+<p>窄化类型转换可能会导致转换结果具备不同的正负号、不同的数量级，因此，转换过程很可能会导致数值丢失精度。</p>
+<p>尽管数据类型窄化转换可能会发生上限溢出、下限溢出和精度丢失等情况，但是Java虚拟机规范中明确规定数值类型的窄化转换指令永远不可能导致虚拟机抛出运行时异常</p>
+<ol>
+<li>补充说明</li>
+</ol>
+<p>当将一个浮点值窄化转换为整数类型T(T限于int或long类型之一)的时候，将遵循以下转换规则：</p>
+<ul>
+<li><p>如果浮点值是NaN,那转换结果就是int或long类型的0. </p>
+</li>
+<li><p>如果浮点值不是无穷大的话，浮点值使用IEEE754的向零含入模式取整，获得整数值v。如果v在目标类型T(int或long)的表示范围之内，那转换结果就是v。否则，将根据v的符号，转换为T所能表示的最大或者最小正数</p>
+</li>
+</ul>
+<p>当将一个double类型窄化转换为float类型时，将遵循以下转换规则，通过向最接近数舍入模式舍入一个可以使用float类型表示的数字。最后结果根据下面这3条规则判断：</p>
+<ul>
+<li><p>如果转换结果的绝对值太小而无法使用float来表示，将返回float类型的正负零 </p>
+</li>
+<li><p>如果转换结果的绝对值太大而无法使用float来表示，将返回float类型的正负无穷大。 </p>
+</li>
+<li><p>对于double类型的NaN值将按规定转换为float类型的NaN值。</p>
+</li>
+</ul>
+<h2 id="对象的创建与访问指令"><a href="#对象的创建与访问指令" class="headerlink" title="对象的创建与访问指令"></a>对象的创建与访问指令</h2><p>Java是面向对象的程序设计语言，虚拟机平台从字节码层面就对面向对象做了深层次的支持。有一系列指令专门用于对象操作，可进一步细分为创建指令、字段访问指令、数组操作指令、类型检查指令。</p>
+<p><strong>对象操作指令</strong></p>
+<p>new 创建一个新对象</p>
+<p>getfield 从对象中获取字段</p>
+<p>putfield 设置对象中字段的值</p>
+<p>getstatic 从类中获取静态字段</p>
+<p>putstatic 设置类中静态字段的值</p>
+<p>checkcast 确定对象为所给定的类型。后跟目标类，判断栈顶元素是否为目标类 &#x2F; 接口的实例。如果不是便抛出异常</p>
+<p>instanceof 判断对象是否为给定的类型。后跟目标类，判断栈顶元素是否为目标类 &#x2F; 接口的实例。是则压入 1，否则压入 0</p>
+<p><strong>数组操作指令</strong></p>
+<p>newarray 分配数据成员类型为基本上数据类型的新数组</p>
+<p>anewarray 分配数据成员类型为引用类型的新数组</p>
+<p>arraylength 获取数组长度</p>
+<p>multianewarray 分配新的多维数组</p>
+<h3 id="创建指令"><a href="#创建指令" class="headerlink" title="创建指令"></a>创建指令</h3><table>
+<thead>
+<tr>
+<th>创建指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>new</td>
+<td>创建类实例</td>
+</tr>
+<tr>
+<td>newarray</td>
+<td>创建基本类型数组</td>
+</tr>
+<tr>
+<td>anewarray</td>
+<td>创建引用类型数组</td>
+</tr>
+<tr>
+<td>multilanewarra</td>
+<td>创建多维数组</td>
+</tr>
+</tbody></table>
+<p>虽然类实例和数组都是对象，但Java虚拟机对类实例和数组的创建与操作使用了不同的字节码指令：</p>
+<ol>
+<li>创建类实例的指令：</li>
+</ol>
+<ul>
+<li><ul>
+<li>创建类实例的指令：new</li>
+</ul>
+</li>
+<li><ul>
+<li>它接收一个操作数，为指向常量池的索引，表示要创建的类型，执行完成后，将对象的引用压入栈。</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>创建数组的指令：</li>
+</ol>
+<ul>
+<li><ul>
+<li>创建数组的指令：newarray、anewarray、multianewarray</li>
+</ul>
+</li>
+<li><ul>
+<li>上述创建指令可以用于创建对象或者数组，由于对象和数组在Java中的广泛使用，这些指令的使用频率也非常高。</li>
+</ul>
+</li>
+</ul>
+<h3 id="字段访问指令"><a href="#字段访问指令" class="headerlink" title="字段访问指令"></a>字段访问指令</h3><table>
+<thead>
+<tr>
+<th>字段访问指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>getstatic、putstatic</td>
+<td>访问类字段（static字段，或者称为类变量）的指令</td>
+</tr>
+<tr>
+<td>getfield、 putfield</td>
+<td>访问类实例字段（非static字段，或者称为实例变量）的指令</td>
+</tr>
+</tbody></table>
+<p>对象创建后，就可以通过对象访问指令获取对象实例或数组实例中的字段或者数组元素。</p>
+<ul>
+<li><p>访问类字段（static字段，或者称为类变量）的指令：getstatic、putstatic</p>
+</li>
+<li><p>访问类实例字段（非static字段，或者称为实例变量）的指令：getfield、putfield</p>
+</li>
+</ul>
+<p>举例：以getstatic指令为例，它含有一个操作数，为指向常量池的Fieldref索引，它的作用就是获取Fieldref指定的对象或者值，并将其压入操作数栈。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sayHello</span><span class="params">()</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;hel1o&quot;</span>); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>对应的字节码指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">0 getstatic #8 &lt;java/lang/System.out&gt;</span><br><span class="line">3 ldc #9 &lt;hello&gt;</span><br><span class="line">5 invokevirtual #10 &lt;java/io/PrintStream.println&gt;</span><br><span class="line">8 return</span><br></pre></td></tr></table></figure>
+
+
+
+<p>图示：</p>
+<p><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509160352.png" alt="img"></p>
+<h3 id="数组操作指令"><a href="#数组操作指令" class="headerlink" title="数组操作指令"></a>数组操作指令</h3><p>数组操作指令主要有：xastore和xaload指令。具体为：</p>
+<ul>
+<li><p>把一个数组元素加载到操作数栈的指令：baload、caload、saload、iaload、laload、faload、daload、aaload</p>
+</li>
+<li><p>将一个操作数栈的值存储到数组元素中的指令：bastore、castore、sastore、iastore、lastore、fastore、dastore、aastore</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>数组指令</th>
+<th>byte(boolean)</th>
+<th>char</th>
+<th>short</th>
+<th>long</th>
+<th>long</th>
+<th>float</th>
+<th>double</th>
+<th>reference</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>xaload</strong></td>
+<td>baload</td>
+<td>caload</td>
+<td>saload</td>
+<td>iaload</td>
+<td>laload</td>
+<td>faload</td>
+<td>daload</td>
+<td>aaload</td>
+</tr>
+<tr>
+<td><strong>xastore</strong></td>
+<td>bastore</td>
+<td>castore</td>
+<td>sastore</td>
+<td>iastore</td>
+<td>lastore</td>
+<td>fastore</td>
+<td>dastore</td>
+<td>aastore</td>
+</tr>
+</tbody></table>
+<p>取数组长度的指令：arraylength。该指令弹出栈顶的数组元素，获取数组的长度，将长度压入栈。</p>
+<p>指令xaload表示将数组的元素压栈，比如saload、caload分别表示压入short数组和char数组。指令xaload在执行时，要求操作数中栈顶元素为数组索引i，栈顶顺位第2个元素为数组引用a，该指令会弹出栈顶这两个元素，并将a[i]重新压入栈。</p>
+<p>xastore则专门针对数组操作，以iastore为例，它用于给一个int数组的给定索引赋值。在iastore执行前，操作数栈顶需要以此准备3个元素：值、索引、数组引用，iastore会弹出这3个值，并将值赋给数组中指定索引的位置。</p>
+<h3 id="类型检查指令"><a href="#类型检查指令" class="headerlink" title="类型检查指令"></a>类型检查指令</h3><p>检查类实例或数组类型的指令：instanceof、checkcast。</p>
+<ul>
+<li>指令instanceof用来判断给定对象是否是某一个类的实例，它会将判断结果压入操作数栈</li>
+<li>指令checkcast用于检查类型强制转换是否可以进行。如果可以进行，那么checkcast指令不会改变操作数栈，否则它会抛出ClassCastException异常</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型检查指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>instanceof</td>
+<td>判断给定对象是否是某一个类的实例</td>
+</tr>
+<tr>
+<td>checkcast</td>
+<td>检查类型强制转换是否可以进行</td>
+</tr>
+</tbody></table>
+<h2 id="方法调用与返回指令"><a href="#方法调用与返回指令" class="headerlink" title="方法调用与返回指令"></a>方法调用与返回指令</h2><p><strong>方法调用指令</strong></p>
+<ul>
+<li><p>invokcvirtual 运行时按照对象的类来调用实例方法</p>
+</li>
+<li><p>invokespecial 根据编译时类型来调用实例方法</p>
+</li>
+<li><p>invokestatic 调用类（静态）方法</p>
+</li>
+<li><p>invokcinterface 调用接口方法</p>
+</li>
+</ul>
+<p><strong>方法返回指令</strong></p>
+<ul>
+<li><p>ireturn 从方法中返回int类型的数据 </p>
+</li>
+<li><p>lreturn 从方法中返回long类型的数据</p>
+</li>
+<li><p>freturn 从方法中返回float类型的数据</p>
+</li>
+<li><p>dreturn 从方法中返回double类型的数据</p>
+</li>
+<li><p>areturn 从方法中返回引用类型的数据</p>
+</li>
+<li><p>return 从方法中返回，返回值为void</p>
+</li>
+</ul>
+<h3 id="方法调用指令"><a href="#方法调用指令" class="headerlink" title="方法调用指令"></a>方法调用指令</h3><p>方法调用指令：invokevirtual、invokeinterface、invokespecial、invokestatic、invokedynamic，以下5条指令用于方法调用：</p>
+<ul>
+<li><p>invokevirtual指令用于调用对象的实例方法，根据对象的实际类型进行分派（虚方法分派），支持多态。这也是Java语言中最常见的方法分派方式。</p>
+</li>
+<li><p>invokeinterface指令用于调用接口方法，它会在运行时搜索由特定对象所实现的这个接口方法，并找出适合的方法进行调用。</p>
+</li>
+<li><p>invokespecial指令用于调用一些需要特殊处理的实例方法，包括实例初始化方法（构造器）、私有方法和父类方法。这些方法都是静态类型绑定的，不会在调用时进行动态派发。</p>
+</li>
+<li><p>invokestatic指令用于调用命名类中的类方法（static方法）。这是静态绑定的。</p>
+</li>
+<li><p>invokedynamic指令用于调用动态绑定的方法，这个是JDK1.7后新加入的指令。用于在运行时动态解析出调用点限定符所引用的方法，并执行该方法。</p>
+</li>
+<li><p>invokedynamic指令的分派逻辑是由用户所设定的引导方法决定的，而前面4条调用指令的分派逻辑都固化在java虚拟机内部。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方法调用指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>invokevirtual</td>
+<td>调用对象的实例方法</td>
+</tr>
+<tr>
+<td>invokeinterface</td>
+<td>调用接口方法</td>
+</tr>
+<tr>
+<td>invokespecial</td>
+<td>调用一些需要特殊处理的实例方法，包括实例初始化方法（构造器）、私有方法和父类方法</td>
+</tr>
+<tr>
+<td>invokestatic</td>
+<td>调用命名类中的类方法（static方法）</td>
+</tr>
+<tr>
+<td>invokedynamic</td>
+<td>调用动态绑定的方法</td>
+</tr>
+</tbody></table>
+<h3 id="方法返回指令"><a href="#方法返回指令" class="headerlink" title="方法返回指令"></a>方法返回指令</h3><p>方法调用结束前，需要进行返回。方法返回指令是根据返回值的类型区分的。</p>
+<ul>
+<li><p>包括ireturn（当返回值是boolean、byte、char、short和int 类型时使用）、lreturn、freturn、dreturn和areturn</p>
+</li>
+<li><p>另外还有一条return 指令供声明为void的方法、实例初始化方法以及类和接口的类初始化方法使用。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方法返回指令</th>
+<th>void</th>
+<th>int</th>
+<th>long</th>
+<th>float</th>
+<th>double</th>
+<th>reference</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>xreturn</strong></td>
+<td>return</td>
+<td>ireturn</td>
+<td>lreturn</td>
+<td>freutrn</td>
+<td>dreturn</td>
+<td>areturn</td>
+</tr>
+</tbody></table>
+<p>通过ireturn指令，将当前函数操作数栈的顶层元素弹出，并将这个元素压入调用者函数的操作数栈中（因为调用者非常关心函数的返回值），所有在当前函数操作数栈中的其他元素都会被丢弃。</p>
+<p>如果当前返回的是synchronized方法，那么还会执行一个隐含的monitorexit指令，退出临界区。</p>
+<p>最后，会丢弃当前方法的整个帧，恢复调用者的帧，并将控制权转交给调用者。</p>
+<p>举例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">methodReturn</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">500</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">200</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> <span class="number">50</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> (i + j) / k;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>图示：</p>
+<p><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509161717.png" alt="img"></p>
+<hr>
+<h2 id="操作数栈管理指令"><a href="#操作数栈管理指令" class="headerlink" title="操作数栈管理指令"></a>操作数栈管理指令</h2><p>如同操作一个普通数据结构中的堆栈那样，JVM提供的操作数栈管理指令，可以用于直接操作操作数栈的指令。</p>
+<p>这类指令包括如下内容：</p>
+<ul>
+<li><p>将一个或两个元素从栈顶弹出，并且直接废弃：<code>pop，pop2</code></p>
+</li>
+<li><p>复制栈顶一个或两个数值并将复制值或双份的复制值重新压入栈顶：<code>dup，dup2，dup_x1，dup2_×1，dup_×2，dup2_×2</code></p>
+</li>
+<li><p>将栈最顶端的两个Slot数值位置交换：<code>swap</code>。Java虚拟机没有提供交换两个64位数据类型（long、double）数值的指令。</p>
+</li>
+<li><p>指令<code>nop</code>，是一个非常特殊的指令，它的字节码为0x00。和汇编语言中的nop一样，它表示什么都不做。这条指令一般可用于调试、占位等。</p>
+</li>
+</ul>
+<p>这些指令属于通用型，对栈的压入或者弹出无需指明数据类型。</p>
+<ul>
+<li><p>不带_x的指令是复制栈顶数据并压入栈顶。包括两个指令，<code>dup，dup2</code>。dup的系数代表要复制的Slot个数。dup开头的指令用于复制1个Slot的数据。例如1个int或1个reference类型数据dup2开头的指令用于复制2个Slot的数据。例如1个long，或2个int，或1个int+1个float类型数据</p>
+</li>
+<li><p>带_x的指令是复制栈顶数据并插入栈顶以下的某个位置。共有4个指令，<code>dup_×1，dup2_×1，dup_×2，dup2×2</code>。对于带<em>x的复制插入指令，只要将指令的dup和x的系数相加，结果即为需要插入的位置。因此dup</em>×1插入位置：1+1&#x3D;2，即栈顶2个slot下面dup_×2插入位置：1+2&#x3D;3，即栈顶3个slot下面；dup2×1插入位置：2+1&#x3D;3，即栈顶3个Slot下面</p>
+</li>
+<li><p>pop：将栈顶的1个Slot数值出栈。例如1个short类型数值</p>
+</li>
+<li><p>pop2：将栈顶的2个slot数值出栈。例如1个double类型数值，或者2个int类型数值</p>
+</li>
+</ul>
+<p><strong>通用(无类型）栈操作</strong></p>
+<ul>
+<li><p>nop 不做任何操作</p>
+</li>
+<li><p>pop 弹出栈顶端一个字长的内容</p>
+</li>
+<li><p>pop2 弹出栈顶端两个字长的内容</p>
+</li>
+<li><p>dup 复制栈顶部一个字长内容</p>
+</li>
+<li><p>dup_x1 复制栈顶部一个字长的内容，然后将复制内容及原来弹出的两个字长的内容压入栈</p>
+</li>
+<li><p>dup_x2 复制栈顶部一个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈</p>
+</li>
+<li><p>dup2 复制栈顶部两个字长内容</p>
+</li>
+<li><p>dup2_x1 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈</p>
+</li>
+<li><p>dup2_x2 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的四个字长的内容压入栈</p>
+</li>
+<li><p>swap 交换栈顶部两个字长内容</p>
+</li>
+</ul>
+<h2 id="控制转移指令"><a href="#控制转移指令" class="headerlink" title="控制转移指令"></a>控制转移指令</h2><p>程序流程离不开条件控制，为了支持条件跳转，虚拟机提供了大量字节码指令，大体上可以分为</p>
+<ul>
+<li><p>比较指令、</p>
+</li>
+<li><p>条件跳转指令、</p>
+</li>
+<li><p>比较条件跳转指令、</p>
+</li>
+<li><p>多条件分支跳转指令、</p>
+</li>
+<li><p>无条件跳转指令等。</p>
+</li>
+</ul>
+<p><strong>比较指令</strong></p>
+<ul>
+<li><p>lcmp 比较long类型值</p>
+</li>
+<li><p>fcmpl 比较float类型值（当遇到NaN时，返回-1）</p>
+</li>
+<li><p>fcmpg 比较float类型值（当遇到NaN时，返回1）</p>
+</li>
+<li><p>dcmpl 比较double类型值（当遇到NaN时，返回-1）</p>
+</li>
+<li><p>dcmpg 比较double类型值（当遇到NaN时，返回1）</p>
+</li>
+</ul>
+<p><strong>条件跳转指令</strong></p>
+<ul>
+<li><p>ifeq 如果等于0，则跳转</p>
+</li>
+<li><p>ifne 如果不等于0，则跳转</p>
+</li>
+<li><p>iflt 如果小于0，则跳转</p>
+</li>
+<li><p>ifge 如果大于等于0，则跳转</p>
+</li>
+<li><p>ifgt 如果大于0，则跳转</p>
+</li>
+<li><p>ifle 如果小于等于0，则跳转</p>
+</li>
+</ul>
+<p><strong>比较条件分支指令</strong></p>
+<ul>
+<li><p>if_icmpeq 如果两个int值相等，则跳转</p>
+</li>
+<li><p>if_icmpne 如果两个int类型值不相等，则跳转</p>
+</li>
+<li><p>if_icmplt 如果一个int类型值小于另外一个int类型值，则跳转</p>
+</li>
+<li><p>if_icmpge 如果一个int类型值大于或者等于另外一个int类型值，则跳转</p>
+</li>
+<li><p>if_icmpgt 如果一个int类型值大于另外一个int类型值，则跳转</p>
+</li>
+<li><p>if_icmple 如果一个int类型值小于或者等于另外一个int类型值，则跳转</p>
+</li>
+<li><p>ifnull 如果等于null，则跳转</p>
+</li>
+<li><p>ifnonnull 如果不等于null，则跳转</p>
+</li>
+<li><p>if_acmpeq 如果两个对象引用相等，则跳转</p>
+</li>
+<li><p>if_acmpne 如果两个对象引用不相等，则跳转</p>
+</li>
+</ul>
+<p><strong>多条件分支跳转指令</strong></p>
+<ul>
+<li><p>tableswitch 通过索引访问跳转表，并跳转</p>
+</li>
+<li><p>lookupswitch 通过键值匹配访问跳转表，并执行跳转操作</p>
+</li>
+</ul>
+<p><strong>无条件跳转指令</strong></p>
+<ul>
+<li><p>goto 无条件跳转</p>
+</li>
+<li><p>goto_w 无条件跳转（宽索引）</p>
+</li>
+</ul>
+<h3 id="比较指令"><a href="#比较指令" class="headerlink" title="比较指令"></a>比较指令</h3><p>比较指令的作用是比较占栈顶两个元素的大小，并将比较结果入栈。比较指令有： dcmpg,dcmpl、 fcmpg、fcmpl、lcmp。与前面讲解的指令类似，首字符d表示double类型，f表示float,l表示long。</p>
+<p>对于double和float类型的数字，由于NaN的存在，各有两个版本的比较指令。以float为例，有fcmpg和fcmpl两个指令，它们的区别在于在数字比较时，若遇到NaN值，处理结果不同。</p>
+<p>指令dcmpl和 dcmpg也是类似的，根据其命名可以推测其含义，在此不再赘述。</p>
+<p>数值类型的数据，才可以谈大小！boolean、引用数据类型不能比较大小。</p>
+<p><strong>举例</strong></p>
+<p>指令 fcmp和fcmpl都从中弹出两个操作数，并将它们做比较，设栈顶的元素为v2，顶顺位第2位的元素为v1：若v1&#x3D;v2，则压入0；若v1&gt;v2，则压入1；若v1&lt;v2，则压入-1。</p>
+<p>两个指令的不同之处在于，如果遇到NaN值， fcmpg会压入1,而fcmpl会压入-1</p>
+<h3 id="条件跳转指令"><a href="#条件跳转指令" class="headerlink" title="条件跳转指令"></a>条件跳转指令</h3><p>条件跳转指令通常和比较指令结合使用。在条件跳转指令执行前，一般可以先用比较指令进行栈顶元素的准备，然后进行条件跳转。</p>
+<p>条件跳转指令有：ifeq，iflt，ifle，ifne，ifgt，ifge，ifnull，ifnonnull。这些指令都接收两个字节的操作数，用于计算跳转的位置（16位符号整数作为当前位置的offset）。</p>
+<p>它们的统一含义为：弹出栈顶元素，测试它是否满足某一条件，如果满足条件，则跳转到给定位置。</p>
+<table>
+<thead>
+<tr>
+<th>&lt;</th>
+<th>&lt;&#x3D;</th>
+<th>&#x3D;&#x3D;</th>
+<th>!&#x3D;</th>
+<th>&gt;&#x3D;</th>
+<th>&gt;</th>
+<th>null</th>
+<th>not null</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>iflt</td>
+<td>ifle</td>
+<td>ifeq</td>
+<td>ifng</td>
+<td>ifge</td>
+<td>ifgt</td>
+<td>ifnull</td>
+<td>ifnonnull</td>
+</tr>
+</tbody></table>
+<p><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509163050.png" alt="img"></p>
+<p>与前面运算规则一致：</p>
+<ul>
+<li><p>对于boolean、byte、char、short类型的条件分支比较操作，都是使用int类型的比较指令完成</p>
+</li>
+<li><p>对于long、float、double类型的条件分支比较操作，则会先执行相应类型的比较运算指令，运算指令会返回一个整型值到操作数栈中，随后再执行int类型的条件分支比较操作来完成整个分支跳转</p>
+</li>
+</ul>
+<p>由于各类型的比较最终都会转为int类型的比较操作，所以Java虚拟机提供的int类型的条件分支指令是最为丰富和强大的。</p>
+<h3 id="2-8-3-比较条件跳转指令"><a href="#2-8-3-比较条件跳转指令" class="headerlink" title="2.8.3. 比较条件跳转指令"></a>2.8.3. 比较条件跳转指令</h3><p>比较条件跳转指令类似于比较指令和条件跳转指令的结合体，它将比较和跳转两个步骤合二为一。</p>
+<p>这类指令有：if_icmpeq、if_icmpne、if_icmplt、if_icmpgt、if_icmple、if_icmpge、if_acmpeq和if_acmpne。其中指令助记符加上“if_”后，以字符“i”开头的指令针对it型整数操作（也包括short和byte类型），以字符“a”开头的指令表示对象引用的比较。</p>
+<table>
+<thead>
+<tr>
+<th>&lt;</th>
+<th>&lt;&#x3D;</th>
+<th>&#x3D;&#x3D;</th>
+<th>!&#x3D;</th>
+<th>&gt;&#x3D;</th>
+<th>&gt;</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>if_icmplt</td>
+<td>if_icmple</td>
+<td>if_icmpeq、if_acmpeq</td>
+<td>if_icmpne、if_acmpne</td>
+<td>if_icmpge</td>
+<td>if_icmpgt</td>
+</tr>
+</tbody></table>
+<p><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509163346.png" alt="img"></p>
+<p>这些指令都接收两个字节的操作数作为参数，用于计算跳转的位置。同时在执行指令时，栈顶需要准备两个元素进行比较。指令执行完成后，栈顶的这两个元素被清空，且没有任何数据入栈。如果预设条件成立，则执行跳转，否则，继续执行下一条语句。</p>
+<h3 id="2-8-4-多条件分支跳转指令"><a href="#2-8-4-多条件分支跳转指令" class="headerlink" title="2.8.4. 多条件分支跳转指令"></a>2.8.4. 多条件分支跳转指令</h3><p>多条件分支跳转指令是专为switch-case语句设计的，主要有tableswitch和lookupswitch。</p>
+<table>
+<thead>
+<tr>
+<th>指令名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>tableswitch</td>
+<td>用于switch条件跳转，case值连续</td>
+</tr>
+<tr>
+<td>lookupswitch</td>
+<td>用于switch条件跳转，case值不连续</td>
+</tr>
+</tbody></table>
+<p>从助记符上看，两者都是switch语句的实现，它们的区别：</p>
+<ul>
+<li><p>tableswitch要求多个条件分支值是连续的，它内部只存放起始值和终止值，以及若干个跳转偏移量，通过给定的操作数index，可以立即定位到跳转偏移量位置，因此效率比较高。</p>
+</li>
+<li><p>lookupswitch内部存放着各个离散的case-offset对，每次执行都要搜索全部的case-offset对，找到匹配的case值，并根据对应的offset计算跳转地址，因此效率较低。</p>
+</li>
+</ul>
+<p>指令tableswitch的示意图如下图所示。由于tableswitch的case值是连续的，因此只需要记录最低值和最高值，以及每一项对应的offset偏移量，根据给定的index值通过简单的计算即可直接定位到offset。</p>
+<p><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509163911.png" alt="img"></p>
+<p>指令lookupswitch处理的是离散的case值，但是出于效率考虑，将case-offset对按照case值大小排序，给定index时，需要查找与index相等的case，获得其offset，如果找不到则跳转到default。指令lookupswitch如下图所示。</p>
+<p><img src="https://gitee.com/vectorx/ImageCloud/raw/master/img/20210509164107.png" alt="img"></p>
+<h3 id="2-8-5-无条件跳转指令"><a href="#2-8-5-无条件跳转指令" class="headerlink" title="2.8.5. 无条件跳转指令"></a>2.8.5. 无条件跳转指令</h3><p>目前主要的无条件跳转指令为goto。指令goto接收两个字节的操作数，共同组成一个带符号的整数，用于指定指令的偏移量，指令执行的目的就是跳转到偏移量给定的位置处。</p>
+<p>如果指令偏移量太大，超过双字节的带符号整数的范围，则可以使用指令goto_w，它和goto有相同的作用，但是它接收4个字节的操作数，可以表示更大的地址范围。</p>
+<p>指令jsr、jsr_w、ret虽然也是无条件跳转的，但主要用于try-finally语句，且已经被虚拟机逐渐废弃，故不在这里介绍这两个指令。</p>
+<table>
+<thead>
+<tr>
+<th>指令名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>goto</td>
+<td>无条件跳转</td>
+</tr>
+<tr>
+<td>goto_w</td>
+<td>无条件跳转（宽索引）</td>
+</tr>
+<tr>
+<td>jsr</td>
+<td>跳转至指定16位offset位置，并将jsr下一条指令地址压入栈顶</td>
+</tr>
+<tr>
+<td>jsr_w</td>
+<td>跳转至指定32位offer位置，并将jsr_w下一条指令地址压入栈顶</td>
+</tr>
+<tr>
+<td>ret</td>
+<td>返回至由指定的局部变量所给出的指令位置（一般与jsr、jsr_w联合使用）</td>
+</tr>
+</tbody></table>
+<h2 id="2-9-异常处理指令"><a href="#2-9-异常处理指令" class="headerlink" title="2.9. 异常处理指令"></a>2.9. 异常处理指令</h2><p><strong>异常处理指令</strong></p>
+<p>athrow 抛出异常或错误。将栈顶异常抛出</p>
+<p>jsr 跳转到子例程</p>
+<p>jsr_w 跳转到子例程（宽索引）</p>
+<p>ret 从子例程返回</p>
+<p><strong>athrow指令</strong></p>
+<p>在Java程序中显示抛出异常的操作（throw语句）都是由athrow指令来实现。</p>
+<p>除了使用throw语句显示抛出异常情况之外，JVM规范还规定了许多运行时异常会在其他Java虚拟机指令检测到异常状况时自动抛出。例如，在之前介绍的整数运算时，当除数为零时，虚拟机会在idiv或1div指令中抛出ArithmeticException异常。</p>
+<p>正常情况下，操作数栈的压入弹出都是一条条指令完成的。唯一的例外情况是在抛异常时，Java虚拟机会清除操作数栈上的所有内容，而后将异常实例压入调用者操作数栈上。</p>
+<p><strong>处理异常</strong></p>
+<p>在Java虚拟机中，处理异常（catch语句）不是由字节码指令来实现的（早期使用jsr、ret指令），而是采用异常表来完成的。</p>
+<p><strong>异常表</strong></p>
+<p>如果一个方法定义了一个try-catch 或者try-finally的异常处理，就会创建一个异常表。它包含了每个异常处理或者finally块的信息。异常表保存了每个异常处理信息。比如：</p>
+<ul>
+<li><p>起始位置</p>
+</li>
+<li><p>结束位置</p>
+</li>
+<li><p>程序计数器记录的代码处理的偏移地址</p>
+</li>
+<li><p>被捕获的异常类在常量池中的索引</p>
+</li>
+</ul>
+<p>当一个异常被抛出时，JVM会在当前的方法里寻找一个匹配的处理，如果没有找到，这个方法会强制结束并弹出当前栈帧，并且异常会重新抛给上层调用的方法（在调用方法栈帧）。如果在所有栈帧弹出前仍然没有找到合适的异常处理，这个线程将终止。如果这个异常在最后一个非守护线程里抛出，将会导致JVM自己终止，比如这个线程是个main线程。</p>
+<p>不管什么时候抛出异常，如果异常处理最终匹配了所有异常类型，代码就会继续执行。在这种情况下，如果方法结束后没有抛出异常，仍然执行finally块，在return前，它直接跳到finally块来完成目标</p>
+<h2 id="2-10-同步控制指令"><a href="#2-10-同步控制指令" class="headerlink" title="2.10. 同步控制指令"></a>2.10. 同步控制指令</h2><p>Java虚拟机支持两种同步结构：方法级的同步和方法内部一段指令序列的同步，这两种同步都是使用monitor来支持的</p>
+<h3 id="2-10-1-方法级的同步"><a href="#2-10-1-方法级的同步" class="headerlink" title="2.10.1. 方法级的同步"></a>2.10.1. 方法级的同步</h3><p>方法级的同步：是隐式的，即无须通过字节码指令来控制，它实现在方法调用和返回操作之中。虚拟机可以从方法常量池的方法表结构中的ACC_SYNCHRONIZED访问标志得知一个方法是否声明为同步方法；</p>
+<p>当调用方法时，调用指令将会检查方法的ACC_SYNCHRONIZED访问标志是否设置。</p>
+<ul>
+<li><p>如果设置了，执行线程将先持有同步锁，然后执行方法。最后在方法完成（无论是正常完成还是非正常完成）时释放同步锁。</p>
+</li>
+<li><p>在方法执行期间，执行线程持有了同步锁，其他任何线程都无法再获得同一个锁。</p>
+</li>
+<li><p>如果一个同步方法执行期间抛出了异常，并且在方法内部无法处理此异常，那这个同步方法所持有的锁将在异常抛到同步方法之外时自动释放。</p>
+</li>
+</ul>
+<p>举例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">()</span> &#123;</span><br><span class="line">	i++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>对应的字节码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">0  aload_0</span><br><span class="line">1  dup</span><br><span class="line">2  getfield #2 &lt;com/atguigu/java1/SynchronizedTest.i&gt;</span><br><span class="line">5  iconst_1 </span><br><span class="line">6  iadd</span><br><span class="line">7  putfield #2 &lt;com/atguigu/java1/SynchronizedTest.i&gt;</span><br><span class="line">10 return</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这段代码和普通的无同步操作的代码没有什么不同，没有使用monitorenter和monitorexit进行同步区控制。</p>
+<p>这是因为，对于同步方法而言，当虚拟机通过方法的访问标示符判断是一个同步方法时，会自动在方法调用前进行加锁，当同步方法执行完毕后，不管方法是正常结束还是有异常抛出，均会由虚拟机释放这个锁。</p>
+<p>因此，对于同步方法而言，monitorenter和monitorexit指令是隐式存在的，并未直接出现在字节码中。</p>
+<h3 id="2-10-2-方法内指令指令序列的同步"><a href="#2-10-2-方法内指令指令序列的同步" class="headerlink" title="2.10.2. 方法内指令指令序列的同步"></a>2.10.2. 方法内指令指令序列的同步</h3><p>同步一段指令集序列：通常是由java中的synchronized语句块来表示的。jvm的指令集有monitorenter和monitorexit 两条指令来支持synchronized关键字的语义。</p>
+<p>当一个线程进入同步代码块时，它使用monitorenter指令请求进入。如果当前对象的监视器计数器为0，则它会被准许进入，若为1，则判断持有当前监视器的线程是否为自己，如果是，则进入，否则进行等待，直到对象的监视器计数器为0，才会被允许进入同步块。</p>
+<p>当线程退出同步块时，需要使用monitorexit声明退出。在Java虚拟机中，任何对象都有一个监视器与之相关联，用来判断对象是否被锁定，当监视器被持有后，对象处于锁定状态。</p>
+<p>指令monitorenter和monitorexit在执行时，都需要在操作数栈顶压入对象，之后monitorenter和monitorexit的锁定和释放都是针对这个对象的监视器进行的。</p>
+<p>下图展示了监视器如何保护临界区代码不同时被多个线程访问，只有当线程4离开临界区后，线程1、2、3才有可能进入。</p>
+<p>对应的字节码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"> 0: aloade</span><br><span class="line"> 1: dup</span><br><span class="line"> 2: astore_1</span><br><span class="line"> 3: monitorenter</span><br><span class="line"> 4: aload_0</span><br><span class="line"> 5: dup</span><br><span class="line"> 6: getfield #2 //Field i:I</span><br><span class="line"> 9: iconst_1</span><br><span class="line">10: isub</span><br><span class="line">11: putfield #2 //Field i:I</span><br><span class="line">14: aload_1</span><br><span class="line">15: monitorexit</span><br><span class="line">16: goto 24</span><br><span class="line">19: astore_2</span><br><span class="line">26: aload_1</span><br><span class="line">21: monitorexit</span><br><span class="line">22: aload_2</span><br><span class="line">23: athrow</span><br><span class="line">24: return</span><br><span class="line"></span><br><span class="line">Exception table:</span><br><span class="line">	from to target type</span><br><span class="line">	4	 16	   19  any</span><br><span class="line">	19	 22    19  any</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.</span> <span class="toc-text">执行模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E7%A0%81%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.2.</span> <span class="toc-text">字节码与数据类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E5%88%86%E6%9E%90"><span class="toc-number">1.3.</span> <span class="toc-text">指令分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E4%B8%8E%E5%AD%98%E5%82%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">2.</span> <span class="toc-text">加载与存储指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8"><span class="toc-number">2.1.</span> <span class="toc-text">作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">2.2.</span> <span class="toc-text">常用指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%8D%E8%B0%88%E6%93%8D%E4%BD%9C%E6%95%B0%E6%A0%88%E4%B8%8E%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E8%A1%A8"><span class="toc-number">2.3.</span> <span class="toc-text">再谈操作数栈与局部变量表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E5%8E%8B%E6%A0%88%E6%8C%87%E4%BB%A4"><span class="toc-number">2.4.</span> <span class="toc-text">局部变量压栈指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E9%87%8F%E5%85%A5%E6%A0%88%E6%8C%87%E4%BB%A4"><span class="toc-number">2.5.</span> <span class="toc-text">常量入栈指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BA%E6%A0%88%E8%A3%85%E5%85%A5%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E8%A1%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">2.6.</span> <span class="toc-text">出栈装入局部变量表指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E6%9C%AF%E6%8C%87%E4%BB%A4"><span class="toc-number">3.</span> <span class="toc-text">算术指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8-1"><span class="toc-number">3.1.</span> <span class="toc-text">作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E7%B1%BB"><span class="toc-number">3.2.</span> <span class="toc-text">分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#byte%E3%80%81short%E3%80%81char%E5%92%8Cboolean%E7%B1%BB%E5%9E%8B%E8%AF%B4%E6%98%8E"><span class="toc-number">3.3.</span> <span class="toc-text">byte、short、char和boolean类型说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E6%97%B6%E7%9A%84%E6%BA%A2%E5%87%BA"><span class="toc-number">3.4.</span> <span class="toc-text">运算时的溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E6%A8%A1%E5%BC%8F"><span class="toc-number">3.5.</span> <span class="toc-text">运算模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NaN%E5%80%BC%E4%BD%BF%E7%94%A8"><span class="toc-number">3.6.</span> <span class="toc-text">NaN值使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E6%9C%89%E7%AE%97%E6%9C%AF%E6%8C%87%E4%BB%A4"><span class="toc-number">3.7.</span> <span class="toc-text">所有算术指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%8C%87%E4%BB%A4"><span class="toc-number">4.</span> <span class="toc-text">类型转换指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%BD%E5%8C%96%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%8C%87%E4%BB%A4"><span class="toc-number">4.1.</span> <span class="toc-text">宽化类型转换指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AA%84%E5%8C%96%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%8C%87%E4%BB%A4"><span class="toc-number">4.2.</span> <span class="toc-text">窄化类型转换指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA%E4%B8%8E%E8%AE%BF%E9%97%AE%E6%8C%87%E4%BB%A4"><span class="toc-number">5.</span> <span class="toc-text">对象的创建与访问指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%8C%87%E4%BB%A4"><span class="toc-number">5.1.</span> <span class="toc-text">创建指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E6%AE%B5%E8%AE%BF%E9%97%AE%E6%8C%87%E4%BB%A4"><span class="toc-number">5.2.</span> <span class="toc-text">字段访问指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E7%BB%84%E6%93%8D%E4%BD%9C%E6%8C%87%E4%BB%A4"><span class="toc-number">5.3.</span> <span class="toc-text">数组操作指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%9F%A5%E6%8C%87%E4%BB%A4"><span class="toc-number">5.4.</span> <span class="toc-text">类型检查指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BF%94%E5%9B%9E%E6%8C%87%E4%BB%A4"><span class="toc-number">6.</span> <span class="toc-text">方法调用与返回指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-number">6.1.</span> <span class="toc-text">方法调用指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E8%BF%94%E5%9B%9E%E6%8C%87%E4%BB%A4"><span class="toc-number">6.2.</span> <span class="toc-text">方法返回指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E6%95%B0%E6%A0%88%E7%AE%A1%E7%90%86%E6%8C%87%E4%BB%A4"><span class="toc-number">7.</span> <span class="toc-text">操作数栈管理指令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E8%BD%AC%E7%A7%BB%E6%8C%87%E4%BB%A4"><span class="toc-number">8.</span> <span class="toc-text">控制转移指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AF%94%E8%BE%83%E6%8C%87%E4%BB%A4"><span class="toc-number">8.1.</span> <span class="toc-text">比较指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">8.2.</span> <span class="toc-text">条件跳转指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-3-%E6%AF%94%E8%BE%83%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">8.3.</span> <span class="toc-text">2.8.3. 比较条件跳转指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-4-%E5%A4%9A%E6%9D%A1%E4%BB%B6%E5%88%86%E6%94%AF%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">8.4.</span> <span class="toc-text">2.8.4. 多条件分支跳转指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-5-%E6%97%A0%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">8.5.</span> <span class="toc-text">2.8.5. 无条件跳转指令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-9-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%8C%87%E4%BB%A4"><span class="toc-number">9.</span> <span class="toc-text">2.9. 异常处理指令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-10-%E5%90%8C%E6%AD%A5%E6%8E%A7%E5%88%B6%E6%8C%87%E4%BB%A4"><span class="toc-number">10.</span> <span class="toc-text">2.10. 同步控制指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-10-1-%E6%96%B9%E6%B3%95%E7%BA%A7%E7%9A%84%E5%90%8C%E6%AD%A5"><span class="toc-number">10.1.</span> <span class="toc-text">2.10.1. 方法级的同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-10-2-%E6%96%B9%E6%B3%95%E5%86%85%E6%8C%87%E4%BB%A4%E6%8C%87%E4%BB%A4%E5%BA%8F%E5%88%97%E7%9A%84%E5%90%8C%E6%AD%A5"><span class="toc-number">10.2.</span> <span class="toc-text">2.10.2. 方法内指令指令序列的同步</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&text=JVM字节码指令集"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&is_video=false&description=JVM字节码指令集"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JVM字节码指令集&body=Check out this article: https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&title=JVM字节码指令集"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&name=JVM字节码指令集&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/&t=JVM字节码指令集"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="认证授权认证授权基础认证 (Authentication) 和授权 (Authorization)的区别这是一个绝大多数人都会混淆的问题。首先先从读音上来认识这两个名词，很多人都会把它俩的读音搞混，所以我建议你先先去查一查这两个单词到底该怎么读，他们的具体含义是什么。 说简单点就是：  认证 (Authentication)： 你是谁。 授权 (Authorization)： 你有权限干什么。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="认证授权基础">
+<meta property="og:url" content="https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="认证授权认证授权基础认证 (Authentication) 和授权 (Authorization)的区别这是一个绝大多数人都会混淆的问题。首先先从读音上来认识这两个名词，很多人都会把它俩的读音搞混，所以我建议你先先去查一查这两个单词到底该怎么读，他们的具体含义是什么。 说简单点就是：  认证 (Authentication)： 你是谁。 授权 (Authorization)： 你有权限干什么。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20210604160908352.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20210604161032412.png">
+<meta property="og:image" content="https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/booksRBAC.png">
+<meta property="og:image" content="https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/2020-11/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1-%E6%9D%83%E9%99%90.png">
+<meta property="og:image" content="https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/books%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20210615162505880.png">
+<meta property="og:image" content="https://javaguide.cn/assets/session-cookie.af8a7cc5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20210615161108272.png">
+<meta property="og:image" content="https://javaguide.cn/assets/jwt.8c21e845.png">
+<meta property="og:image" content="https://javaguide.cn/assets/sso.74162fc9.png">
+<meta property="og:image" content="https://img.ken.io/blog/sso/sso-system.png-kblb.png">
+<meta property="og:image" content="https://img.ken.io/blog/sso/sso-login-sequence.png-kbrb.png">
+<meta property="og:image" content="https://img.ken.io/blog/sso/sso-logincheck-sequence.png-kbrb.png">
+<meta property="og:image" content="https://img.ken.io/blog/sso/sso-logout-sequence.png-kbrb.png">
+<meta property="og:image" content="https://img.ken.io/blog/sso/sso-crossdomain-login-loggedin-sequence.png-kbrb.png">
+<meta property="og:image" content="https://img.ken.io/blog/sso/sso-crossdomain-login-unlogin-sequence.png-kbrb.png">
+<meta property="og:image" content="https://img.ken.io/blog/sso/sso-crossdomain-logout-sequence.png-kbrb.png">
+<meta property="og:image" content="https://javaguide.cn/assets/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98-fnglfdlgdfj.5b85dfa7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20210615151716340.png">
+<meta property="article:published_time" content="2022-05-18T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-29T08:40:12.629Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="鉴权">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20210604160908352.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>认证授权基础</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/05/18/%E5%90%8E%E7%AB%AF/SpringSpringBoot%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3%E6%80%BB%E7%BB%93/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/05/06/database/Redis/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&text=认证授权基础"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&is_video=false&description=认证授权基础"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=认证授权基础&body=Check out this article: https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&name=认证授权基础&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&t=认证授权基础"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83"><span class="toc-number">1.</span> <span class="toc-text">认证授权</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80"><span class="toc-number">1.1.</span> <span class="toc-text">认证授权基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A4%E8%AF%81-Authentication-%E5%92%8C%E6%8E%88%E6%9D%83-Authorization-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">1.1.1.</span> <span class="toc-text">认证 (Authentication) 和授权 (Authorization)的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RBAC-%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">RBAC 模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cookie%E3%80%81Session"><span class="toc-number">1.2.</span> <span class="toc-text">Cookie、Session</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Cookie-Cookie-%E7%9A%84%E4%BD%9C%E7%94%A8%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.2.1.</span> <span class="toc-text">什么是 Cookie ? Cookie 的作用是什么?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8-Cookie"><span class="toc-number">1.2.2.</span> <span class="toc-text">在项目中使用 Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cookie-%E5%92%8C-Session-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">1.2.3.</span> <span class="toc-text">Cookie 和 Session 的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-Session-Cookie-%E6%96%B9%E6%A1%88%E8%BF%9B%E8%A1%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81"><span class="toc-number">1.2.4.</span> <span class="toc-text">使用 Session-Cookie 方案进行身份验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%8A%82%E7%82%B9%E4%B8%8B-Session-Cookie-%E6%96%B9%E6%A1%88"><span class="toc-number">1.2.5.</span> <span class="toc-text">多服务器节点下 Session-Cookie 方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E6%B2%A1%E6%9C%89-Cookie-%E7%9A%84%E8%AF%9D-Session-%E8%BF%98%E8%83%BD%E7%94%A8%E5%90%97%EF%BC%9F"><span class="toc-number">1.2.6.</span> <span class="toc-text">如果没有 Cookie 的话 Session 还能用吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-Cookie-%E6%97%A0%E6%B3%95%E9%98%B2%E6%AD%A2-CSRF-%E6%94%BB%E5%87%BB%EF%BC%8C%E8%80%8C-Token-%E5%8F%AF%E4%BB%A5%EF%BC%9F"><span class="toc-number">1.2.7.</span> <span class="toc-text">为什么 Cookie 无法防止 CSRF 攻击，而 Token 可以？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Token%E3%80%81JWT"><span class="toc-number">1.3.</span> <span class="toc-text">Token、JWT</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E-Token-%E8%BF%9B%E8%A1%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81"><span class="toc-number">1.3.1.</span> <span class="toc-text">基于 Token 进行身份验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Token-%E8%AE%A4%E8%AF%81%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="toc-number">1.3.2.</span> <span class="toc-text">Token 认证的优势</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%97%A0%E7%8A%B6%E6%80%81"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">1.无状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%9C%89%E6%95%88%E9%81%BF%E5%85%8D%E4%BA%86CSRF-%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">2.有效避免了CSRF 攻击</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%80%82%E5%90%88%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BA%94%E7%94%A8"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">3.适合移动端应用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E5%8F%8B%E5%A5%BD"><span class="toc-number">1.3.2.4.</span> <span class="toc-text">4.单点登录友好</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Token-%E8%AE%A4%E8%AF%81%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A5%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="toc-number">1.3.3.</span> <span class="toc-text">Token 认证常见问题以及解决办法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%B3%A8%E9%94%80%E7%99%BB%E5%BD%95%E7%AD%89%E5%9C%BA%E6%99%AF%E4%B8%8B-token-%E8%BF%98%E6%9C%89%E6%95%88"><span class="toc-number">1.3.3.1.</span> <span class="toc-text">1.注销登录等场景下 token 还有效</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-token-%E7%9A%84%E7%BB%AD%E7%AD%BE%E9%97%AE%E9%A2%98"><span class="toc-number">1.3.3.2.</span> <span class="toc-text">2.token 的续签问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.4.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSO"><span class="toc-number">1.4.</span> <span class="toc-text">SSO</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.4.1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SSO%E8%AF%B4%E6%98%8E"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">SSO说明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">单点登录系统的好处</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E7%9B%AE%E6%A0%87"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">设计目标</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSO%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.4.2.</span> <span class="toc-text">SSO设计与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%BA%94%E7%94%A8%E4%B8%8E%E4%BE%9D%E8%B5%96"><span class="toc-number">1.4.2.1.</span> <span class="toc-text">核心应用与依赖</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E7%8A%B6%E6%80%81%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E6%A0%A1%E9%AA%8C"><span class="toc-number">1.4.2.2.</span> <span class="toc-text">用户登录状态的存储与校验</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95-%E7%99%BB%E5%BD%95%E6%A0%A1%E9%AA%8C"><span class="toc-number">1.4.2.3.</span> <span class="toc-text">用户登录&#x2F;登录校验</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%87%BA"><span class="toc-number">1.4.2.4.</span> <span class="toc-text">用户登出</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B7%A8%E5%9F%9F%E7%99%BB%E5%BD%95%E3%80%81%E7%99%BB%E5%87%BA"><span class="toc-number">1.4.2.5.</span> <span class="toc-text">跨域登录、登出</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%87%E6%B3%A8"><span class="toc-number">1.4.3.</span> <span class="toc-text">备注</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OAuth-2-0%EF%BC%9F"><span class="toc-number">1.5.</span> <span class="toc-text">OAuth 2.0？</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        认证授权基础
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-05-18T08:51:33.000Z" class="dt-published" itemprop="datePublished">2022-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag">后端</a>, <a class="p-category" href="/tags/%E9%89%B4%E6%9D%83/" rel="tag">鉴权</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="认证授权"><a href="#认证授权" class="headerlink" title="认证授权"></a>认证授权</h1><h2 id="认证授权基础"><a href="#认证授权基础" class="headerlink" title="认证授权基础"></a>认证授权基础</h2><h3 id="认证-Authentication-和授权-Authorization-的区别"><a href="#认证-Authentication-和授权-Authorization-的区别" class="headerlink" title="认证 (Authentication) 和授权 (Authorization)的区别"></a>认证 (Authentication) 和授权 (Authorization)的区别</h3><p>这是一个绝大多数人都会混淆的问题。首先先从读音上来认识这两个名词，很多人都会把它俩的读音搞混，所以我建议你先先去查一查这两个单词到底该怎么读，他们的具体含义是什么。</p>
+<p>说简单点就是：</p>
+<ul>
+<li><strong>认证 (Authentication)：</strong> 你是谁。</li>
+<li><strong>授权 (Authorization)：</strong> 你有权限干什么。</li>
+</ul>
+<p>稍微正式点（啰嗦点）的说法就是 ：</p>
+<ul>
+<li><strong>Authentication（认证）</strong> 是验证您的身份的凭据（例如用户名&#x2F;用户 ID 和密码），通过这个凭据，系统得以知道你就是你，也就是说系统存在你这个用户。所以，Authentication 被称为身份&#x2F;用户验证。</li>
+<li><strong>Authorization（授权）</strong> 发生在 <strong>Authentication（认证）</strong> 之后。授权嘛，光看意思大家应该就明白，它主要掌管我们访问系统的权限。比如有些特定资源只能具有特定权限的人才能访问比如 admin，有些对系统资源操作比如删除、添加、更新只能特定人才具有。</li>
+</ul>
+<p>认证 ：</p>
+<p><img src="https://img-blog.csdnimg.cn/20210604160908352.png" alt="img"></p>
+<p>授权：</p>
+<p><img src="https://img-blog.csdnimg.cn/20210604161032412.png" alt="img"></p>
+<p>这两个一般在我们的系统中被结合在一起使用，目的就是为了保护我们系统的安全性。</p>
+<h3 id="RBAC-模型"><a href="#RBAC-模型" class="headerlink" title="RBAC 模型"></a>RBAC 模型</h3><p>系统权限控制最常采用的访问控制模型就是 <strong>RBAC 模型</strong> 。</p>
+<p><strong>什么是 RBAC 呢？</strong></p>
+<p>RBAC 即基于角色的权限访问控制（Role-Based Access Control）。这是一种通过角色关联权限，角色同时又关联用户的授权的方式。</p>
+<p>简单地说：一个用户可以拥有若干角色，每一个角色又可以被分配若干权限，这样就构造成“用户-角色-权限” 的授权模型。在这种模型中，用户与角色、角色与权限之间构成了多对多的关系，如下图</p>
+<p><img src="https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/booksRBAC.png" alt="RBAC"></p>
+<p><strong>在 RBAC 中，权限与角色相关联，用户通过成为适当角色的成员而得到这些角色的权限。这就极大地简化了权限的管理。</strong></p>
+<p>本系统的权限设计相关的表如下（一共 5 张表，2 张用户建立表之间的联系）：</p>
+<p><img src="https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/2020-11/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1-%E6%9D%83%E9%99%90.png" alt="img"></p>
+<p>通过这个权限模型，我们可以创建不同的角色并为不同的角色分配不同的权限范围（菜单）。</p>
+<p><img src="https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/books%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97.png" alt="img"></p>
+<p>通常来说，如果系统对于权限控制要求比较严格的话，一般都会选择使用 RBAC 模型来做权限控制。</p>
+<h2 id="Cookie、Session"><a href="#Cookie、Session" class="headerlink" title="Cookie、Session"></a>Cookie、Session</h2><h3 id="什么是-Cookie-Cookie-的作用是什么"><a href="#什么是-Cookie-Cookie-的作用是什么" class="headerlink" title="什么是 Cookie ? Cookie 的作用是什么?"></a>什么是 Cookie ? Cookie 的作用是什么?</h3><p><img src="https://img-blog.csdnimg.cn/20210615162505880.png" alt="img"></p>
+<p><code>Cookie</code> 和 <code>Session</code> 都是用来跟踪浏览器用户身份的会话方式，但是两者的应用场景不太一样。</p>
+<p>维基百科是这样定义 <code>Cookie</code> 的：</p>
+<blockquote>
+<p><code>Cookies</code> 是某些网站为了辨别用户身份而储存在用户本地终端上的数据（通常经过加密）。</p>
+</blockquote>
+<p>简单来说： <strong><code>Cookie</code> 存放在客户端，一般用来保存用户信息</strong>。</p>
+<p>下面是 <code>Cookie</code> 的一些应用案例：</p>
+<ol>
+<li>我们在 <code>Cookie</code> 中保存已经登录过的用户信息，下次访问网站的时候页面可以自动帮你登录的一些基本信息给填了。除此之外，<code>Cookie</code> 还能保存用户首选项，主题和其他设置信息。</li>
+<li>使用 <code>Cookie</code> 保存 <code>SessionId</code> 或者 <code>Token</code> ，向后端发送请求的时候带上 <code>Cookie</code>，这样后端就能取到 <code>Session</code> 或者 <code>Token</code> 了。这样就能记录用户当前的状态了，因为 HTTP 协议是无状态的。</li>
+<li><code>Cookie</code> 还可以用来记录和分析用户行为。举个简单的例子你在网上购物的时候，因为 HTTP 协议是没有状态的，如果服务器想要获取你在某个页面的停留状态或者看了哪些商品，一种常用的实现方式就是将这些信息存放在 <code>Cookie</code></li>
+<li>……</li>
+</ol>
+<h3 id="在项目中使用-Cookie"><a href="#在项目中使用-Cookie" class="headerlink" title="在项目中使用 Cookie"></a>在项目中使用 Cookie</h3><p>我这里以 Spring Boot 项目为例。</p>
+<p><strong>1)设置 <code>Cookie</code> 返回给客户端</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/change-username&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">setCookie</span><span class="params">(HttpServletResponse response)</span> &#123;</span><br><span class="line">    <span class="comment">// 创建一个 cookie</span></span><br><span class="line">    <span class="type">Cookie</span> <span class="variable">cookie</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Cookie</span>(<span class="string">&quot;username&quot;</span>, <span class="string">&quot;Jovan&quot;</span>);</span><br><span class="line">    <span class="comment">//设置 cookie过期时间</span></span><br><span class="line">    cookie.setMaxAge(<span class="number">7</span> * <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span>); <span class="comment">// expires in 7 days</span></span><br><span class="line">    <span class="comment">//添加到 response 中</span></span><br><span class="line">    response.addCookie(cookie);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;Username is changed!&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>2) 使用 Spring 框架提供的 <code>@CookieValue</code> 注解获取特定的 cookie 的值</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">readCookie</span><span class="params">(<span class="meta">@CookieValue(value = &quot;username&quot;, defaultValue = &quot;Atta&quot;)</span> String username)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;Hey! My username is &quot;</span> + username;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>3) 读取所有的 <code>Cookie</code> 值</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/all-cookies&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">readAllCookies</span><span class="params">(HttpServletRequest request)</span> &#123;</span><br><span class="line"></span><br><span class="line">    Cookie[] cookies = request.getCookies();</span><br><span class="line">    <span class="keyword">if</span> (cookies != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> Arrays.stream(cookies)</span><br><span class="line">                .map(c -&gt; c.getName() + <span class="string">&quot;=&quot;</span> + c.getValue()).collect(Collectors.joining(<span class="string">&quot;, &quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;No cookies&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>更多关于如何在 Spring Boot 中使用 <code>Cookie</code> 的内容可以查看这篇文章：<a target="_blank" rel="noopener" href="https://attacomsian.com/blog/cookies-spring-boot">How to use cookies in Spring Bootopen in new window</a> 。</p>
+<h3 id="Cookie-和-Session-的区别"><a href="#Cookie-和-Session-的区别" class="headerlink" title="Cookie 和 Session 的区别"></a>Cookie 和 Session 的区别</h3><p><strong><code>Session</code> 的主要作用就是通过服务端记录用户的状态。</strong> 典型的场景是购物车，当你要添加商品到购物车的时候，系统不知道是哪个用户操作的，因为 HTTP 协议是无状态的。服务端给特定的用户创建特定的 <code>Session</code> 之后就可以标识这个用户并且跟踪这个用户了。</p>
+<p><code>Cookie</code> 数据保存在客户端(浏览器端)，<code>Session</code> 数据保存在服务器端。相对来说 <code>Session</code> 安全性更高。如果使用 <code>Cookie</code> 的一些敏感信息不要写入 <code>Cookie</code> 中，最好能将 <code>Cookie</code> 信息加密然后使用到的时候再去服务器端解密。</p>
+<p><strong>那么，如何使用 <code>Session</code> 进行身份验证？</strong></p>
+<h3 id="使用-Session-Cookie-方案进行身份验证"><a href="#使用-Session-Cookie-方案进行身份验证" class="headerlink" title="使用 Session-Cookie 方案进行身份验证"></a>使用 Session-Cookie 方案进行身份验证</h3><p>很多时候我们都是通过 <code>SessionID</code> 来实现特定的用户，<code>SessionID</code> 一般会选择存放在 Redis 中。举个例子：</p>
+<ol>
+<li>用户成功登陆系统，然后返回给客户端具有 <code>SessionID</code> 的 <code>Cookie</code></li>
+<li>当用户向后端发起请求的时候会把 <code>SessionID</code> 带上，这样后端就知道你的身份状态了。</li>
+</ol>
+<p>关于这种认证方式更详细的过程如下：</p>
+<p><img src="https://javaguide.cn/assets/session-cookie.af8a7cc5.png" alt="img"></p>
+<ol>
+<li>用户向服务器发送用户名、密码、验证码用于登陆系统。</li>
+<li>服务器验证通过后，服务器为用户创建一个 <code>Session</code>，并将 <code>Session</code> 信息存储起来。</li>
+<li>服务器向用户返回一个 <code>SessionID</code>，写入用户的 <code>Cookie</code>。</li>
+<li>当用户保持登录状态时，<code>Cookie</code> 将与每个后续请求一起被发送出去。</li>
+<li>服务器可以将存储在 <code>Cookie</code> 上的 <code>SessionID</code> 与存储在内存中或者数据库中的 <code>Session</code> 信息进行比较，以验证用户的身份，返回给用户客户端响应信息的时候会附带用户当前的状态。</li>
+</ol>
+<p>使用 <code>Session</code> 的时候需要注意下面几个点：</p>
+<ol>
+<li>依赖 <code>Session</code> 的关键业务一定要确保客户端开启了 <code>Cookie</code>。</li>
+<li>注意 <code>Session</code> 的过期时间。</li>
+</ol>
+<p>另外，Spring Session 提供了一种跨多个应用程序或实例管理用户会话信息的机制。如果想详细了解可以查看下面几篇很不错的文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://codeboje.de/spring-Session-tutorial/">Getting Started with Spring Sessionopen in new window</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.baeldung.com/spring-Session">Guide to Spring Sessionopen in new window</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@gvnix/sticky-Sessions-with-spring-Session-redis-bdc6f7438cc3">Sticky Sessions with Spring Session &amp; Redisopen in new window</a></li>
+</ul>
+<h3 id="多服务器节点下-Session-Cookie-方案"><a href="#多服务器节点下-Session-Cookie-方案" class="headerlink" title="多服务器节点下 Session-Cookie 方案"></a>多服务器节点下 Session-Cookie 方案</h3><p>Session-Cookie 方案在单体环境是一个非常好的身份认证方案。但是，当服务器水平拓展成多节点时，Session-Cookie 方案就要面临挑战了。</p>
+<p>举个例子：假如我们部署了两份相同的服务 A，B，用户第一次登陆的时候 ，Nginx 通过负载均衡机制将用户请求转发到 A 服务器，此时用户的 Session 信息保存在 A 服务器。结果，用户第二次访问的时候 Nginx 将请求路由到 B 服务器，由于 B 服务器没有保存 用户的 Session 信息，导致用户需要重新进行登陆。</p>
+<p><strong>我们应该如何避免上面这种情况的出现呢？</strong></p>
+<p>有几个方案可供大家参考：</p>
+<ol>
+<li>某个用户的所有请求都通过特性的哈希策略分配给同一个服务器处理。这样的话，每个服务器都保存了一部分用户的 Session 信息。服务器宕机，其保存的所有 Session 信息就完全丢失了。</li>
+<li>每一个服务器保存的 Session 信息都是互相同步的，也就是说每一个服务器都保存了全量的 Session 信息。每当一个服务器的 Session 信息发生变化，我们就将其同步到其他服务器。这种方案成本太大，并且，节点越多时，同步成本也越高。</li>
+<li>单独使用一个所有服务器都能访问到的数据节点（比如缓存）来存放 Session 信息。为了保证高可用，数据节点尽量要避免是单点。</li>
+</ol>
+<h3 id="如果没有-Cookie-的话-Session-还能用吗？"><a href="#如果没有-Cookie-的话-Session-还能用吗？" class="headerlink" title="如果没有 Cookie 的话 Session 还能用吗？"></a>如果没有 Cookie 的话 Session 还能用吗？</h3><p>这是一道经典的面试题！</p>
+<p>一般是通过 <code>Cookie</code> 来保存 <code>SessionID</code> ，假如你使用了 <code>Cookie</code> 保存 <code>SessionID</code> 的方案的话， 如果客户端禁用了 <code>Cookie</code>，那么 <code>Session</code> 就无法正常工作。</p>
+<p>但是，并不是没有 <code>Cookie</code> 之后就不能用 <code>Session</code> 了，比如你可以将 <code>SessionID</code> 放在请求的 <code>url</code> 里面<code>https://javaguide.cn/?Session_id=xxx</code> 。这种方案的话可行，但是安全性和用户体验感降低。当然，为了你也可以对 <code>SessionID</code> 进行一次加密之后再传入后端。</p>
+<h3 id="为什么-Cookie-无法防止-CSRF-攻击，而-Token-可以？"><a href="#为什么-Cookie-无法防止-CSRF-攻击，而-Token-可以？" class="headerlink" title="为什么 Cookie 无法防止 CSRF 攻击，而 Token 可以？"></a>为什么 Cookie 无法防止 CSRF 攻击，而 Token 可以？</h3><p><strong>CSRF(Cross Site Request Forgery)</strong> 一般被翻译为 <strong>跨站请求伪造</strong> 。那么什么是 <strong>跨站请求伪造</strong> 呢？说简单用你的身份去发送一些对你不友好的请求。举个简单的例子：</p>
+<p>小壮登录了某网上银行，他来到了网上银行的帖子区，看到一个帖子下面有一个链接写着“科学理财，年盈利率过万”，小壮好奇的点开了这个链接，结果发现自己的账户少了 10000 元。这是这么回事呢？原来黑客在链接中藏了一个请求，这个请求直接利用小壮的身份给银行发送了一个转账请求,也就是通过你的 Cookie 向银行发出请求。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">src</span>=<span class="string">http://www.mybank.com/Transfer?bankId</span>=<span class="string">11&amp;money</span>=<span class="string">10000</span>&gt;</span>科学理财，年盈利率过万<span class="tag">&lt;/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面也提到过，进行 <code>Session</code> 认证的时候，我们一般使用 <code>Cookie</code> 来存储 <code>SessionId</code>,当我们登陆后后端生成一个 <code>SessionId</code> 放在 Cookie 中返回给客户端，服务端通过 Redis 或者其他存储工具记录保存着这个 <code>SessionId</code>，客户端登录以后每次请求都会带上这个 <code>SessionId</code>，服务端通过这个 <code>SessionId</code> 来标示你这个人。如果别人通过 <code>Cookie</code> 拿到了 <code>SessionId</code> 后就可以代替你的身份访问系统了。</p>
+<p><code>Session</code> 认证中 <code>Cookie</code> 中的 <code>SessionId</code> 是由浏览器发送到服务端的，借助这个特性，攻击者就可以通过让用户误点攻击链接，达到攻击效果。</p>
+<p>但是，我们使用 <code>Token</code> 的话就不会存在这个问题，在我们登录成功获得 <code>Token</code> 之后，一般会选择存放在 <code>localStorage</code> （浏览器本地存储）中。然后我们在前端通过某些方式会给每个发到后端的请求加上这个 <code>Token</code>,这样就不会出现 CSRF 漏洞的问题。因为，即使有个你点击了非法链接发送了请求到服务端，这个非法请求是不会携带 <code>Token</code> 的，所以这个请求将是非法的。</p>
+<p><img src="https://img-blog.csdnimg.cn/20210615161108272.png" alt="img"></p>
+<p>需要注意的是不论是 <code>Cookie</code> 还是 <code>Token</code> 都无法避免 <strong>跨站脚本攻击（Cross Site Scripting）XSS</strong> 。</p>
+<blockquote>
+<p>跨站脚本攻击（Cross Site Scripting）缩写为 CSS 但这会与层叠样式表（Cascading Style Sheets，CSS）的缩写混淆。因此，有人将跨站脚本攻击缩写为 XSS。</p>
+</blockquote>
+<p>XSS 中攻击者会用各种方式将恶意代码注入到其他用户的页面中。就可以通过脚本盗用信息比如 <code>Cookie</code> 。</p>
+<p>推荐阅读：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2018/10/11/fe-security-csrf.html">如何防止 CSRF 攻击？—美团技术团队open in new window</a></p>
+<h2 id="Token、JWT"><a href="#Token、JWT" class="headerlink" title="Token、JWT"></a>Token、JWT</h2><p>我们在前面的问题中探讨了使用 <code>Session</code> 来鉴别用户的身份，并且给出了几个 Spring Session 的案例分享。 我们知道 <code>Session</code> 信息需要保存一份在服务器端。这种方式会带来一些麻烦，比如需要我们保证保存 <code>Session</code> 信息服务器的可用性、不适合移动端（依赖 <code>Cookie</code>）等等。</p>
+<p>有没有一种不需要自己存放 <code>Session</code> 信息就能实现身份验证的方式呢？使用 <code>Token</code> 即可！<strong>JWT</strong> （JSON Web Token） 就是这种方式的实现，通过这种方式服务器端就不需要保存 <code>Session</code> 数据了，只用在客户端保存服务端返回给客户的 <code>Token</code> 就可以了，扩展性得到提升。</p>
+<p><strong>JWT 本质上就一段签名的 JSON 格式的数据。由于它是带有签名的，因此接收者便可以验证它的真实性。</strong></p>
+<p>下面是 <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7519">RFC 7519open in new window</a> 对 JWT 做的较为正式的定义。</p>
+<blockquote>
+<p>JSON Web Token (JWT) is a compact, URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is used as the payload of a JSON Web Signature (JWS) structure or as the plaintext of a JSON Web Encryption (JWE) structure, enabling the claims to be digitally signed or integrity protected with a Message Authentication Code (MAC) and&#x2F;or encrypted. ——<a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7519">JSON Web Token (JWT)open in new window</a></p>
+</blockquote>
+<p>JWT 由 3 部分构成:</p>
+<ol>
+<li><strong>Header</strong> : 描述 JWT 的元数据，定义了生成签名的算法以及 <code>Token</code> 的类型。</li>
+<li><strong>Payload</strong> : 用来存放实际需要传递的数据</li>
+<li><strong>Signature（签名）</strong> ：服务器通过<code>Payload</code>、<code>Header</code>和一个密钥(<code>secret</code>)使用 <code>Header</code> 里面指定的签名算法（默认是 HMAC SHA256）生成。</li>
+</ol>
+<h3 id="基于-Token-进行身份验证"><a href="#基于-Token-进行身份验证" class="headerlink" title="基于 Token 进行身份验证"></a>基于 Token 进行身份验证</h3><p>在基于 Token 进行身份验证的的应用程序中，服务器通过<code>Payload</code>、<code>Header</code>和一个密钥(<code>secret</code>)创建令牌（<code>Token</code>）并将 <code>Token</code> 发送给客户端，客户端将 <code>Token</code> 保存在 Cookie 或者 localStorage 里面，以后客户端发出的所有请求都会携带这个令牌。你可以把它放在 Cookie 里面自动发送，但是这样不能跨域，所以更好的做法是放在 HTTP Header 的 Authorization 字段中：<code>Authorization: Bearer Token</code>。</p>
+<p><img src="https://javaguide.cn/assets/jwt.8c21e845.png" alt="jwt"></p>
+<ol>
+<li>用户向服务器发送用户名和密码用于登陆系统。</li>
+<li>身份验证服务响应并返回了签名的 JWT，上面包含了用户是谁的内容。</li>
+<li>用户以后每次向后端发请求都在 <code>Header</code> 中带上 JWT。</li>
+<li>服务端检查 JWT 并从中获取用户相关信息。</li>
+</ol>
+<h3 id="Token-认证的优势"><a href="#Token-认证的优势" class="headerlink" title="Token 认证的优势"></a>Token 认证的优势</h3><p>相比于 Session 认证的方式来说，使用 token 进行身份认证主要有下面四个优势：</p>
+<h4 id="1-无状态"><a href="#1-无状态" class="headerlink" title="1.无状态"></a>1.无状态</h4><p>token 自身包含了身份验证所需要的所有信息，使得我们的服务器不需要存储 Session 信息，这显然增加了系统的可用性和伸缩性，大大减轻了服务端的压力。但是，也正是由于 token 的无状态，也导致了它最大的缺点：当后端在token 有效期内废弃一个 token 或者更改它的权限的话，不会立即生效，一般需要等到有效期过后才可以。另外，当用户 Logout 的话，token 也还有效。除非，我们在后端增加额外的处理逻辑。</p>
+<h4 id="2-有效避免了CSRF-攻击"><a href="#2-有效避免了CSRF-攻击" class="headerlink" title="2.有效避免了CSRF 攻击"></a>2.有效避免了CSRF 攻击</h4><p><strong>CSRF（Cross Site Request Forgery）</strong> 一般被翻译为 <strong>跨站请求伪造</strong>，属于网络攻击领域范围。相比于 SQL 脚本注入、XSS等安全攻击方式，CSRF 的知名度并没有它们高。但是,它的确是每个系统都要考虑的安全隐患，就连技术帝国 Google 的 Gmail 在早些年也被曝出过存在 CSRF 漏洞，这给 Gmail 的用户造成了很大的损失。</p>
+<p>那么究竟什么是 <strong>跨站请求伪造</strong> 呢？说简单用你的身份去发送一些对你不友好的请求。举个简单的例子：</p>
+<p>小壮登录了某网上银行，他来到了网上银行的帖子区，看到一个帖子下面有一个链接写着“科学理财，年盈利率过万”，小壮好奇的点开了这个链接，结果发现自己的账户少了10000元。这是这么回事呢？原来黑客在链接中藏了一个请求，这个请求直接利用小壮的身份给银行发送了一个转账请求,也就是通过你的 Cookie 向银行发出请求。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">src</span>=<span class="string">&quot;http://www.mybank.com/Transfer?bankId=11&amp;money=10000&quot;</span>&gt;</span>科学理财，年盈利率过万<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>导致这个问题很大的原因就是： Session 认证中 Cookie 中的 session_id 是由浏览器发送到服务端的，借助这个特性，攻击者就可以通过让用户误点攻击链接，达到攻击效果。</p>
+<p><strong>那为什么 token 不会存在这种问题呢？</strong></p>
+<p>我是这样理解的：一般情况下我们使用 JWT 的话，在我们登录成功获得 token 之后，一般会选择存放在 local storage 中。然后我们在前端通过某些方式会给每个发到后端的请求加上这个 token,这样就不会出现 CSRF 漏洞的问题。因为，即使你点击了非法链接发送了请求到服务端，这个非法请求是不会携带 token 的，所以这个请求将是非法的。</p>
+<p>但是这样会存在 XSS 攻击中被盗的风险，为了避免 XSS 攻击，你可以选择将 token 存储在标记为<code>httpOnly</code> 的cookie 中。但是，这样又导致了你必须自己提供CSRF保护。</p>
+<p>具体采用上面哪种方式存储 token 呢，大部分情况下存放在 local storage 下都是最好的选择，某些情况下可能需要存放在标记为<code>httpOnly</code> 的cookie 中会更好。</p>
+<h4 id="3-适合移动端应用"><a href="#3-适合移动端应用" class="headerlink" title="3.适合移动端应用"></a>3.适合移动端应用</h4><p>使用 Session 进行身份认证的话，需要保存一份信息在服务器端，而且这种方式会依赖到 Cookie（需要 Cookie 保存 SessionId），所以不适合移动端。</p>
+<p>但是，使用 token 进行身份认证就不会存在这种问题，因为只要 token 可以被客户端存储就能够使用，而且 token 还可以跨语言使用。</p>
+<h4 id="4-单点登录友好"><a href="#4-单点登录友好" class="headerlink" title="4.单点登录友好"></a>4.单点登录友好</h4><p>使用 Session 进行身份认证的话，实现单点登录，需要我们把用户的 Session 信息保存在一台电脑上，并且还会遇到常见的 Cookie 跨域的问题。但是，使用 token 进行认证的话， token 被保存在客户端，不会存在这些问题。</p>
+<h3 id="Token-认证常见问题以及解决办法"><a href="#Token-认证常见问题以及解决办法" class="headerlink" title="Token 认证常见问题以及解决办法"></a>Token 认证常见问题以及解决办法</h3><h4 id="1-注销登录等场景下-token-还有效"><a href="#1-注销登录等场景下-token-还有效" class="headerlink" title="1.注销登录等场景下 token 还有效"></a>1.注销登录等场景下 token 还有效</h4><p>与之类似的具体相关场景有：</p>
+<ol>
+<li>退出登录;</li>
+<li>修改密码;</li>
+<li>服务端修改了某个用户具有的权限或者角色；</li>
+<li>用户的帐户被删除&#x2F;暂停。</li>
+<li>用户由管理员注销；</li>
+</ol>
+<p>这个问题不存在于 Session 认证方式中，因为在 Session 认证方式中，遇到这种情况的话服务端删除对应的 Session 记录即可。但是，使用 token 认证的方式就不好解决了。我们也说过了，token 一旦派发出去，如果后端不增加其他逻辑的话，它在失效之前都是有效的。那么，我们如何解决这个问题呢？查阅了很多资料，总结了下面几种方案：</p>
+<ul>
+<li><strong>将 token 存入内存数据库</strong>：将 token 存入 DB 中，redis 内存数据库在这里是不错的选择。如果需要让某个 token 失效就直接从 redis 中删除这个 token 即可。但是，这样会导致每次使用 token 发送请求都要先从 DB 中查询 token 是否存在的步骤，而且违背了 JWT 的无状态原则。</li>
+<li><strong>黑名单机制</strong>：和上面的方式类似，使用内存数据库比如 redis 维护一个黑名单，如果想让某个 token 失效的话就直接将这个 token 加入到 <strong>黑名单</strong> 即可。然后，每次使用 token 进行请求的话都会先判断这个 token 是否存在于黑名单中。</li>
+<li><strong>修改密钥 (Secret)</strong> : 我们为每个用户都创建一个专属密钥，如果我们想让某个 token 失效，我们直接修改对应用户的密钥即可。但是，这样相比于前两种引入内存数据库带来了危害更大，比如：1) 如果服务是分布式的，则每次发出新的 token 时都必须在多台机器同步密钥。为此，你需要将密钥存储在数据库或其他外部服务中，这样和 Session 认证就没太大区别了。 2) 如果用户同时在两个浏览器打开系统，或者在手机端也打开了系统，如果它从一个地方将账号退出，那么其他地方都要重新进行登录，这是不可取的。</li>
+<li><strong>保持令牌的有效期限短并经常轮换</strong> ：很简单的一种方式。但是，会导致用户登录状态不会被持久记录，而且需要用户经常登录。</li>
+</ul>
+<p>对于修改密码后 token 还有效问题的解决还是比较容易的，说一种我觉得比较好的方式：<strong>使用用户的密码的哈希值对 token 进行签名。因此，如果密码更改，则任何先前的令牌将自动无法验证。</strong></p>
+<h4 id="2-token-的续签问题"><a href="#2-token-的续签问题" class="headerlink" title="2.token 的续签问题"></a>2.token 的续签问题</h4><p>token 有效期一般都建议设置的不太长，那么 token 过期后如何认证，如何实现动态刷新 token，避免用户经常需要重新登录？</p>
+<p>我们先来看看在 Session 认证中一般的做法：<strong>假如 session 的有效期30分钟，如果 30 分钟内用户有访问，就把 session 有效期延长30分钟。</strong></p>
+<ol>
+<li><strong>类似于 Session 认证中的做法</strong>：这种方案满足于大部分场景。假设服务端给的 token 有效期设置为30分钟，服务端每次进行校验时，如果发现 token 的有效期马上快过期了，服务端就重新生成 token 给客户端。客户端每次请求都检查新旧token，如果不一致，则更新本地的token。这种做法的问题是仅仅在快过期的时候请求才会更新 token ,对客户端不是很友好。</li>
+<li><strong>每次请求都返回新 token</strong> :这种方案的的思路很简单，但是，很明显，开销会比较大。</li>
+<li><strong>token 有效期设置到半夜</strong> ：这种方案是一种折衷的方案，保证了大部分用户白天可以正常登录，适用于对安全性要求不高的系统。</li>
+<li><strong>用户登录返回两个 token</strong> ：第一个是 accessToken ，它的过期时间 token 本身的过期时间比如半个小时，另外一个是 refreshToken 它的过期时间更长一点比如为1天。客户端登录后，将 accessToken和refreshToken 保存在本地，每次访问将 accessToken 传给服务端。服务端校验 accessToken 的有效性，如果过期的话，就将 refreshToken 传给服务端。如果有效，服务端就生成新的 accessToken 给客户端。否则，客户端就重新登录即可。该方案的不足是：1) 需要客户端来配合；2) 用户注销的时候需要同时保证两个 token 都无效；3) 重新请求获取 token 的过程中会有短暂 token 不可用的情况（可以通过在客户端设置定时器，当accessToken 快过期的时候，提前去通过 refreshToken 获取新的accessToken）。</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>JWT 最适合的场景是不需要服务端保存用户状态的场景，如果考虑到 token 注销和 token 续签的场景话，没有特别好的解决方案，大部分解决方案都给 token 加上了状态，这就有点类似 Session 认证了。</p>
+<p><strong>Reference</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://learnku.com/articles/17883?order_by=vote_count&">JWT 超详细分析open in new window</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/devgorilla/how-to-log-out-when-using-jwt-a8c7823e8a6">https://medium.com/devgorilla/how-to-log-out-when-using-jwt-a8c7823e8a6</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@agungsantoso/csrf-protection-with-json-web-tokens-83e0f2fcbcc">https://medium.com/@agungsantoso/csrf-protection-with-json-web-tokens-83e0f2fcbcc</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/21978658/invalidating-json-web-tokens">Invalidating JSON Web Tokens</a></li>
+</ul>
+<h2 id="SSO"><a href="#SSO" class="headerlink" title="SSO"></a>SSO</h2><p>SSO(Single Sign On)即单点登录说的是用户登陆多个子系统的其中一个就有权访问与其相关的其他系统。举个例子我们在登陆了京东金融之后，我们同时也成功登陆京东的京东超市、京东国际、京东生鲜等子系统。</p>
+<p><img src="https://javaguide.cn/assets/sso.74162fc9.png" alt="sso"></p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><h4 id="SSO说明"><a href="#SSO说明" class="headerlink" title="SSO说明"></a>SSO说明</h4><p>SSO英文全称Single Sign On，单点登录。SSO是在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/SSO/3451380">https://baike.baidu.com/item/SSO/3451380</a></p>
+<p>例如访问在网易账号中心（<a target="_blank" rel="noopener" href="https://reg.163.com/">https://reg.163.com/</a> ）登录之后 访问以下站点都是登录状态</p>
+<ul>
+<li>网易直播 <a target="_blank" rel="noopener" href="https://v.163.com/">https://v.163.comopen in new window</a></li>
+<li>网易博客 <a target="_blank" rel="noopener" href="https://blog.163.com/">https://blog.163.comopen in new window</a></li>
+<li>网易花田 <a target="_blank" rel="noopener" href="https://love.163.com/">https://love.163.comopen in new window</a></li>
+<li>网易考拉 <a target="_blank" rel="noopener" href="https://www.kaola.com/">https://www.kaola.comopen in new window</a></li>
+<li>网易Lofter <a target="_blank" rel="noopener" href="http://www.lofter.com/">http://www.lofter.comopen in new window</a></li>
+</ul>
+<h4 id="单点登录系统的好处"><a href="#单点登录系统的好处" class="headerlink" title="单点登录系统的好处"></a>单点登录系统的好处</h4><ol>
+<li><strong>用户角度</strong> :用户能够做到一次登录多次使用，无需记录多套用户名和密码，省心。</li>
+<li><strong>系统管理员角度</strong> : 管理员只需维护好一个统一的账号中心就可以了，方便。</li>
+<li><strong>新系统开发角度:</strong> 新系统开发时只需直接对接统一的账号中心即可，简化开发流程，省时。</li>
+</ol>
+<h4 id="设计目标"><a href="#设计目标" class="headerlink" title="设计目标"></a>设计目标</h4><p>本篇文章也主要是为了探讨如何设计&amp;实现一个SSO系统</p>
+<p>以下为需要实现的核心功能：</p>
+<ul>
+<li>单点登录</li>
+<li>单点登出</li>
+<li>支持跨域单点登录</li>
+<li>支持跨域单点登出</li>
+</ul>
+<h3 id="SSO设计与实现"><a href="#SSO设计与实现" class="headerlink" title="SSO设计与实现"></a>SSO设计与实现</h3><h4 id="核心应用与依赖"><a href="#核心应用与依赖" class="headerlink" title="核心应用与依赖"></a>核心应用与依赖</h4><p><img src="https://img.ken.io/blog/sso/sso-system.png-kblb.png" alt="单点登录（SSO）设计"></p>
+<table>
+<thead>
+<tr>
+<th>应用&#x2F;模块&#x2F;对象</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>前台站点</td>
+<td>需要登录的站点</td>
+</tr>
+<tr>
+<td>SSO站点-登录</td>
+<td>提供登录的页面</td>
+</tr>
+<tr>
+<td>SSO站点-登出</td>
+<td>提供注销登录的入口</td>
+</tr>
+<tr>
+<td>SSO服务-登录</td>
+<td>提供登录服务</td>
+</tr>
+<tr>
+<td>SSO服务-登录状态</td>
+<td>提供登录状态校验&#x2F;登录信息查询的服务</td>
+</tr>
+<tr>
+<td>SSO服务-登出</td>
+<td>提供用户注销登录的服务</td>
+</tr>
+<tr>
+<td>数据库</td>
+<td>存储用户账户信息</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td>存储用户的登录信息，通常使用Redis</td>
+</tr>
+</tbody></table>
+<h4 id="用户登录状态的存储与校验"><a href="#用户登录状态的存储与校验" class="headerlink" title="用户登录状态的存储与校验"></a>用户登录状态的存储与校验</h4><p>常见的Web框架对于<a target="_blank" rel="noopener" href="https://ken.io/note/session-principle-skill">Sessionopen in new window</a>的实现都是生成一个SessionId存储在浏览器Cookie中。然后将Session内容存储在服务器端内存中，这个 ken.io 在之前<a target="_blank" rel="noopener" href="https://ken.io/note/session-principle-skill">Session工作原理open in new window</a>中也提到过。整体也是借鉴这个思路。 用户登录成功之后，生成AuthToken交给客户端保存。如果是浏览器，就保存在Cookie中。如果是手机App就保存在App本地缓存中。本篇主要探讨基于Web站点的SSO。 用户在浏览需要登录的页面时，客户端将AuthToken提交给SSO服务校验登录状态&#x2F;获取用户登录信息</p>
+<p>对于登录信息的存储，建议采用Redis，使用Redis集群来存储登录信息，既可以保证高可用，又可以线性扩充。同时也可以让SSO服务满足负载均衡&#x2F;可伸缩的需求。</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AuthToken</td>
+<td>直接使用UUID&#x2F;GUID即可，如果有验证AuthToken合法性需求，可以将UserName+时间戳加密生成，服务端解密之后验证合法性</td>
+</tr>
+<tr>
+<td>登录信息</td>
+<td>通常是将UserId，UserName缓存起来</td>
+</tr>
+</tbody></table>
+<h4 id="用户登录-登录校验"><a href="#用户登录-登录校验" class="headerlink" title="用户登录&#x2F;登录校验"></a>用户登录&#x2F;登录校验</h4><ul>
+<li>登录时序图</li>
+</ul>
+<p><img src="https://img.ken.io/blog/sso/sso-login-sequence.png-kbrb.png" alt="SSO系统设计-登录时序图"></p>
+<p>按照上图，用户登录后AuthToken保存在Cookie中。 domain&#x3D;test.com 浏览器会将domain设置成 .test.com， 这样访问所有*.test.com的web站点，都会将AuthToken携带到服务器端。 然后通过SSO服务，完成对用户状态的校验&#x2F;用户登录信息的获取</p>
+<ul>
+<li>登录信息获取&#x2F;登录状态校验</li>
+</ul>
+<p><img src="https://img.ken.io/blog/sso/sso-logincheck-sequence.png-kbrb.png" alt="SSO系统设计-登录信息获取/登录状态校验"></p>
+<h4 id="用户登出"><a href="#用户登出" class="headerlink" title="用户登出"></a>用户登出</h4><p>用户登出时要做的事情很简单：</p>
+<ol>
+<li>服务端清除缓存（Redis）中的登录状态</li>
+<li>客户端清除存储的AuthToken</li>
+</ol>
+<ul>
+<li>登出时序图</li>
+</ul>
+<p><img src="https://img.ken.io/blog/sso/sso-logout-sequence.png-kbrb.png" alt="SSO系统设计-用户登出"></p>
+<h4 id="跨域登录、登出"><a href="#跨域登录、登出" class="headerlink" title="跨域登录、登出"></a>跨域登录、登出</h4><p>前面提到过，核心思路是客户端存储AuthToken，服务器端通过Redis存储登录信息。由于客户端是将AuthToken存储在Cookie中的。所以跨域要解决的问题，就是如何解决Cookie的跨域读写问题。</p>
+<p>解决跨域的核心思路就是：</p>
+<ul>
+<li>登录完成之后通过回调的方式，将AuthToken传递给主域名之外的站点，该站点自行将AuthToken保存在当前域下的Cookie中。</li>
+<li>登出完成之后通过回调的方式，调用非主域名站点的登出页面，完成设置Cookie中的AuthToken过期的操作。</li>
+<li>跨域登录（主域名已登录）</li>
+</ul>
+<p><img src="https://img.ken.io/blog/sso/sso-crossdomain-login-loggedin-sequence.png-kbrb.png" alt="SSO系统设计-跨域登录（主域名已登录）"></p>
+<ul>
+<li>跨域登录（主域名未登录）</li>
+</ul>
+<p><img src="https://img.ken.io/blog/sso/sso-crossdomain-login-unlogin-sequence.png-kbrb.png" alt="SSO系统设计-跨域登录（主域名未登录）"></p>
+<ul>
+<li>跨域登出</li>
+</ul>
+<p><img src="https://img.ken.io/blog/sso/sso-crossdomain-logout-sequence.png-kbrb.png" alt="SSO系统设计-跨域登出"></p>
+<h3 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h3><ul>
+<li>关于方案</li>
+</ul>
+<p>这次设计方案更多是提供实现思路。如果涉及到APP用户登录等情况，在访问SSO服务时，增加对APP的签名验证就好了。当然，如果有无线网关，验证签名不是问题。</p>
+<ul>
+<li>关于时序图</li>
+</ul>
+<p>时序图中并没有包含所有场景，ken.io只列举了核心&#x2F;主要场景，另外对于一些不影响理解思路的消息能省就省了。</p>
+<h2 id="OAuth-2-0？"><a href="#OAuth-2-0？" class="headerlink" title="OAuth 2.0？"></a>OAuth 2.0？</h2><p>OAuth 是一个行业的标准授权协议，主要用来授权第三方应用获取有限的权限。而 OAuth 2.0 是对 OAuth 1.0 的完全重新设计，OAuth 2.0 更快，更容易实现，OAuth 1.0 已经被废弃。详情请见：<a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc6749">rfc6749open in new window</a>。</p>
+<p>实际上它就是一种授权机制，它的最终目的是为第三方应用颁发一个有时效性的令牌 Token，使得第三方应用能够通过该令牌获取相关的资源。</p>
+<p>OAuth 2.0 比较常用的场景就是第三方登录，当你的网站接入了第三方登录的时候一般就是使用的 OAuth 2.0 协议。</p>
+<p>另外，现在 OAuth 2.0 也常见于支付场景（微信支付、支付宝支付）和开发平台（微信开放平台、阿里开放平台等等）。</p>
+<p>微信支付账户相关参数：</p>
+<p><img src="https://javaguide.cn/assets/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98-fnglfdlgdfj.5b85dfa7.png" alt="img"></p>
+<p>下图是 <a target="_blank" rel="noopener" href="https://api.slack.com/legacy/oauth">Slack OAuth 2.0 第三方登录open in new window</a>的示意图：</p>
+<p><img src="https://img-blog.csdnimg.cn/20210615151716340.png" alt="img"></p>
+<p><strong>推荐阅读：</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2019/04/oauth_design.html">OAuth 2.0 的一个简单解释open in new window</a></li>
+<li><a target="_blank" rel="noopener" href="https://deepzz.com/post/what-is-oauth2-protocol.html">10 分钟理解什么是 OAuth 2.0 协议open in new window</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2019/04/oauth-grant-types.html">OAuth 2.0 的四种方式open in new window</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2019/04/github-oauth.html">GitHub OAuth 第三方登录示例教程</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83"><span class="toc-number">1.</span> <span class="toc-text">认证授权</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80"><span class="toc-number">1.1.</span> <span class="toc-text">认证授权基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A4%E8%AF%81-Authentication-%E5%92%8C%E6%8E%88%E6%9D%83-Authorization-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">1.1.1.</span> <span class="toc-text">认证 (Authentication) 和授权 (Authorization)的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RBAC-%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">RBAC 模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cookie%E3%80%81Session"><span class="toc-number">1.2.</span> <span class="toc-text">Cookie、Session</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Cookie-Cookie-%E7%9A%84%E4%BD%9C%E7%94%A8%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.2.1.</span> <span class="toc-text">什么是 Cookie ? Cookie 的作用是什么?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8-Cookie"><span class="toc-number">1.2.2.</span> <span class="toc-text">在项目中使用 Cookie</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cookie-%E5%92%8C-Session-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">1.2.3.</span> <span class="toc-text">Cookie 和 Session 的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-Session-Cookie-%E6%96%B9%E6%A1%88%E8%BF%9B%E8%A1%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81"><span class="toc-number">1.2.4.</span> <span class="toc-text">使用 Session-Cookie 方案进行身份验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%8A%82%E7%82%B9%E4%B8%8B-Session-Cookie-%E6%96%B9%E6%A1%88"><span class="toc-number">1.2.5.</span> <span class="toc-text">多服务器节点下 Session-Cookie 方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E6%B2%A1%E6%9C%89-Cookie-%E7%9A%84%E8%AF%9D-Session-%E8%BF%98%E8%83%BD%E7%94%A8%E5%90%97%EF%BC%9F"><span class="toc-number">1.2.6.</span> <span class="toc-text">如果没有 Cookie 的话 Session 还能用吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-Cookie-%E6%97%A0%E6%B3%95%E9%98%B2%E6%AD%A2-CSRF-%E6%94%BB%E5%87%BB%EF%BC%8C%E8%80%8C-Token-%E5%8F%AF%E4%BB%A5%EF%BC%9F"><span class="toc-number">1.2.7.</span> <span class="toc-text">为什么 Cookie 无法防止 CSRF 攻击，而 Token 可以？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Token%E3%80%81JWT"><span class="toc-number">1.3.</span> <span class="toc-text">Token、JWT</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E-Token-%E8%BF%9B%E8%A1%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81"><span class="toc-number">1.3.1.</span> <span class="toc-text">基于 Token 进行身份验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Token-%E8%AE%A4%E8%AF%81%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="toc-number">1.3.2.</span> <span class="toc-text">Token 认证的优势</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%97%A0%E7%8A%B6%E6%80%81"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">1.无状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%9C%89%E6%95%88%E9%81%BF%E5%85%8D%E4%BA%86CSRF-%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">2.有效避免了CSRF 攻击</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%80%82%E5%90%88%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BA%94%E7%94%A8"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">3.适合移动端应用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E5%8F%8B%E5%A5%BD"><span class="toc-number">1.3.2.4.</span> <span class="toc-text">4.单点登录友好</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Token-%E8%AE%A4%E8%AF%81%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A5%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="toc-number">1.3.3.</span> <span class="toc-text">Token 认证常见问题以及解决办法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%B3%A8%E9%94%80%E7%99%BB%E5%BD%95%E7%AD%89%E5%9C%BA%E6%99%AF%E4%B8%8B-token-%E8%BF%98%E6%9C%89%E6%95%88"><span class="toc-number">1.3.3.1.</span> <span class="toc-text">1.注销登录等场景下 token 还有效</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-token-%E7%9A%84%E7%BB%AD%E7%AD%BE%E9%97%AE%E9%A2%98"><span class="toc-number">1.3.3.2.</span> <span class="toc-text">2.token 的续签问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.4.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSO"><span class="toc-number">1.4.</span> <span class="toc-text">SSO</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.4.1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SSO%E8%AF%B4%E6%98%8E"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">SSO说明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">单点登录系统的好处</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E7%9B%AE%E6%A0%87"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">设计目标</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSO%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.4.2.</span> <span class="toc-text">SSO设计与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%BA%94%E7%94%A8%E4%B8%8E%E4%BE%9D%E8%B5%96"><span class="toc-number">1.4.2.1.</span> <span class="toc-text">核心应用与依赖</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E7%8A%B6%E6%80%81%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E6%A0%A1%E9%AA%8C"><span class="toc-number">1.4.2.2.</span> <span class="toc-text">用户登录状态的存储与校验</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95-%E7%99%BB%E5%BD%95%E6%A0%A1%E9%AA%8C"><span class="toc-number">1.4.2.3.</span> <span class="toc-text">用户登录&#x2F;登录校验</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E7%99%BB%E5%87%BA"><span class="toc-number">1.4.2.4.</span> <span class="toc-text">用户登出</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B7%A8%E5%9F%9F%E7%99%BB%E5%BD%95%E3%80%81%E7%99%BB%E5%87%BA"><span class="toc-number">1.4.2.5.</span> <span class="toc-text">跨域登录、登出</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%87%E6%B3%A8"><span class="toc-number">1.4.3.</span> <span class="toc-text">备注</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OAuth-2-0%EF%BC%9F"><span class="toc-number">1.5.</span> <span class="toc-text">OAuth 2.0？</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&text=认证授权基础"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&is_video=false&description=认证授权基础"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=认证授权基础&body=Check out this article: https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&title=认证授权基础"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&name=认证授权基础&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2022/05/18/%E5%90%8E%E7%AB%AF/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%9F%BA%E7%A1%80/&t=认证授权基础"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

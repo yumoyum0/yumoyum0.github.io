@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="概述在JDK19刚刚出来时，本人曾对JEP 425: Virtual Threads 做过一篇翻译文Java高并发革命！JDK19新特性——虚拟线程（Virtual Threads） – 羽墨的个人博客 (yumoyumo.top)。 本文仅仅讨论虚拟线程的执行流程及底层实现原理，具体关于虚拟线程可看我上面的文章链接。 另外需要对I&#x2F;O模型有所了解，可看我的另一篇博文IO模型 – 羽墨的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟线程调度执行流程及原理">
+<meta property="og:url" content="https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="概述在JDK19刚刚出来时，本人曾对JEP 425: Virtual Threads 做过一篇翻译文Java高并发革命！JDK19新特性——虚拟线程（Virtual Threads） – 羽墨的个人博客 (yumoyumo.top)。 本文仅仅讨论虚拟线程的执行流程及底层实现原理，具体关于虚拟线程可看我上面的文章链接。 另外需要对I&#x2F;O模型有所了解，可看我的另一篇博文IO模型 – 羽墨的">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230328220800697.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230328205108693.png">
+<meta property="og:image" content="c:\Users\yumo\AppData\Roaming\Typora\typora-user-images\image-20230328205920463.png">
+<meta property="og:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230328223411198.png">
+<meta property="article:published_time" content="2023-03-28T08:51:33.000Z">
+<meta property="article:modified_time" content="2023-09-28T08:49:13.966Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="并发">
+<meta property="article:tag" content="虚拟线程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230328220800697.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>虚拟线程调度执行流程及原理</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/03/29/database/%E7%BC%93%E5%AD%98%E5%92%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/03/27/database/Redis%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&text=虚拟线程调度执行流程及原理"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&is_video=false&description=虚拟线程调度执行流程及原理"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=虚拟线程调度执行流程及原理&body=Check out this article: https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&name=虚拟线程调度执行流程及原理&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&t=虚拟线程调度执行流程及原理"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%A8%A1%E5%BC%8F%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">用户模式线程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6"><span class="toc-number">3.</span> <span class="toc-text">调度</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E9%98%9F%E5%88%97"><span class="toc-number">3.1.</span> <span class="toc-text">调度队列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E7%A8%8B%E5%BA%8F"><span class="toc-number">3.2.</span> <span class="toc-text">调度程序</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">执行流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-number">5.</span> <span class="toc-text">实现原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Continuation"><span class="toc-number">5.1.</span> <span class="toc-text">Continuation</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        虚拟线程调度执行流程及原理
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-03-28T08:51:33.000Z" class="dt-published" itemprop="datePublished">2023-03-28</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Java/" rel="tag">Java</a>, <a class="p-category" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a>, <a class="p-category" href="/tags/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/" rel="tag">虚拟线程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在JDK19刚刚出来时，本人曾对<a target="_blank" rel="noopener" href="https://openjdk.org/jeps/425">JEP 425: Virtual Threads </a>做过一篇翻译文<a target="_blank" rel="noopener" href="https://www.yumoyumo.top/843.html">Java高并发革命！JDK19新特性——虚拟线程（Virtual Threads） – 羽墨的个人博客 (yumoyumo.top)</a>。</p>
+<p>本文仅仅讨论虚拟线程的执行流程及底层实现原理，具体关于虚拟线程可看我上面的文章链接。</p>
+<p>另外需要对I&#x2F;O模型有所了解，可看我的另一篇博文<a target="_blank" rel="noopener" href="https://www.yumoyumo.top/1005.html">IO模型 – 羽墨的个人博客 (yumoyumo.top)</a></p>
+<p>让我们回顾一下虚拟线程的大概说明：</p>
+<ul>
+<li>JDK 19引入了虚拟线程，这是一种轻量级线程，可以减少编写、维护和调试高吞吐量并发应用程序的工作量。</li>
+<li>虚拟线程是<code>java.lang.Thread</code>的一个实例，它不绑定到特定的操作系统线程。虚拟线程仍然在操作系统线程上运行代码。</li>
+<li>但是，当在虚拟线程中运行的代码调用阻塞I&#x2F;O操作时，Java运行时会挂起虚拟线程，直到它可以恢复为止。</li>
+<li>与挂起的虚拟线程相关联的操作系统线程现在可以为其他虚拟线程执行操作。</li>
+<li>虚拟线程的开销极小，因此可以有很多很多很多个。就像操作系统通过将大型虚拟地址空间映射到有限的物理RAM来给人以丰富内存的错觉一样，JDK通过将许多虚拟线程映射到少量操作系统线程来给人以丰富线程的错觉</li>
+</ul>
+<hr>
+<p>调度、执行流程架构图如下：</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230328220800697.png" alt="image-20230328220800697"></p>
+<p>接下来会对其中的各个部分进行具体阐述</p>
+<hr>
+<h1 id="用户模式线程"><a href="#用户模式线程" class="headerlink" title="用户模式线程"></a>用户模式线程</h1><p>首先我们应该分清<strong>用户模式线程</strong>和<strong>内核模式线程</strong>的概念和区别：</p>
+<p><strong>User-mode threads（用户模式线程）</strong>和 <strong>kernel-mode threads（内核模式线程）</strong>是两种不同类型的线程，它们的主要区别在于它们是<strong>由谁来管理和调度</strong>的。</p>
+<ul>
+<li><strong>User-mode threads</strong>是由<strong>应用程序</strong>来管理和调度的，而不是操作系统。这意味着，当一个user-mode thread阻塞时，整个进程都会阻塞，除非应用程序实现了一种机制来调度其他线程。User-mode threads通常比kernel-mode threads更快，因为它们不需要在用户模式和内核模式之间进行切换。</li>
+<li><strong>Kernel-mode threads</strong>是由<strong>操作系统内核</strong>来管理和调度的。当一个kernel-mode thread阻塞时，操作系统可以调度其他线程来运行。Kernel-mode threads通常比user-mode threads更慢，因为它们需要在用户模式和内核模式之间进行切换。</li>
+</ul>
+<p>虚拟线程是一种<strong>轻量级（用户模式）线程</strong>，这种线程是由Java虚拟机调度，而不是操作系统。</p>
+<p>虚拟线程占用空间小，任务切换开销几乎可以忽略不计，因此可以极大量地创建和使用。</p>
+<hr>
+<p>过去我们在Java中谈论的创建的线程，是以<strong>1:1映射</strong>到**操作系统线程(OS therad)<strong>上的，为此我们用了一个新的词——</strong>平台线程(Platform thread)**来描述之前的线程，以此区分现在的虚拟线程。</p>
+<blockquote>
+<p><strong>平台线程</strong>是以传统方式实现的线程，作为<strong>围绕操作系统线程的简单包装</strong>。</p>
+<p><strong>虚拟线程</strong>是没有绑定到<strong>特定操作系统线程</strong>的线程。</p>
+</blockquote>
+<h1 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h1><p>为了完成有用的工作，需要调度一个线程，也就是分配给处理器核心执行。对于作为 OS 线程实现的平台线程，JDK 依赖于 OS 中的调度程序。相比之下，对于虚拟线程，JDK 有自己的调度程序。JDK 的调度程序不直接将虚拟线程分配给处理器，而是<strong>将虚拟线程分配给平台线程(这是前面提到的虚拟线程的 M: N 调度)。然后，操作系统像往常一样调度平台线程</strong>。</p>
+<p>这里有两个重要的东西：</p>
+<ul>
+<li><strong>调度队列</strong>：调度虚拟线程</li>
+<li><strong>调度程序</strong>（scheduler）：调度平台线程</li>
+</ul>
+<p>接下来我将对这两个概念详细描述</p>
+<h2 id="调度队列"><a href="#调度队列" class="headerlink" title="调度队列"></a>调度队列</h2><p>先来看一下调度队列的定义和功能：</p>
+<p>虚拟线程的调度队列是由Java运行时内部实现的，它负责跟踪所有挂起的虚拟线程，并根据可用性和其他因素来选择一个虚拟线程来恢复执行。</p>
+<p>虚拟线程的调度队列通常是一个<strong>先进先出（FIFO）</strong>的数据结构，它按照虚拟线程被挂起的顺序来选择虚拟线程来恢复执行。</p>
+<p>当虚拟线程被挂起时，它会被添加到调度队列中。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230328205108693.png" alt="image-20230328205108693"></p>
+<h2 id="调度程序"><a href="#调度程序" class="headerlink" title="调度程序"></a>调度程序</h2><p>再看看调度程序的定义和功能：</p>
+<p>Java运行时会使用<strong>调度程序（scheduler）</strong>来管理<strong>运载线程（carrier thread）</strong>，并根据可用性和其他因素来选择一个运载线程来执行虚拟线程。</p>
+<ul>
+<li>当一个运载线程变得可用时，<strong>调度程序</strong>会从<strong>调度队列</strong>中选择一个虚拟线程，并将其重新<strong>挂载</strong>到运载线程上，<strong>从之前挂起的位置继续执行</strong>。</li>
+</ul>
+<p>默认情况下，Java运行时使用<strong>FIFO模式</strong>的<strong>ForkJoinPool</strong>作为虚拟线程的调度程序。</p>
+<p>ForkJoinPool是一种特殊类型的ExecutorService，它使用<strong>工作窃取算法</strong>来平衡任务负载并最大化吞吐量。</p>
+<ul>
+<li>当使用ForkJoinPool作为调度程序时，它会管理一组运载线程，并根据可用性和其他因素来选择一个运载线程来执行虚拟线程。</li>
+</ul>
+<blockquote>
+<p><strong>工作窃取算法（work-stealing algorithm）</strong>是一种用于动态负载平衡的算法。它用于多线程环境中，当一个线程完成了它的<strong>工作队列</strong>中的所有任务时，它会从其他线程的工作队列中“<strong>窃取</strong>”一些任务来执行。这样可以有效地平衡各个线程之间的负载，最大化吞吐量。</p>
+<p>在Java中，ForkJoinPool使用工作窃取算法来管理它的工作线程。每个工作线程都有自己的双端队列，用于存储分配给它的任务。当一个工作线程完成了它的队列中的所有任务时，它会尝试从其他工作线程的队列中窃取一些任务来执行。这样可以有效地平衡各个工作线程之间的负载，并最大化吞吐量。</p>
+</blockquote>
+<p><img src="C:\Users\yumo\AppData\Roaming\Typora\typora-user-images\image-20230328205920463.png" alt="image-20230328205920463"></p>
+<hr>
+<h1 id="执行流程"><a href="#执行流程" class="headerlink" title="执行流程"></a>执行流程</h1><p>现在对于这段代码进行具体分析：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="comment">// 1.创建虚拟线程</span></span><br><span class="line">    <span class="type">Thread</span> <span class="variable">v</span> <span class="operator">=</span> Thread.ofVirtual().factory().newThread(() -&gt; &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;before park&quot;</span>);</span><br><span class="line">        LockSupport.park();</span><br><span class="line">        System.out.println(<span class="string">&quot;after park&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 2.执行虚拟线程</span></span><br><span class="line">    v.start();</span><br><span class="line">    <span class="comment">// 3.完成阻塞操作</span></span><br><span class="line">    LockSupport.unpark(v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p><strong>创建</strong>：主线程代码<strong>创建</strong>了一个虚拟线程，并把它放进调度队列</p>
+</li>
+<li><p><strong>挂载</strong>：<strong>挂载（mount）</strong>该虚拟线程：调度程序sheduler选择一个可用的平台线程作为载体，从调度队列取出该虚拟线程并将其挂在到之前选择的载体线程，在这个载体上执行它内部的代码（比如传给Runnale参数的lanbda代码）。这里即</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">() -&gt; &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;before park&quot;</span>);</span><br><span class="line">    LockSupport.park();</span><br><span class="line">    System.out.println(<span class="string">&quot;after park&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>执行</strong>：<strong>执行</strong>该虚拟线程，直至遇到阻塞操作</p>
+</li>
+<li><p><strong>卸载（unmount）</strong>：该虚拟线程会被<strong>卸载</strong>以释放其载体线程，以便为其他虚拟线程执行操作。</p>
+</li>
+<li><p><strong>挂起</strong>：然后这个虚拟线程会被<strong>Java Runtime</strong> 给<strong>挂起（suspend）</strong>，然后放进调度队列</p>
+</li>
+<li><p><strong>唤醒</strong>：当该虚拟线程的阻塞状态被打破（比如阻塞I&#x2F;O操作完成，或这里的<code>LockSupport.unpark();</code>），它将被<strong>Java Runtime</strong> 给<strong>唤醒（await）</strong>，从调度队列中取出然后挂在到调度程序为其选择的新的载体上</p>
+</li>
+<li><p><strong>继续执行</strong>：从之前挂起的位置继续执行。</p>
+</li>
+<li><p><strong>执行完毕</strong>：重复上面第2-7步，直至虚拟线程执行完毕。虚拟线程不是GC roots，当没有其他平台线程引用它时，它将在一次gc中被顺带<strong>回收</strong>。</p>
+</li>
+</ol>
+<hr>
+<h1 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h1><p>为什么一个虚拟线程可以在上次被挂起的线程继续执行呢？这必须得提到底层的<strong>Continuation</strong>。</p>
+<h2 id="Continuation"><a href="#Continuation" class="headerlink" title="Continuation"></a>Continuation</h2><p>Continuation是一个重要的组件，它既是任务的包装器，也是任务切换虚拟线程与平台线程之间数据转移的一个句柄。它为程序流程（函数）提供了<strong>暂停&#x2F;继续（yield&#x2F;resume）</strong>的能力可以实现任务上下文的中断和恢复。</p>
+<p>在虚拟线程中，任务（通常为<code>java.lang.Runnable</code>）被包装到<code>Continuation</code>实例中。</p>
+<ul>
+<li>当任务需要阻塞挂起的时候，会调用<code>Continuation</code>的<code>yield</code>操作进行阻塞</li>
+<li>当任务需要解除阻塞继续执行的时候，<code>Continuation</code>会被继续执行</li>
+</ul>
+<p>操作系统调度系统线程，而<code>Java</code>平台线程与系统线程一一映射，所以平台线程被操作系统调度，但是虚拟线程是由<code>JVM</code>调度。<code>JVM</code>把虚拟线程分配给平台线程的操作称为<code>mount</code>（挂载），反过来取消分配平台线程的操作称为<code>unmount</code>（卸载）：</p>
+<ul>
+<li><code>mount</code>操作：虚拟线程挂载到平台线程，虚拟线程中包装的<code>Continuation</code>栈数据帧或者引用栈数据会被拷贝到平台线程的线程栈，这是一个从堆复制到栈的过程</li>
+<li><code>unmount</code>操作：虚拟线程从平台线程卸载，大多数虚拟线程中包装的<code>Continuation</code>栈数据帧会留在堆内存中</li>
+</ul>
+<p>这个<code>mount -&gt; run -&gt; unmount</code>过程用伪代码表示如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mount();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    Continuation.run();</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    unmount();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从<code>Java</code>代码的角度来看，虚拟线程和它的载体线程暂时共享一个<code>OS</code>线程实例这个事实是不可见，因为虚拟线程的堆栈跟踪和线程本地变量与平台线程是完全隔离的。<code>JDK</code>中专门是用了一个<code>FIFO</code>模式的<code>ForkJoinPool</code>作为虚拟线程的调度程序，从这个调度程序看虚拟线程任务的执行流程大致如下：</p>
+<ul>
+<li>调度器（线程池）中的平台线程等待处理任务</li>
+<li>一个虚拟线程被分配平台线程，该平台线程作为运载线程执行虚拟线程中的任务</li>
+<li>虚拟线程运行其<code>Continuation</code>，从而执行基于<code>Runnable</code>包装的用户任务</li>
+<li>虚拟线程任务执行完成，标记<code>Continuation</code>终结，标记虚拟线程为终结状态，清空一些上下文变量，运载线程”返还”到调度器（线程池）中作为平台线程等待处理下一个任务</li>
+</ul>
+<p>当虚拟线程挂载到平台线程时，<strong>虚拟线程中包装的<code>Continuation</code>栈数据帧或引用栈数据会被复制到平台线程的线程栈中</strong>。当虚拟线程从平台线程卸载时，大多数虚拟线程中包装的Continuation栈数据帧会留在<strong>堆内存</strong>中。</p>
+<p><img src="https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20230328223411198.png" alt="image-20230328223411198"></p>
+<p>上面是描述一般的虚拟线程任务执行情况，在执行任务时候首次调用<code>Continuation#run()</code>获取锁（<code>ReentrantLock</code>）的时候会触发<code>Continuation</code>的<code>yield</code>操作让出控制权，等待虚拟线程重新分配运载线程并且执行，见下面的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">VirtualThreadLock</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ReentrantLock</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantLock</span>();</span><br><span class="line">        Thread.startVirtualThread(() -&gt; &#123;</span><br><span class="line">            lock.lock();     <span class="comment">// &lt;------ 这里确保锁已经被另一个虚拟线程持有</span></span><br><span class="line">        &#125;);</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        Thread.startVirtualThread(() -&gt; &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;first&quot;</span>);</span><br><span class="line">            lock.lock();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;second&quot;</span>);</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                lock.unlock();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(<span class="string">&quot;third&quot;</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">        Thread.sleep(Long.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>虚拟线程中任务执行时候首次调用<code>Continuation#run()</code>执行了部分任务代码，然后尝试获取锁，会导致<code>Continuation</code>的<code>yield</code>操作让出控制权（任务切换），也就是<code>unmount</code>，运载线程栈数据会移动到<code>Continuation</code>栈的数据帧中，保存在堆内存，虚拟线程任务完成（但是虚拟线程没有终结，同时其<code>Continuation</code>也没有终结和释放），运载线程被释放到执行器中等待新的任务；如果<code>Continuation</code>的<code>yield</code>操作失败，则会对运载线程进行<code>park</code>调用，阻塞在运载线程上</p>
+</li>
+<li><p>当锁持有者释放锁之后，会唤醒虚拟线程获取锁（成功后），虚拟线程会重新进行<code>mount</code>，让虚拟线程任务再次执行，有可能是分配到另一个运载线程中执行，<code>Continuation</code>栈会的数据帧会被恢复到运载线程栈中，然后再次调用<code>Continuation#run()</code>恢复任务执行：</p>
+</li>
+<li><p>最终虚拟线程任务执行完成，标记<code>Continuation</code>终结，标记虚拟线程为终结状态，清空一些上下文变量，运载线程”返还”到调度器（线程池）中作为平台线程等待处理下一个任务</p>
+</li>
+</ul>
+<hr>
+<p><code>Continuation</code>组件十分重要，它既是用户真实任务的包装器，也是任务切换虚拟线程与平台线程之间数据转移的一个句柄，它提供的<code>yield</code>操作可以实现任务上下文的中断和恢复。由于<code>Continuation</code>被封闭在<code>java.base/jdk.internal.vm</code>下，可以通过增加编译参数<code>--add-exports java.base/jdk.internal.vm=ALL-UNNAMED</code>暴露对应的功能，从而编写实验性案例。</p>
+<p>然后编写和运行下面的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jdk.internal.vm.Continuation;</span><br><span class="line"><span class="keyword">import</span> jdk.internal.vm.ContinuationScope;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ContinuationDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ContinuationScope</span> <span class="variable">scope</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ContinuationScope</span>(<span class="string">&quot;scope&quot;</span>);</span><br><span class="line">        <span class="type">Continuation</span> <span class="variable">continuation</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Continuation</span>(scope, () -&gt; &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;Running before yield&quot;</span>);</span><br><span class="line">            Continuation.<span class="keyword">yield</span>(scope);</span><br><span class="line">            System.out.println(<span class="string">&quot;Running after yield&quot;</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(<span class="string">&quot;First run&quot;</span>);</span><br><span class="line">        <span class="comment">// 第一次执行Continuation.run</span></span><br><span class="line">        continuation.run();</span><br><span class="line">        System.out.println(<span class="string">&quot;Second run&quot;</span>);</span><br><span class="line">        <span class="comment">// 第二次执行Continuation.run</span></span><br><span class="line">        continuation.run();</span><br><span class="line">        System.out.println(<span class="string">&quot;Done&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行代码的结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">First run</span><br><span class="line">Running before yield</span><br><span class="line">Second run</span><br><span class="line">Running after yield</span><br><span class="line">Done</span><br></pre></td></tr></table></figure>
+
+<p>这里可以看出<code>Continuation</code>的奇妙之处，<code>Continuation</code>实例进行<code>yield</code>调用后，再次调用其<code>run</code>方法就可以从<code>yield</code>的调用之处往下执行，从而实现了程序的中断和恢复。</p>
+<p><strong>参考</strong></p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/514719325">Java虚拟线程的核心: Continuation - 知乎 (zhihu.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/425">JEP 425: Virtual Threads (Preview) (openjdk.org)</a></p>
+<p><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/436">JEP 436: Virtual Threads (Second Preview) (openjdk.org)</a></p>
+</blockquote>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%A8%A1%E5%BC%8F%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">用户模式线程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6"><span class="toc-number">3.</span> <span class="toc-text">调度</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E9%98%9F%E5%88%97"><span class="toc-number">3.1.</span> <span class="toc-text">调度队列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E7%A8%8B%E5%BA%8F"><span class="toc-number">3.2.</span> <span class="toc-text">调度程序</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">执行流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-number">5.</span> <span class="toc-text">实现原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Continuation"><span class="toc-number">5.1.</span> <span class="toc-text">Continuation</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&text=虚拟线程调度执行流程及原理"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&is_video=false&description=虚拟线程调度执行流程及原理"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=虚拟线程调度执行流程及原理&body=Check out this article: https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&title=虚拟线程调度执行流程及原理"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&name=虚拟线程调度执行流程及原理&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/&t=虚拟线程调度执行流程及原理"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
