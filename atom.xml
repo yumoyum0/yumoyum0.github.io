@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Yumo&#39;s Blog</title>
+  <icon>https://username.github.io/icon.png</icon>
+  <subtitle>Yumo&#39;s Blog</subtitle>
+  <link href="https://username.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://username.github.io/"/>
+  <updated>2023-09-29T06:08:10.025Z</updated>
+  <id>https://username.github.io/</id>
+  
+  <author>
+    <name>Yumo</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>缓存和数据库一致性问题及解决</title>
+    <link href="https://username.github.io/2023/03/29/database/%E7%BC%93%E5%AD%98%E5%92%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3/"/>
+    <id>https://username.github.io/2023/03/29/database/%E7%BC%93%E5%AD%98%E5%92%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3/</id>
+    <published>2023-03-29T08:51:33.000Z</published>
+    <updated>2023-09-29T06:08:10.025Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;hr&gt;
+&lt;h1 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Database" scheme="https://username.github.io/categories/Database/"/>
+    
+    
+    <category term="后端" scheme="https://username.github.io/tags/%E5%90%8E%E7%AB%AF/"/>
+    
+    <category term="Database" scheme="https://username.github.io/tags/Database/"/>
+    
+    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
+    
+    <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
+    
+    <category term="缓存" scheme="https://username.github.io/tags/%E7%BC%93%E5%AD%98/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>虚拟线程调度执行流程及原理</title>
+    <link href="https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/"/>
+    <id>https://username.github.io/2023/03/28/Java/%E5%B9%B6%E5%8F%91/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86/</id>
+    <published>2023-03-28T08:51:33.000Z</published>
+    <updated>2023-09-28T08:49:13.966Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h1&gt;&lt;p&gt;在JDK19刚刚出来时，本人曾对&lt;a href=&quot;https://openjdk.org/jeps/425&quot;&gt;JEP 425:</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="虚拟线程" scheme="https://username.github.io/tags/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis线程模型详解</title>
+    <link href="https://username.github.io/2023/03/27/database/Redis%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/"/>
+    <id>https://username.github.io/2023/03/27/database/Redis%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/</id>
+    <published>2023-03-27T08:51:33.000Z</published>
+    <updated>2023-09-28T08:47:37.935Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Database" scheme="https://username.github.io/categories/Database/"/>
+    
+    
+    <category term="后端" scheme="https://username.github.io/tags/%E5%90%8E%E7%AB%AF/"/>
+    
+    <category term="Database" scheme="https://username.github.io/tags/Database/"/>
+    
+    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
+    
+    <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
+    
+    <category term="线程" scheme="https://username.github.io/tags/%E7%BA%BF%E7%A8%8B/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>IO模型</title>
+    <link href="https://username.github.io/2023/03/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/IO%E6%A8%A1%E5%9E%8B/"/>
+    <id>https://username.github.io/2023/03/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/IO%E6%A8%A1%E5%9E%8B/</id>
+    <published>2023-03-26T08:51:33.000Z</published>
+    <updated>2023-09-29T05:57:53.140Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="计算机基础" scheme="https://username.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
+    
+    
+    <category term="IO模型" scheme="https://username.github.io/tags/IO%E6%A8%A1%E5%9E%8B/"/>
+    
+    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>AQS原理</title>
+    <link href="https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/"/>
+    <id>https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/AQS/</id>
+    <published>2023-03-11T08:51:33.000Z</published>
+    <updated>2023-09-28T08:10:48.422Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;AQS&quot;&gt;&lt;a href=&quot;#AQS&quot; class=&quot;headerlink&quot; title=&quot;AQS&quot;&gt;&lt;/a&gt;AQS&lt;/h1&gt;&lt;h2 id=&quot;导图&quot;&gt;&lt;a href=&quot;#导图&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>读写锁&amp;邮戳锁</title>
+    <link href="https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/"/>
+    <id>https://username.github.io/2023/03/11/Java/%E5%B9%B6%E5%8F%91/%E8%AF%BB%E5%86%99%E9%94%81&amp;%E9%82%AE%E6%88%B3%E9%94%81/</id>
+    <published>2023-03-11T08:51:33.000Z</published>
+    <updated>2023-09-28T08:11:17.271Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;面试题&quot;&gt;&lt;a href=&quot;#面试题&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java对象内存布局及Synchronized锁升级</title>
+    <link href="https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/"/>
+    <id>https://username.github.io/2023/02/19/Java/%E5%B9%B6%E5%8F%91/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%8F%8ASynchronized%E9%94%81%E5%8D%87%E7%BA%A7/</id>
+    <published>2023-02-19T08:51:33.000Z</published>
+    <updated>2023-09-28T08:10:11.229Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Java对象内存布局和对象头&quot;&gt;&lt;a href=&quot;#Java对象内存布局和对象头&quot; class=&quot;headerlink&quot; title=&quot;Java对象内存布局和对象头&quot;&gt;&lt;/a&gt;Java对象内存布局和对象头&lt;/h1&gt;&lt;h2 id=&quot;面试题&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CAS与原子操作类</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/</id>
+    <published>2023-02-18T08:51:33.000Z</published>
+    <updated>2023-09-28T08:05:35.187Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;CAS&quot;&gt;&lt;a href=&quot;#CAS&quot; class=&quot;headerlink&quot; title=&quot;CAS&quot;&gt;&lt;/a&gt;CAS&lt;/h1&gt;&lt;h2 id=&quot;原子类&quot;&gt;&lt;a href=&quot;#原子类&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CompletableFuture基本使用</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
+    <published>2023-02-18T08:51:33.000Z</published>
+    <updated>2023-09-28T08:04:33.161Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java内存模型JMM与volatile</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
+    <published>2023-02-18T08:51:33.000Z</published>
+    <updated>2023-09-28T08:09:24.993Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Java内存模型之JMM&quot;&gt;&lt;a href=&quot;#Java内存模型之JMM&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型之JMM&quot;&gt;&lt;/a&gt;Java内存模型之JMM&lt;/h1&gt;&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a href=&quot;#大厂面试题&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ThreadLocal基础及源码分析</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/ThreadLocal/</id>
+    <published>2023-02-18T08:51:33.000Z</published>
+    <updated>2023-09-28T08:07:08.876Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;ThreadLocal简介&quot;&gt;&lt;a href=&quot;#ThreadLocal简介&quot; class=&quot;headerlink&quot; title=&quot;ThreadLocal简介&quot;&gt;&lt;/a&gt;ThreadLocal简介&lt;/h2&gt;&lt;h3 id=&quot;大厂面试题&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>操作系统</title>
+    <link href="https://username.github.io/2023/01/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
+    <id>https://username.github.io/2023/01/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</id>
+    <published>2023-01-08T08:51:33.000Z</published>
+    <updated>2023-09-29T05:57:45.291Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;基础&quot;&gt;&lt;a href=&quot;#基础&quot; class=&quot;headerlink&quot; title=&quot;基础&quot;&gt;&lt;/a&gt;基础&lt;/h2&gt;&lt;h3 id=&quot;什么是操作系统&quot;&gt;&lt;a href=&quot;#什么是操作系统&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="计算机基础" scheme="https://username.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
+    
+    
+    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CSAPP笔记</title>
+    <link href="https://username.github.io/2023/01/01/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/CSAPP/"/>
+    <id>https://username.github.io/2023/01/01/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/CSAPP/</id>
+    <published>2023-01-01T08:51:33.000Z</published>
+    <updated>2023-09-29T05:57:51.256Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;1、计算机系统漫游&quot;&gt;&lt;a href=&quot;#1、计算机系统漫游&quot; class=&quot;headerlink&quot; title=&quot;1、计算机系统漫游&quot;&gt;&lt;/a&gt;1、计算机系统漫游&lt;/h1&gt;&lt;h2 id=&quot;信息就是位-上下文&quot;&gt;&lt;a href=&quot;#信息就是位-上下文&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="计算机基础" scheme="https://username.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
+    
+    
+    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
+    
+    <category term="CSAPP" scheme="https://username.github.io/tags/CSAPP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Nginx入门</title>
+    <link href="https://username.github.io/2022/12/23/linux/Nginx/"/>
+    <id>https://username.github.io/2022/12/23/linux/Nginx/</id>
+    <published>2022-12-23T08:51:33.000Z</published>
+    <updated>2023-09-28T08:28:59.293Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Nginx-简介&quot;&gt;&lt;a href=&quot;#Nginx-简介&quot; class=&quot;headerlink&quot; title=&quot;Nginx 简介&quot;&gt;&lt;/a&gt;Nginx 简介&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;什么是</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="https://username.github.io/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="https://username.github.io/tags/Linux/"/>
+    
+    <category term="Nginx" scheme="https://username.github.io/tags/Nginx/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM字节码指令集</title>
+    <link href="https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"/>
+    <id>https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/</id>
+    <published>2022-11-28T08:51:33.000Z</published>
+    <updated>2023-09-28T08:17:55.556Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://username.github.io/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM类加载子系统</title>
+    <link href="https://username.github.io/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/"/>
+    <id>https://username.github.io/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/</id>
+    <published>2022-11-28T08:51:33.000Z</published>
+    <updated>2023-09-29T06:09:13.362Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;内存结构概述&quot;&gt;&lt;a href=&quot;#内存结构概述&quot; class=&quot;headerlink&quot; title=&quot;内存结构概述&quot;&gt;&lt;/a&gt;内存结构概述&lt;/h2&gt;&lt;h3 id=&quot;简图&quot;&gt;&lt;a href=&quot;#简图&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://username.github.io/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM垃圾回收</title>
+    <link href="https://username.github.io/2022/11/24/Java/JVM/JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"/>
+    <id>https://username.github.io/2022/11/24/Java/JVM/JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</id>
+    <published>2022-11-24T08:51:33.000Z</published>
+    <updated>2023-09-28T08:17:26.602Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;垃圾回收概述&quot;&gt;&lt;a href=&quot;#垃圾回收概述&quot; class=&quot;headerlink&quot; title=&quot;垃圾回收概述&quot;&gt;&lt;/a&gt;垃圾回收概述&lt;/h1&gt;&lt;p&gt;&lt;img</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://username.github.io/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM执行引擎</title>
+    <link href="https://username.github.io/2022/11/18/Java/JVM/%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/"/>
+    <id>https://username.github.io/2022/11/18/Java/JVM/%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/</id>
+    <published>2022-11-18T08:51:33.000Z</published>
+    <updated>2023-09-28T08:16:18.438Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;执行引擎概述&quot;&gt;&lt;a href=&quot;#执行引擎概述&quot; class=&quot;headerlink&quot; title=&quot;执行引擎概述&quot;&gt;&lt;/a&gt;执行引擎概述&lt;/h2&gt;&lt;p&gt;&lt;img</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://username.github.io/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM内存模型</title>
+    <link href="https://username.github.io/2022/11/16/Java/JVM/JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"/>
+    <id>https://username.github.io/2022/11/16/Java/JVM/JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/</id>
+    <published>2022-11-16T08:51:33.000Z</published>
+    <updated>2023-09-28T08:15:42.039Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;运行时数据区概述及线程&quot;&gt;&lt;a href=&quot;#运行时数据区概述及线程&quot; class=&quot;headerlink&quot; title=&quot;运行时数据区概述及线程&quot;&gt;&lt;/a&gt;运行时数据区概述及线程&lt;/h1&gt;&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="JVM" scheme="https://username.github.io/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker部署Springboot项目(jdk19)</title>
+    <link href="https://username.github.io/2022/10/27/linux/Docker%E9%83%A8%E7%BD%B2Springboot%E9%A1%B9%E7%9B%AE(jdk19)/"/>
+    <id>https://username.github.io/2022/10/27/linux/Docker%E9%83%A8%E7%BD%B2Springboot%E9%A1%B9%E7%9B%AE(jdk19)/</id>
+    <published>2022-10-27T08:51:33.000Z</published>
+    <updated>2023-09-29T05:59:34.023Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;因为docker上的jdk没有19的，其他的野镜像不敢用，所以我决定自己构建个jdk19镜像，然后以此镜像来部署springboot项目&lt;/p&gt;
+&lt;h2 id=&quot;自定义jdk19镜像&quot;&gt;&lt;a href=&quot;#自定义jdk19镜像&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="https://username.github.io/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="https://username.github.io/tags/Linux/"/>
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="SpringBoot" scheme="https://username.github.io/tags/SpringBoot/"/>
+    
+  </entry>
+  
+</feed>
