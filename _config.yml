@@ -106,7 +106,7 @@ theme: cactus
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: git     # 必须！
-  repo: https://github.com/Yumoyum0/Yumoyum0.github.io.git  # 必须！
-  branch: master        # 强烈建议
-  message: Site updated {{ now('YYYY-MM-DD HH:mm:ss') }}        # 可根据需求修改
+  type: git
+  repo: https://github.com/yumoyum0/yumoyum0.github.io.git
+  branch: gh-pages
+  message: Site updated {{ now('YYYY-MM-DD HH:mm:ss') }}

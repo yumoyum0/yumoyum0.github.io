@@ -15,10 +15,10 @@ direction: ltr
 # languages/*.yml
 nav:
   home: /
-  about: /about/
   articles: /archives/
-  tag: /tags/
-  category: /categories/
+  tags: /tags/
+  categorys: /categories/
+  about: /about/
   search: /search/
 
 
@@ -75,7 +75,7 @@ post:
 # Customize the copyright years
 # Note: if start_year/end_year not provided, will use current year.
 copyright:
-  start_year:
+  start_year: 2022
   end_year:
 
 # Customize the 404 page
@@ -166,7 +166,7 @@ mathjax:
 # Fill in your Disqus Comments Shortname to enable Disqus comments.
 disqus:
   enabled: false
-  shortname: cactus-1
+  shortname: yumoyumo
 
 # Fill in your Utterances data to enable Utterances comments
 utterances:
