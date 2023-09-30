@@ -133,9 +133,9 @@
     <category term="计算机基础" scheme="https://username.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
     
     
-    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
-    
     <category term="IO模型" scheme="https://username.github.io/tags/IO%E6%A8%A1%E5%9E%8B/"/>
+    
+    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
     
   </entry>
   
@@ -256,18 +256,18 @@
   </entry>
   
   <entry>
-    <title>Java内存模型JMM与volatile</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
+    <title>CompletableFuture基本使用</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:09:24.993Z</updated>
+    <updated>2023-09-28T08:04:33.161Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;Java内存模型之JMM&quot;&gt;&lt;a href=&quot;#Java内存模型之JMM&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型之JMM&quot;&gt;&lt;/a&gt;Java内存模型之JMM&lt;/h1&gt;&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a href=&quot;#大厂面试题&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
         
       
     
@@ -285,18 +285,18 @@
   </entry>
   
   <entry>
-    <title>CompletableFuture基本使用</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
+    <title>Java内存模型JMM与volatile</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:04:33.161Z</updated>
+    <updated>2023-09-28T08:09:24.993Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1 id=&quot;Java内存模型之JMM&quot;&gt;&lt;a href=&quot;#Java内存模型之JMM&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型之JMM&quot;&gt;&lt;/a&gt;Java内存模型之JMM&lt;/h1&gt;&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a href=&quot;#大厂面试题&quot;</summary>
         
       
     
