@@ -106,9 +106,9 @@
     
     <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
     
-    <category term="线程" scheme="https://username.github.io/tags/%E7%BA%BF%E7%A8%8B/"/>
-    
     <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
+    
+    <category term="线程" scheme="https://username.github.io/tags/%E7%BA%BF%E7%A8%8B/"/>
     
   </entry>
   
@@ -578,9 +578,9 @@
     <category term="Linux" scheme="https://username.github.io/categories/Linux/"/>
     
     
-    <category term="Linux" scheme="https://username.github.io/tags/Linux/"/>
-    
     <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="Linux" scheme="https://username.github.io/tags/Linux/"/>
     
     <category term="SpringBoot" scheme="https://username.github.io/tags/SpringBoot/"/>
     
