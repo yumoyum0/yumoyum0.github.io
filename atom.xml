@@ -106,9 +106,9 @@
     
     <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
     
-    <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
-    
     <category term="线程" scheme="https://username.github.io/tags/%E7%BA%BF%E7%A8%8B/"/>
+    
+    <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
   </entry>
   
@@ -133,9 +133,9 @@
     <category term="计算机基础" scheme="https://username.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
     
     
-    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
-    
     <category term="IO模型" scheme="https://username.github.io/tags/IO%E6%A8%A1%E5%9E%8B/"/>
+    
+    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
     
   </entry>
   
@@ -578,9 +578,9 @@
     <category term="Linux" scheme="https://username.github.io/categories/Linux/"/>
     
     
-    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
-    
     <category term="Linux" scheme="https://username.github.io/tags/Linux/"/>
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
     
     <category term="SpringBoot" scheme="https://username.github.io/tags/SpringBoot/"/>
     
