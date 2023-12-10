@@ -227,18 +227,18 @@
   </entry>
   
   <entry>
-    <title>CAS与原子操作类</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/</id>
+    <title>CompletableFuture基本使用</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:05:35.187Z</updated>
+    <updated>2023-09-28T08:04:33.161Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;CAS&quot;&gt;&lt;a href=&quot;#CAS&quot; class=&quot;headerlink&quot; title=&quot;CAS&quot;&gt;&lt;/a&gt;CAS&lt;/h1&gt;&lt;h2 id=&quot;原子类&quot;&gt;&lt;a href=&quot;#原子类&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
         
       
     
@@ -256,18 +256,18 @@
   </entry>
   
   <entry>
-    <title>CompletableFuture基本使用</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
+    <title>CAS与原子操作类</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:04:33.161Z</updated>
+    <updated>2023-09-28T08:05:35.187Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1 id=&quot;CAS&quot;&gt;&lt;a href=&quot;#CAS&quot; class=&quot;headerlink&quot; title=&quot;CAS&quot;&gt;&lt;/a&gt;CAS&lt;/h1&gt;&lt;h2 id=&quot;原子类&quot;&gt;&lt;a href=&quot;#原子类&quot; class=&quot;headerlink&quot;</summary>
         
       
     
