@@ -6,7 +6,7 @@
   <link href="https://username.github.io/atom.xml" rel="self"/>
   
   <link href="https://username.github.io/"/>
-  <updated>2024-12-16T13:17:47.914Z</updated>
+  <updated>2026-05-18T14:09:30.365Z</updated>
   <id>https://username.github.io/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Learn Harness Engineering</title>
+    <link href="https://username.github.io/2026/05/18/AI/Harness%20Engineering/"/>
+    <id>https://username.github.io/2026/05/18/AI/Harness%20Engineering/</id>
+    <published>2026-05-18T08:00:00.000Z</published>
+    <updated>2026-05-18T14:09:30.365Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Harness-Engineering&quot;&gt;&lt;a href=&quot;#Harness-Engineering&quot; class=&quot;headerlink&quot; title=&quot;Harness Engineering&quot;&gt;&lt;/a&gt;Harness</summary>
+        
+      
+    
+    
+    
+    <category term="AI" scheme="https://username.github.io/categories/AI/"/>
+    
+    
+    <category term="AI" scheme="https://username.github.io/tags/AI/"/>
+    
+  </entry>
   
   <entry>
     <title>软件工程专业APS德审一审通过经验分享</title>
@@ -67,13 +92,13 @@
     
     <category term="后端" scheme="https://username.github.io/tags/%E5%90%8E%E7%AB%AF/"/>
     
-    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
-    
     <category term="Database" scheme="https://username.github.io/tags/Database/"/>
     
-    <category term="缓存" scheme="https://username.github.io/tags/%E7%BC%93%E5%AD%98/"/>
+    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
     
     <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
+    
+    <category term="缓存" scheme="https://username.github.io/tags/%E7%BC%93%E5%AD%98/"/>
     
   </entry>
   
@@ -129,9 +154,9 @@
     
     <category term="后端" scheme="https://username.github.io/tags/%E5%90%8E%E7%AB%AF/"/>
     
-    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
-    
     <category term="Database" scheme="https://username.github.io/tags/Database/"/>
+    
+    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
     
     <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
@@ -160,9 +185,9 @@
     <category term="计算机基础" scheme="https://username.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
     
     
-    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
-    
     <category term="IO模型" scheme="https://username.github.io/tags/IO%E6%A8%A1%E5%9E%8B/"/>
+    
+    <category term="操作系统" scheme="https://username.github.io/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
     
   </entry>
   
@@ -283,18 +308,18 @@
   </entry>
   
   <entry>
-    <title>CompletableFuture基本使用</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
+    <title>Java内存模型JMM与volatile</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:04:33.161Z</updated>
+    <updated>2023-09-28T08:09:24.993Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1 id=&quot;Java内存模型之JMM&quot;&gt;&lt;a href=&quot;#Java内存模型之JMM&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型之JMM&quot;&gt;&lt;/a&gt;Java内存模型之JMM&lt;/h1&gt;&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a href=&quot;#大厂面试题&quot;</summary>
         
       
     
@@ -312,18 +337,18 @@
   </entry>
   
   <entry>
-    <title>Java内存模型JMM与volatile</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
+    <title>CompletableFuture基本使用</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:09:24.993Z</updated>
+    <updated>2023-09-28T08:04:33.161Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;Java内存模型之JMM&quot;&gt;&lt;a href=&quot;#Java内存模型之JMM&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型之JMM&quot;&gt;&lt;/a&gt;Java内存模型之JMM&lt;/h1&gt;&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a href=&quot;#大厂面试题&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
         
       
     
@@ -542,33 +567,6 @@
         
         
     <summary type="html">&lt;h2 id=&quot;执行引擎概述&quot;&gt;&lt;a href=&quot;#执行引擎概述&quot; class=&quot;headerlink&quot; title=&quot;执行引擎概述&quot;&gt;&lt;/a&gt;执行引擎概述&lt;/h2&gt;&lt;p&gt;&lt;img</summary>
-        
-      
-    
-    
-    
-    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
-    
-    
-    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
-    
-    <category term="JVM" scheme="https://username.github.io/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM内存模型</title>
-    <link href="https://username.github.io/2022/11/16/Java/JVM/JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"/>
-    <id>https://username.github.io/2022/11/16/Java/JVM/JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/</id>
-    <published>2022-11-16T08:51:33.000Z</published>
-    <updated>2023-09-28T08:15:42.039Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;运行时数据区概述及线程&quot;&gt;&lt;a href=&quot;#运行时数据区概述及线程&quot; class=&quot;headerlink&quot; title=&quot;运行时数据区概述及线程&quot;&gt;&lt;/a&gt;运行时数据区概述及线程&lt;/h1&gt;&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot;</summary>
         
       
     
