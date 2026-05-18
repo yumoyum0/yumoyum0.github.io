@@ -5,7 +5,7 @@
 # Link to a page that gives an overview of all your projects.
 # This can be an external link (e.g., to you GitHub profile) or to another
 # page within your website.
-projects_url: http://github.com/probberechts
+projects_url: https://github.com/yumoyum0/yumoyum0.github.io
 
 # Set the page direction to RTL or LTR. default is LTR. (if you set it 'rtl', the 'vazir' font will be loaded.)
 direction: ltr
@@ -20,6 +20,8 @@ nav:
   categorys: /categories/
   about: /about/
   search: /search/
+  Links: /links/
+  RSS: atom.xml
 
 
 # Links to your social media accounts.
@@ -31,7 +33,7 @@ nav:
 social_links:
   -
     icon: github
-    link: https://github.com/Yumoyum0
+    link: https://github.com/yumoyum0
   #   icon: twitter
   #   link: /
   # -
@@ -43,6 +45,9 @@ social_links:
   -
     icon: bilibili
     link: https://space.bilibili.com/14014010
+  -
+    icon: rss
+    link: atom.xml
 
 # Customize the overview with displaying a tagcloud on the index page.
 # Options: https://hexo.io/docs/helpers.html#tagcloud
@@ -100,12 +105,12 @@ error_404:
 #   - gravatar: whether to use your Gravatar as the logo
 #   - grayout: whether to enable a hover effect on the logo
 logo:
-  enabled: false
-  width: 50
-  height: 50
-  url: /images/logo.png
+  enabled: tre
+  width: 70
+  height: 70
+  url: /images/slime/logo.jpg
   gravatar: false
-  grayout: true
+  grayout: false
 
 # Customize the favicons.
 # Cactus supports a limited set of the three most important icons:
@@ -118,13 +123,13 @@ logo:
 #   - gravatar: whether to create a favicon from your Gravatar
 favicon:
   desktop:
-    url: /images/favicon.ico
+    url: /images/slime/favicon.ico
     gravatar: false
   android:
-    url: /images/android-192x192.png
+    url: /images/slime/android-chrome-192x192.png
     gravatar: false
   apple:
-    url: /images/apple-touch-icon.png
+    url: /images/slime/apple-touch-icon.png
     gravatar: false
 
 # The color scheme that should be used to highlight codeblocks.
@@ -145,7 +150,7 @@ page_width: 48
 ##############################################################################
 
 # Enable or disable the RSS feed.
-rss: false
+rss:
 
 # Turn your web pages into graph objects (see http://ogp.me).
 open_graph:
