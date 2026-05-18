@@ -109,5 +109,68 @@ $(document).ready(function() {
         }
       });
     }
+
+    /**
+     * TOC IntersectionObserver for active link highlighting.
+     * Watches all article headings and highlights corresponding TOC links.
+     */
+    (function initTocObserver() {
+      var headings = document.querySelectorAll('.content.e-content h1, .content.e-content h2, .content.e-content h3, .content.e-content h4, .content.e-content h5, .content.e-content h6');
+      if (!headings.length) return;
+
+      var tocLinks = document.querySelectorAll('#toc .toc-link, #toc-footer .toc-link');
+      if (!tocLinks.length) return;
+
+      // Build a map from heading id to TOC links
+      var linkMap = {};
+      tocLinks.forEach(function(link) {
+        var href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          var id = href.slice(1);
+          if (!linkMap[id]) linkMap[id] = [];
+          linkMap[id].push(link);
+        }
+      });
+
+      // Track currently active heading
+      var activeId = null;
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            // Clear previous active
+            if (activeId && linkMap[activeId]) {
+              linkMap[activeId].forEach(function(l) { l.classList.remove('active'); });
+            }
+            // Set new active
+            activeId = entry.target.id;
+            if (activeId && linkMap[activeId]) {
+              linkMap[activeId].forEach(function(l) { l.classList.add('active'); });
+            }
+          }
+        });
+      }, {
+        rootMargin: '-80px 0px -70% 0px',
+        threshold: 0
+      });
+
+      headings.forEach(function(h) { observer.observe(h); });
+
+      // Fallback: remove active on click to let CSS :target handle it
+      // Also scroll TOC to keep active link visible
+      document.querySelectorAll('#toc .toc-link, #toc-footer .toc-link').forEach(function(link) {
+        link.addEventListener('click', function() {
+          var parentToc = link.closest('#toc, #toc-footer');
+          if (parentToc) {
+            setTimeout(function() {
+              var activeEl = parentToc.querySelector('.toc-link.active');
+              if (activeEl) {
+                activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+              }
+            }, 100);
+          }
+        });
+      });
+    })();
   }
 });

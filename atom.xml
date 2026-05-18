@@ -6,7 +6,7 @@
   <link href="https://username.github.io/atom.xml" rel="self"/>
   
   <link href="https://username.github.io/"/>
-  <updated>2026-05-18T14:20:49.188Z</updated>
+  <updated>2026-05-18T16:19:46.632Z</updated>
   <id>https://username.github.io/</id>
   
   <author>
@@ -17,18 +17,19 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)</title>
+    <title>RAG Demo: Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)</title>
     <link href="https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/"/>
     <id>https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/</id>
-    <published>2026-05-18T09:00:00.000Z</published>
-    <updated>2026-05-18T14:20:49.188Z</updated>
+    <published>2026-05-18T08:00:00.000Z</published>
+    <updated>2026-05-18T16:19:46.632Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;RAG-Demo-Complete-Setup-Run-and-Cleanup-Guide-WSL-Conda-VSCode&quot;&gt;&lt;a</summary>
+    <summary type="html">&lt;h1&gt;RAG Demo: Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)&lt;/h1&gt;
+&lt;h2 id=&quot;1-project-background&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -46,14 +47,15 @@
     <link href="https://username.github.io/2026/05/18/AI/Harness%20Engineering/"/>
     <id>https://username.github.io/2026/05/18/AI/Harness%20Engineering/</id>
     <published>2026-05-18T08:00:00.000Z</published>
-    <updated>2026-05-18T14:09:30.365Z</updated>
+    <updated>2026-05-18T14:21:45.625Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;Harness-Engineering&quot;&gt;&lt;a href=&quot;#Harness-Engineering&quot; class=&quot;headerlink&quot; title=&quot;Harness Engineering&quot;&gt;&lt;/a&gt;Harness</summary>
+    <summary type="html">&lt;h1&gt;Harness Engineering&lt;/h1&gt;
+&lt;h2 id=&quot;what-harness-actually-means&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#what-harness-actually-means&quot;&gt;#&lt;/a&gt;What</summary>
         
       
     
@@ -78,7 +80,8 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;软件工程专业APS德审一审通过经验分享&quot;&gt;&lt;a href=&quot;#软件工程专业APS德审一审通过经验分享&quot; class=&quot;headerlink&quot; title=&quot;软件工程专业APS德审一审通过经验分享&quot;&gt;&lt;/a&gt;软件工程专业APS德审一审通过经验分享&lt;/h1&gt;&lt;h2</summary>
+    <summary type="html">&lt;h1&gt;软件工程专业APS德审一审通过经验分享&lt;/h1&gt;
+&lt;h2 id=&quot;鸣谢&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -106,7 +109,9 @@
         
         
     <summary type="html">&lt;hr&gt;
-&lt;h1 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot;</summary>
+&lt;h1&gt;概述&lt;/h1&gt;
+&lt;p&gt;缓存是一种常用的提高系统性能的技术，它可以减少对数据库的访问，提高响应速度。但是，缓存也带来了一个难题：如何保证缓存和数据库的数据一致性？&lt;/p&gt;
+&lt;p&gt;数据一致性是指数据在不同存储介质中的状态是否相同。如果缓存和数据库中的数据不一致，就会</summary>
         
       
     
@@ -117,9 +122,9 @@
     
     <category term="后端" scheme="https://username.github.io/tags/%E5%90%8E%E7%AB%AF/"/>
     
-    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
-    
     <category term="Database" scheme="https://username.github.io/tags/Database/"/>
+    
+    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
     
     <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
@@ -139,7 +144,8 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h1&gt;&lt;p&gt;在JDK19刚刚出来时，本人曾对&lt;a href=&quot;https://openjdk.org/jeps/425&quot;&gt;JEP 425:</summary>
+    <summary type="html">&lt;h1&gt;概述&lt;/h1&gt;
+&lt;p&gt;在JDK19刚刚出来时，本人曾对&lt;a href=&quot;https://openjdk.org/jeps/425&quot;&gt;JEP 425: Virtual Threads &lt;/a&gt;做过一篇翻译文&lt;a</summary>
         
       
     
@@ -168,7 +174,13 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1&gt;问题&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;什么是Redis线程模型？&lt;/li&gt;
+&lt;li&gt;Redis4.0前的单线程模型是什么？&lt;/li&gt;
+&lt;li&gt;为什么Redis之前一直选择单线程？&lt;/li&gt;
+&lt;li&gt;Redis4.0后为什么又加入了多线程异步执行？&lt;/li&gt;
+&lt;li&gt;Redis</summary>
         
       
     
@@ -179,13 +191,13 @@
     
     <category term="后端" scheme="https://username.github.io/tags/%E5%90%8E%E7%AB%AF/"/>
     
-    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
-    
     <category term="Database" scheme="https://username.github.io/tags/Database/"/>
     
-    <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
+    <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
     
     <category term="线程" scheme="https://username.github.io/tags/%E7%BA%BF%E7%A8%8B/"/>
+    
+    <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
   </entry>
   
@@ -201,7 +213,10 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1&gt;前言&lt;/h1&gt;
+&lt;p&gt;经常在网上看到各种IO，比如阻塞/非阻塞IO、同步/异步IO、IO多路复用，又比如select、poll、epoll、reactor。以及BIO、NIO、AIO等概念。&lt;/p&gt;
+&lt;p&gt;被这些概念给迷花了眼，因此一怒之下决心搞清这些东西&lt;/p&gt;
+&lt;h1</summary>
         
       
     
@@ -228,7 +243,9 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;AQS&quot;&gt;&lt;a href=&quot;#AQS&quot; class=&quot;headerlink&quot; title=&quot;AQS&quot;&gt;&lt;/a&gt;AQS&lt;/h1&gt;&lt;h2 id=&quot;导图&quot;&gt;&lt;a href=&quot;#导图&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1&gt;AQS&lt;/h1&gt;
+&lt;h2 id=&quot;导图&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#导图&quot;&gt;#&lt;/a&gt;导图&lt;/h2&gt;
+&lt;p&gt;&lt;img</summary>
         
       
     
@@ -257,7 +274,7 @@
       
         
         
-    <summary type="html">&lt;h2 id=&quot;面试题&quot;&gt;&lt;a href=&quot;#面试题&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;面试题&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -286,36 +303,9 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;Java对象内存布局和对象头&quot;&gt;&lt;a href=&quot;#Java对象内存布局和对象头&quot; class=&quot;headerlink&quot; title=&quot;Java对象内存布局和对象头&quot;&gt;&lt;/a&gt;Java对象内存布局和对象头&lt;/h1&gt;&lt;h2 id=&quot;面试题&quot;&gt;&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
-    
-    
-    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
-    
-    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>CAS与原子操作类</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/</id>
-    <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:05:35.187Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;CAS&quot;&gt;&lt;a href=&quot;#CAS&quot; class=&quot;headerlink&quot; title=&quot;CAS&quot;&gt;&lt;/a&gt;CAS&lt;/h1&gt;&lt;h2 id=&quot;原子类&quot;&gt;&lt;a href=&quot;#原子类&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1&gt;Java对象内存布局和对象头&lt;/h1&gt;
+&lt;h2 id=&quot;面试题&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#面试题&quot;&gt;#&lt;/a&gt;面试题&lt;/h2&gt;
+&lt;p&gt;&lt;img</summary>
         
       
     
@@ -344,7 +334,7 @@
       
         
         
-    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;future和callable接口&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -362,18 +352,19 @@
   </entry>
   
   <entry>
-    <title>Java内存模型JMM与volatile</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
+    <title>CAS与原子操作类</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CAS%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E7%B1%BB/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:09:24.993Z</updated>
+    <updated>2023-09-28T08:05:35.187Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;Java内存模型之JMM&quot;&gt;&lt;a href=&quot;#Java内存模型之JMM&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型之JMM&quot;&gt;&lt;/a&gt;Java内存模型之JMM&lt;/h1&gt;&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a href=&quot;#大厂面试题&quot;</summary>
+    <summary type="html">&lt;h1&gt;CAS&lt;/h1&gt;
+&lt;h2 id=&quot;原子类&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -402,7 +393,38 @@
       
         
         
-    <summary type="html">&lt;h2 id=&quot;ThreadLocal简介&quot;&gt;&lt;a href=&quot;#ThreadLocal简介&quot; class=&quot;headerlink&quot; title=&quot;ThreadLocal简介&quot;&gt;&lt;/a&gt;ThreadLocal简介&lt;/h2&gt;&lt;h3 id=&quot;大厂面试题&quot;&gt;&lt;a</summary>
+    <summary type="html">&lt;h2 id=&quot;threadlocal简介&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#threadlocal简介&quot;&gt;#&lt;/a&gt;ThreadLocal简介&lt;/h2&gt;
+&lt;h3 id=&quot;大厂面试题&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
+    
+    
+    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
+    
+    <category term="并发" scheme="https://username.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="JUC" scheme="https://username.github.io/tags/JUC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java内存模型JMM与volatile</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
+    <published>2023-02-18T08:51:33.000Z</published>
+    <updated>2023-09-28T08:09:24.993Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1&gt;Java内存模型之JMM&lt;/h1&gt;
+&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -431,7 +453,8 @@
       
         
         
-    <summary type="html">&lt;h2 id=&quot;基础&quot;&gt;&lt;a href=&quot;#基础&quot; class=&quot;headerlink&quot; title=&quot;基础&quot;&gt;&lt;/a&gt;基础&lt;/h2&gt;&lt;h3 id=&quot;什么是操作系统&quot;&gt;&lt;a href=&quot;#什么是操作系统&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;基础&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#基础&quot;&gt;#&lt;/a&gt;基础&lt;/h2&gt;
+&lt;h3 id=&quot;什么是操作系统&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -456,7 +479,8 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;1、计算机系统漫游&quot;&gt;&lt;a href=&quot;#1、计算机系统漫游&quot; class=&quot;headerlink&quot; title=&quot;1、计算机系统漫游&quot;&gt;&lt;/a&gt;1、计算机系统漫游&lt;/h1&gt;&lt;h2 id=&quot;信息就是位-上下文&quot;&gt;&lt;a href=&quot;#信息就是位-上下文&quot;</summary>
+    <summary type="html">&lt;h1&gt;1、计算机系统漫游&lt;/h1&gt;
+&lt;h2 id=&quot;信息就是位-上下文&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -483,7 +507,9 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;Nginx-简介&quot;&gt;&lt;a href=&quot;#Nginx-简介&quot; class=&quot;headerlink&quot; title=&quot;Nginx 简介&quot;&gt;&lt;/a&gt;Nginx 简介&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;什么是</summary>
+    <summary type="html">&lt;h1&gt;Nginx 简介&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;什么是 Nginx?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Nginx (engine x)&lt;/strong&gt; 是一款轻量级的 Web 服务器</summary>
         
       
     
@@ -499,18 +525,18 @@
   </entry>
   
   <entry>
-    <title>JVM类加载子系统</title>
-    <link href="https://username.github.io/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/"/>
-    <id>https://username.github.io/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/</id>
+    <title>JVM字节码指令集</title>
+    <link href="https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"/>
+    <id>https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/</id>
     <published>2022-11-28T08:51:33.000Z</published>
-    <updated>2023-09-29T06:09:13.362Z</updated>
+    <updated>2023-09-28T08:17:55.556Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;内存结构概述&quot;&gt;&lt;a href=&quot;#内存结构概述&quot; class=&quot;headerlink&quot; title=&quot;内存结构概述&quot;&gt;&lt;/a&gt;内存结构概述&lt;/h2&gt;&lt;h3 id=&quot;简图&quot;&gt;&lt;a href=&quot;#简图&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -526,18 +552,19 @@
   </entry>
   
   <entry>
-    <title>JVM字节码指令集</title>
-    <link href="https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"/>
-    <id>https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/</id>
+    <title>JVM类加载子系统</title>
+    <link href="https://username.github.io/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/"/>
+    <id>https://username.github.io/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/</id>
     <published>2022-11-28T08:51:33.000Z</published>
-    <updated>2023-09-28T08:17:55.556Z</updated>
+    <updated>2023-09-29T06:09:13.362Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;内存结构概述&quot;&gt;&lt;a class=&quot;header-anchor&quot; href=&quot;#内存结构概述&quot;&gt;#&lt;/a&gt;内存结构概述&lt;/h2&gt;
+&lt;h3 id=&quot;简图&quot;&gt;&lt;a class=&quot;header-anchor&quot;</summary>
         
       
     
@@ -564,7 +591,8 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;垃圾回收概述&quot;&gt;&lt;a href=&quot;#垃圾回收概述&quot; class=&quot;headerlink&quot; title=&quot;垃圾回收概述&quot;&gt;&lt;/a&gt;垃圾回收概述&lt;/h1&gt;&lt;p&gt;&lt;img</summary>
+    <summary type="html">&lt;h1&gt;垃圾回收概述&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;https://yumoimgbed.oss-cn-shenzhen.aliyuncs.com/img/image-20221120140044206.png&quot;</summary>
         
       
     
