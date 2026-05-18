@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="RAG Demo: Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)1. Project BackgroundThis demo is based on the classic paper:  Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks A">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)">
+<meta property="og:url" content="https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/index.html">
+<meta property="og:site_name" content="Yumo&#39;s Blog">
+<meta property="og:description" content="RAG Demo: Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)1. Project BackgroundThis demo is based on the classic paper:  Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks A">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-18T09:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-18T14:20:49.188Z">
+<meta property="article:author" content="Yumo">
+<meta property="article:tag" content="AI">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/slime/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/slime/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/slime/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Yumo's Blog" type="application/atom+xml">
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tags</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Categorys</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a href="/links/">Links</a></li><!--
+     --><!--
+       --><li><a href="/atom.xml">RSS</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2026/05/18/AI/Harness%20Engineering/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&text=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&is_video=false&description=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)&body=Check out this article: https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&name=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&t=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#RAG-Demo-Complete-Setup-Run-and-Cleanup-Guide-WSL-Conda-VSCode"><span class="toc-number">1.</span> <span class="toc-text">RAG Demo: Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Project-Background"><span class="toc-number">1.1.</span> <span class="toc-text">1. Project Background</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-Recommended-Development-Environment"><span class="toc-number">2.</span> <span class="toc-text">2. Recommended Development Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-Install-WSL-Ubuntu"><span class="toc-number">3.</span> <span class="toc-text">3. Install WSL Ubuntu</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-Install-Basic-Development-Tools"><span class="toc-number">4.</span> <span class="toc-text">4. Install Basic Development Tools</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-Install-Miniconda-Recommended"><span class="toc-number">5.</span> <span class="toc-text">5. Install Miniconda (Recommended)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-Create-a-Python-3-11-Environment"><span class="toc-number">6.</span> <span class="toc-text">6. Create a Python 3.11 Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-Create-the-Project-Directory"><span class="toc-number">7.</span> <span class="toc-text">7. Create the Project Directory</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-Install-VSCode-and-WSL-Extensions"><span class="toc-number">8.</span> <span class="toc-text">8. Install VSCode and WSL Extensions</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-Install-RAG-Demo-Dependencies"><span class="toc-number">9.</span> <span class="toc-text">9. Install RAG Demo Dependencies</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-Create-the-RAG-Demo"><span class="toc-number">10.</span> <span class="toc-text">10. Create the RAG Demo</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-Run-the-Demo"><span class="toc-number">11.</span> <span class="toc-text">11. Run the Demo</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#12-Common-Issues"><span class="toc-number">12.</span> <span class="toc-text">12. Common Issues</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#12-1-datasets-scripts-are-no-longer-supported"><span class="toc-number">12.1.</span> <span class="toc-text">12.1 datasets scripts are no longer supported</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-2-NumPy-2-x-errors"><span class="toc-number">12.2.</span> <span class="toc-text">12.2 NumPy 2.x errors</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-3-WSL-Input-output-error"><span class="toc-number">12.3.</span> <span class="toc-text">12.3 WSL Input&#x2F;output error</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-4-conda-command-not-found"><span class="toc-number">12.4.</span> <span class="toc-text">12.4 conda command not found</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#13-Check-the-Current-Environment"><span class="toc-number">13.</span> <span class="toc-text">13. Check the Current Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#14-Remove-the-Environment"><span class="toc-number">14.</span> <span class="toc-text">14. Remove the Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#15-Clean-Cache-Recommended"><span class="toc-number">15.</span> <span class="toc-text">15. Clean Cache (Recommended)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#16-Save-the-Environment"><span class="toc-number">16.</span> <span class="toc-text">16. Save the Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#17-Modern-RAG-Architecture"><span class="toc-number">17.</span> <span class="toc-text">17. Modern RAG Architecture</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#LangChain"><span class="toc-number">17.1.</span> <span class="toc-text">LangChain</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LlamaIndex"><span class="toc-number">17.2.</span> <span class="toc-text">LlamaIndex</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Qdrant"><span class="toc-number">17.3.</span> <span class="toc-text">Qdrant</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Chroma"><span class="toc-number">17.4.</span> <span class="toc-text">Chroma</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FastAPI"><span class="toc-number">17.5.</span> <span class="toc-text">FastAPI</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#18-Recommended-Next-Projects"><span class="toc-number">18.</span> <span class="toc-text">18. Recommended Next Projects</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#19-Important-AI-Engineering-Lessons"><span class="toc-number">19.</span> <span class="toc-text">19. Important AI Engineering Lessons</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Never-install-AI-packages-into-system-Python"><span class="toc-number">19.1.</span> <span class="toc-text">1. Never install AI packages into system Python</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Use-conda-to-manage-environments"><span class="toc-number">19.2.</span> <span class="toc-text">2. Use conda to manage environments</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Pin-dependency-versions"><span class="toc-number">19.3.</span> <span class="toc-text">3. Pin dependency versions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Keep-large-free-disk-space-on-C-drive"><span class="toc-number">19.4.</span> <span class="toc-text">4. Keep large free disk space on C drive</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Regularly-back-up-WSL"><span class="toc-number">19.5.</span> <span class="toc-text">5. Regularly back up WSL</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#20-Final-Summary"><span class="toc-number">20.</span> <span class="toc-text">20. Final Summary</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Yumo</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-05-18T09:00:00.000Z" class="dt-published" itemprop="datePublished">2026-05-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/AI/">AI</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/AI/" rel="tag">AI</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="RAG-Demo-Complete-Setup-Run-and-Cleanup-Guide-WSL-Conda-VSCode"><a href="#RAG-Demo-Complete-Setup-Run-and-Cleanup-Guide-WSL-Conda-VSCode" class="headerlink" title="RAG Demo: Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"></a>RAG Demo: Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)</h1><h2 id="1-Project-Background"><a href="#1-Project-Background" class="headerlink" title="1. Project Background"></a>1. Project Background</h2><p>This demo is based on the classic paper:</p>
+<ul>
+<li>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</li>
+<li>Authors: Patrick Lewis et al. (Meta &#x2F; Facebook AI)</li>
+</ul>
+<p>Paper:</p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2005.11401">https://arxiv.org/abs/2005.11401</a></p>
+<p>HuggingFace Model:</p>
+<p><a target="_blank" rel="noopener" href="https://huggingface.co/facebook/rag-token-nq">https://huggingface.co/facebook/rag-token-nq</a></p>
+<p>The paper introduced the classic RAG (Retrieval-Augmented Generation) architecture:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Question</span><br><span class="line">   ↓</span><br><span class="line">Retriever (retrieve relevant documents)</span><br><span class="line">   ↓</span><br><span class="line">Generator (generate answers using retrieved context)</span><br></pre></td></tr></table></figure>
+
+<p>Many modern systems are based on these ideas:</p>
+<ul>
+<li>Enterprise Knowledge Bases</li>
+<li>AI Search</li>
+<li>AI Agents</li>
+<li>LangChain</li>
+<li>LlamaIndex</li>
+</ul>
+<hr>
+<h1 id="2-Recommended-Development-Environment"><a href="#2-Recommended-Development-Environment" class="headerlink" title="2. Recommended Development Environment"></a>2. Recommended Development Environment</h1><p>Recommended:</p>
+<ul>
+<li>Windows 11</li>
+<li>WSL2 Ubuntu</li>
+<li>VSCode + Remote WSL</li>
+<li>Miniconda</li>
+<li>Python 3.11</li>
+</ul>
+<p>Not recommended:</p>
+<ul>
+<li>Installing AI packages directly into system Python</li>
+<li>Doing AI development with native Windows Python</li>
+<li>Developing AI projects under &#x2F;mnt&#x2F;c</li>
+</ul>
+<hr>
+<h1 id="3-Install-WSL-Ubuntu"><a href="#3-Install-WSL-Ubuntu" class="headerlink" title="3. Install WSL Ubuntu"></a>3. Install WSL Ubuntu</h1><p>Run in Administrator PowerShell:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">--install</span></span><br></pre></td></tr></table></figure>
+
+<p>If Microsoft Store download fails:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">--install</span> Ubuntu <span class="literal">--web-download</span></span><br></pre></td></tr></table></figure>
+
+<p>or:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">--install</span> <span class="literal">-d</span> Ubuntu <span class="literal">--web-download</span></span><br></pre></td></tr></table></figure>
+
+<p>When Ubuntu launches for the first time:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Create a default Unix user account</span><br></pre></td></tr></table></figure>
+
+<p>Set:</p>
+<ul>
+<li>Username</li>
+<li>Password</li>
+</ul>
+<hr>
+<h1 id="4-Install-Basic-Development-Tools"><a href="#4-Install-Basic-Development-Tools" class="headerlink" title="4. Install Basic Development Tools"></a>4. Install Basic Development Tools</h1><p>Inside Ubuntu:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt upgrade -y</span><br></pre></td></tr></table></figure>
+
+<p>Install development tools:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install -y \</span><br><span class="line">build-essential \</span><br><span class="line">git \</span><br><span class="line">curl \</span><br><span class="line">wget \</span><br><span class="line">vim</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="5-Install-Miniconda-Recommended"><a href="#5-Install-Miniconda-Recommended" class="headerlink" title="5. Install Miniconda (Recommended)"></a>5. Install Miniconda (Recommended)</h1><p>Download:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh</span><br></pre></td></tr></table></figure>
+
+<p>Install:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash Miniconda3-latest-Linux-x86_64.sh</span><br></pre></td></tr></table></figure>
+
+<p>Type:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yes</span><br></pre></td></tr></table></figure>
+
+<p>Initialize conda:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/miniconda3/bin/conda init</span><br></pre></td></tr></table></figure>
+
+<p>Reload shell:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<p>Check conda:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda --version</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="6-Create-a-Python-3-11-Environment"><a href="#6-Create-a-Python-3-11-Environment" class="headerlink" title="6. Create a Python 3.11 Environment"></a>6. Create a Python 3.11 Environment</h1><p>Create environment:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda create -n rag python=3.11</span><br></pre></td></tr></table></figure>
+
+<p>Activate:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda activate rag</span><br></pre></td></tr></table></figure>
+
+<p>Check Python version:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python --version</span><br></pre></td></tr></table></figure>
+
+<p>Expected output:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Python 3.11.x</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="7-Create-the-Project-Directory"><a href="#7-Create-the-Project-Directory" class="headerlink" title="7. Create the Project Directory"></a>7. Create the Project Directory</h1><p>Recommended:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p ~/ai-projects/rag-demo</span><br><span class="line"><span class="built_in">cd</span> ~/ai-projects/rag-demo</span><br></pre></td></tr></table></figure>
+
+<p>Avoid:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/mnt/c/...</span><br></pre></td></tr></table></figure>
+
+<p>Reasons:</p>
+<ul>
+<li>Slower performance</li>
+<li>More permission issues</li>
+<li>More WSL I&#x2F;O problems</li>
+<li>pip failures happen more often</li>
+</ul>
+<hr>
+<h1 id="8-Install-VSCode-and-WSL-Extensions"><a href="#8-Install-VSCode-and-WSL-Extensions" class="headerlink" title="8. Install VSCode and WSL Extensions"></a>8. Install VSCode and WSL Extensions</h1><p>VSCode:</p>
+<p><a target="_blank" rel="noopener" href="https://code.visualstudio.com/">https://code.visualstudio.com/</a></p>
+<p>Remote WSL Extension:</p>
+<p><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl">https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl</a></p>
+<p>Python Extension:</p>
+<p><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">https://marketplace.visualstudio.com/items?itemName=ms-python.python</a></p>
+<p>Inside the project directory:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">code .</span><br></pre></td></tr></table></figure>
+
+<p>The bottom-left corner in VSCode should display:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WSL: Ubuntu</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="9-Install-RAG-Demo-Dependencies"><a href="#9-Install-RAG-Demo-Dependencies" class="headerlink" title="9. Install RAG Demo Dependencies"></a>9. Install RAG Demo Dependencies</h1><p>⚠️ Important:</p>
+<p>This RAG implementation is from 2020.</p>
+<p>Some dependency versions must be pinned.</p>
+<p>Otherwise:</p>
+<ul>
+<li>NumPy 2.x</li>
+<li>datasets 4.x</li>
+<li>latest transformers</li>
+</ul>
+<p>may introduce compatibility issues.</p>
+<p>Install recommended versions:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pip install \</span><br><span class="line">numpy==1.26.4 \</span><br><span class="line">datasets==2.19.2 \</span><br><span class="line">transformers==4.41.2 \</span><br><span class="line">faiss-cpu \</span><br><span class="line">sentencepiece \</span><br><span class="line">torch</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="10-Create-the-RAG-Demo"><a href="#10-Create-the-RAG-Demo" class="headerlink" title="10. Create the RAG Demo"></a>10. Create the RAG Demo</h1><p>Create the file:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">touch</span> rag_demo.py</span><br></pre></td></tr></table></figure>
+
+<p>Code:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> RagTokenizer</span><br><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> RagRetriever</span><br><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> RagTokenForGeneration</span><br><span class="line"></span><br><span class="line"><span class="comment"># tokenizer</span></span><br><span class="line"></span><br><span class="line">tokenizer = RagTokenizer.from_pretrained(</span><br><span class="line">    <span class="string">&quot;facebook/rag-token-nq&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># retriever</span></span><br><span class="line"></span><br><span class="line">retriever = RagRetriever.from_pretrained(</span><br><span class="line">    <span class="string">&quot;facebook/rag-token-nq&quot;</span>,</span><br><span class="line">    index_name=<span class="string">&quot;exact&quot;</span>,</span><br><span class="line">    use_dummy_dataset=<span class="literal">True</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># model</span></span><br><span class="line"></span><br><span class="line">model = RagTokenForGeneration.from_pretrained(</span><br><span class="line">    <span class="string">&quot;facebook/rag-token-nq&quot;</span>,</span><br><span class="line">    retriever=retriever</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">question = <span class="string">&quot;Who invented the telephone?&quot;</span></span><br><span class="line"></span><br><span class="line">inputs = tokenizer(question, return_tensors=<span class="string">&quot;pt&quot;</span>)</span><br><span class="line"></span><br><span class="line">generated = model.generate(</span><br><span class="line">    input_ids=inputs[<span class="string">&quot;input_ids&quot;</span>]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">answer = tokenizer.batch_decode(</span><br><span class="line">    generated,</span><br><span class="line">    skip_special_tokens=<span class="literal">True</span></span><br><span class="line">)[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Q:&quot;</span>, question)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;A:&quot;</span>, answer)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="11-Run-the-Demo"><a href="#11-Run-the-Demo" class="headerlink" title="11. Run the Demo"></a>11. Run the Demo</h1><p>Run:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python rag_demo.py</span><br></pre></td></tr></table></figure>
+
+<p>The first run downloads:</p>
+<ul>
+<li>DPR</li>
+<li>BART</li>
+<li>tokenizers</li>
+<li>FAISS index</li>
+<li>wiki_dpr</li>
+</ul>
+<p>The total size may reach several GB.</p>
+<p>The first run can be slow. This is normal.</p>
+<p>Expected output:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Q: Who invented the telephone?</span><br><span class="line">A: Alexander Graham Bell</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="12-Common-Issues"><a href="#12-Common-Issues" class="headerlink" title="12. Common Issues"></a>12. Common Issues</h1><h2 id="12-1-datasets-scripts-are-no-longer-supported"><a href="#12-1-datasets-scripts-are-no-longer-supported" class="headerlink" title="12.1 datasets scripts are no longer supported"></a>12.1 datasets scripts are no longer supported</h2><p>Cause:</p>
+<p>New versions of datasets removed old dataset script support.</p>
+<p>Solution:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install datasets==2.19.2</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="12-2-NumPy-2-x-errors"><a href="#12-2-NumPy-2-x-errors" class="headerlink" title="12.2 NumPy 2.x errors"></a>12.2 NumPy 2.x errors</h2><p>Example:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ValueError: Unable to avoid copy while creating an array</span><br></pre></td></tr></table></figure>
+
+<p>Cause:</p>
+<p>Old RAG code is incompatible with NumPy 2.x.</p>
+<p>Solution:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install numpy==1.26.4</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="12-3-WSL-Input-output-error"><a href="#12-3-WSL-Input-output-error" class="headerlink" title="12.3 WSL Input&#x2F;output error"></a>12.3 WSL Input&#x2F;output error</h2><p>Common causes:</p>
+<ul>
+<li>C drive full</li>
+<li>pip cache too large</li>
+<li>HuggingFace cache too large</li>
+<li>WSL ext4.vhdx out of space</li>
+</ul>
+<p>Solutions:</p>
+<ul>
+<li>Keep 30–50GB free on C drive</li>
+<li>Clean caches</li>
+<li>Avoid development under &#x2F;mnt&#x2F;c</li>
+</ul>
+<hr>
+<h2 id="12-4-conda-command-not-found"><a href="#12-4-conda-command-not-found" class="headerlink" title="12.4 conda command not found"></a>12.4 conda command not found</h2><p>Run:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">~/miniconda3/bin/conda init</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="13-Check-the-Current-Environment"><a href="#13-Check-the-Current-Environment" class="headerlink" title="13. Check the Current Environment"></a>13. Check the Current Environment</h1><p>List conda environments:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda <span class="built_in">env</span> list</span><br></pre></td></tr></table></figure>
+
+<p>Check current Python:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">which</span> python</span><br></pre></td></tr></table></figure>
+
+<p>Check Python version:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python --version</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="14-Remove-the-Environment"><a href="#14-Remove-the-Environment" class="headerlink" title="14. Remove the Environment"></a>14. Remove the Environment</h1><p>Deactivate:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda deactivate</span><br></pre></td></tr></table></figure>
+
+<p>Delete the environment:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda remove -n rag --all</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="15-Clean-Cache-Recommended"><a href="#15-Clean-Cache-Recommended" class="headerlink" title="15. Clean Cache (Recommended)"></a>15. Clean Cache (Recommended)</h1><p>Remove HuggingFace cache:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rm</span> -rf ~/.cache/huggingface</span><br></pre></td></tr></table></figure>
+
+<p>Remove pip cache:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rm</span> -rf ~/.cache/pip</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="16-Save-the-Environment"><a href="#16-Save-the-Environment" class="headerlink" title="16. Save the Environment"></a>16. Save the Environment</h1><p>Save dependencies:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip freeze &gt; requirements.txt</span><br></pre></td></tr></table></figure>
+
+<p>Restore dependencies:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install -r requirements.txt</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="17-Modern-RAG-Architecture"><a href="#17-Modern-RAG-Architecture" class="headerlink" title="17. Modern RAG Architecture"></a>17. Modern RAG Architecture</h1><p>This demo is mainly:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A 2020 academic prototype</span><br></pre></td></tr></table></figure>
+
+<p>Modern industrial RAG systems usually follow:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Documents</span><br><span class="line">   ↓</span><br><span class="line">Embedding Model</span><br><span class="line">   ↓</span><br><span class="line">Vector Database</span><br><span class="line">   ↓</span><br><span class="line">Retriever</span><br><span class="line">   ↓</span><br><span class="line">LLM</span><br></pre></td></tr></table></figure>
+
+<p>Recommended technologies to learn next:</p>
+<h2 id="LangChain"><a href="#LangChain" class="headerlink" title="LangChain"></a>LangChain</h2><p><a target="_blank" rel="noopener" href="https://www.langchain.com/">https://www.langchain.com/</a></p>
+<h2 id="LlamaIndex"><a href="#LlamaIndex" class="headerlink" title="LlamaIndex"></a>LlamaIndex</h2><p><a target="_blank" rel="noopener" href="https://www.llamaindex.ai/">https://www.llamaindex.ai/</a></p>
+<h2 id="Qdrant"><a href="#Qdrant" class="headerlink" title="Qdrant"></a>Qdrant</h2><p><a target="_blank" rel="noopener" href="https://qdrant.tech/">https://qdrant.tech/</a></p>
+<h2 id="Chroma"><a href="#Chroma" class="headerlink" title="Chroma"></a>Chroma</h2><p><a target="_blank" rel="noopener" href="https://www.trychroma.com/">https://www.trychroma.com/</a></p>
+<h2 id="FastAPI"><a href="#FastAPI" class="headerlink" title="FastAPI"></a>FastAPI</h2><p><a target="_blank" rel="noopener" href="https://fastapi.tiangolo.com/">https://fastapi.tiangolo.com/</a></p>
+<hr>
+<h1 id="18-Recommended-Next-Projects"><a href="#18-Recommended-Next-Projects" class="headerlink" title="18. Recommended Next Projects"></a>18. Recommended Next Projects</h1><p>Suggested practice projects:</p>
+<ul>
+<li>PDF Question Answering</li>
+<li>Local Knowledge Base</li>
+<li>AI Search</li>
+<li>Enterprise FAQ Agent</li>
+<li>AI Workflow Automation</li>
+<li>Email Agent</li>
+<li>MCP Tools</li>
+</ul>
+<p>These are common directions for:</p>
+<ul>
+<li>AI Application Engineers</li>
+<li>AI Agent Engineers</li>
+<li>AI Automation</li>
+<li>Freelancing</li>
+</ul>
+<hr>
+<h1 id="19-Important-AI-Engineering-Lessons"><a href="#19-Important-AI-Engineering-Lessons" class="headerlink" title="19. Important AI Engineering Lessons"></a>19. Important AI Engineering Lessons</h1><h2 id="1-Never-install-AI-packages-into-system-Python"><a href="#1-Never-install-AI-packages-into-system-Python" class="headerlink" title="1. Never install AI packages into system Python"></a>1. Never install AI packages into system Python</h2><p>Avoid:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo pip install ...</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="2-Use-conda-to-manage-environments"><a href="#2-Use-conda-to-manage-environments" class="headerlink" title="2. Use conda to manage environments"></a>2. Use conda to manage environments</h2><p>Recommended:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda create -n xxx python=3.11</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-Pin-dependency-versions"><a href="#3-Pin-dependency-versions" class="headerlink" title="3. Pin dependency versions"></a>3. Pin dependency versions</h2><p>The AI ecosystem changes extremely fast.</p>
+<p>Especially:</p>
+<ul>
+<li>transformers</li>
+<li>torch</li>
+<li>datasets</li>
+<li>numpy</li>
+<li>langchain</li>
+</ul>
+<p>breaking changes happen frequently.</p>
+<hr>
+<h2 id="4-Keep-large-free-disk-space-on-C-drive"><a href="#4-Keep-large-free-disk-space-on-C-drive" class="headerlink" title="4. Keep large free disk space on C drive"></a>4. Keep large free disk space on C drive</h2><p>Recommended:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">50GB+</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-Regularly-back-up-WSL"><a href="#5-Regularly-back-up-WSL" class="headerlink" title="5. Regularly back up WSL"></a>5. Regularly back up WSL</h2><p>Example:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">--export</span> Ubuntu ubuntu<span class="literal">-backup</span>.tar</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="20-Final-Summary"><a href="#20-Final-Summary" class="headerlink" title="20. Final Summary"></a>20. Final Summary</h1><p>By completing this demo, you have practiced:</p>
+<ul>
+<li>WSL Linux development</li>
+<li>Conda environment management</li>
+<li>VSCode + Remote WSL</li>
+<li>Transformers basics</li>
+<li>RAG basics</li>
+<li>HuggingFace basics</li>
+<li>FAISS basics</li>
+<li>AI dependency management</li>
+</ul>
+<p>This is an important starting point for modern AI Application and Agent development.</p>
+
+  </div>
+  <script src="https://giscus.app/client.js"
+        data-repo="yumoyum0/yumoyum0.github.io"
+        data-repo-id="R_kgDOKZzJIg"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOKZzJIs4CZwB8"
+        data-mapping="title"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+</script>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/archives/">Archives</a></li>
+        
+          <li><a href="/tags/">Tags</a></li>
+        
+          <li><a href="/categories/">Categorys</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/search/">Search</a></li>
+        
+          <li><a href="/links/">Links</a></li>
+        
+          <li><a href="/atom.xml">RSS</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#RAG-Demo-Complete-Setup-Run-and-Cleanup-Guide-WSL-Conda-VSCode"><span class="toc-number">1.</span> <span class="toc-text">RAG Demo: Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Project-Background"><span class="toc-number">1.1.</span> <span class="toc-text">1. Project Background</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-Recommended-Development-Environment"><span class="toc-number">2.</span> <span class="toc-text">2. Recommended Development Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-Install-WSL-Ubuntu"><span class="toc-number">3.</span> <span class="toc-text">3. Install WSL Ubuntu</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-Install-Basic-Development-Tools"><span class="toc-number">4.</span> <span class="toc-text">4. Install Basic Development Tools</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-Install-Miniconda-Recommended"><span class="toc-number">5.</span> <span class="toc-text">5. Install Miniconda (Recommended)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-Create-a-Python-3-11-Environment"><span class="toc-number">6.</span> <span class="toc-text">6. Create a Python 3.11 Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-Create-the-Project-Directory"><span class="toc-number">7.</span> <span class="toc-text">7. Create the Project Directory</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-Install-VSCode-and-WSL-Extensions"><span class="toc-number">8.</span> <span class="toc-text">8. Install VSCode and WSL Extensions</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-Install-RAG-Demo-Dependencies"><span class="toc-number">9.</span> <span class="toc-text">9. Install RAG Demo Dependencies</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-Create-the-RAG-Demo"><span class="toc-number">10.</span> <span class="toc-text">10. Create the RAG Demo</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-Run-the-Demo"><span class="toc-number">11.</span> <span class="toc-text">11. Run the Demo</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#12-Common-Issues"><span class="toc-number">12.</span> <span class="toc-text">12. Common Issues</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#12-1-datasets-scripts-are-no-longer-supported"><span class="toc-number">12.1.</span> <span class="toc-text">12.1 datasets scripts are no longer supported</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-2-NumPy-2-x-errors"><span class="toc-number">12.2.</span> <span class="toc-text">12.2 NumPy 2.x errors</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-3-WSL-Input-output-error"><span class="toc-number">12.3.</span> <span class="toc-text">12.3 WSL Input&#x2F;output error</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-4-conda-command-not-found"><span class="toc-number">12.4.</span> <span class="toc-text">12.4 conda command not found</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#13-Check-the-Current-Environment"><span class="toc-number">13.</span> <span class="toc-text">13. Check the Current Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#14-Remove-the-Environment"><span class="toc-number">14.</span> <span class="toc-text">14. Remove the Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#15-Clean-Cache-Recommended"><span class="toc-number">15.</span> <span class="toc-text">15. Clean Cache (Recommended)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#16-Save-the-Environment"><span class="toc-number">16.</span> <span class="toc-text">16. Save the Environment</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#17-Modern-RAG-Architecture"><span class="toc-number">17.</span> <span class="toc-text">17. Modern RAG Architecture</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#LangChain"><span class="toc-number">17.1.</span> <span class="toc-text">LangChain</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LlamaIndex"><span class="toc-number">17.2.</span> <span class="toc-text">LlamaIndex</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Qdrant"><span class="toc-number">17.3.</span> <span class="toc-text">Qdrant</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Chroma"><span class="toc-number">17.4.</span> <span class="toc-text">Chroma</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FastAPI"><span class="toc-number">17.5.</span> <span class="toc-text">FastAPI</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#18-Recommended-Next-Projects"><span class="toc-number">18.</span> <span class="toc-text">18. Recommended Next Projects</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#19-Important-AI-Engineering-Lessons"><span class="toc-number">19.</span> <span class="toc-text">19. Important AI Engineering Lessons</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Never-install-AI-packages-into-system-Python"><span class="toc-number">19.1.</span> <span class="toc-text">1. Never install AI packages into system Python</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Use-conda-to-manage-environments"><span class="toc-number">19.2.</span> <span class="toc-text">2. Use conda to manage environments</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Pin-dependency-versions"><span class="toc-number">19.3.</span> <span class="toc-text">3. Pin dependency versions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Keep-large-free-disk-space-on-C-drive"><span class="toc-number">19.4.</span> <span class="toc-text">4. Keep large free disk space on C drive</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Regularly-back-up-WSL"><span class="toc-number">19.5.</span> <span class="toc-text">5. Regularly back up WSL</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#20-Final-Summary"><span class="toc-number">20.</span> <span class="toc-text">20. Final Summary</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&text=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&is_video=false&description=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)&body=Check out this article: https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&title=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&name=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/&t=RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2022-2026
+    Yumo
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tags</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Categorys</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a href="/links/">Links</a></li><!--
+     --><!--
+       --><li><a href="/atom.xml">RSS</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

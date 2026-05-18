@@ -6,7 +6,7 @@
   <link href="https://username.github.io/atom.xml" rel="self"/>
   
   <link href="https://username.github.io/"/>
-  <updated>2026-05-18T14:09:30.365Z</updated>
+  <updated>2026-05-18T14:20:49.188Z</updated>
   <id>https://username.github.io/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>RAG Demo Complete Setup, Run, and Cleanup Guide (WSL + Conda + VSCode)</title>
+    <link href="https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/"/>
+    <id>https://username.github.io/2026/05/18/AI/rag_demo_full_setup_and_run_guide_en/</id>
+    <published>2026-05-18T09:00:00.000Z</published>
+    <updated>2026-05-18T14:20:49.188Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;RAG-Demo-Complete-Setup-Run-and-Cleanup-Guide-WSL-Conda-VSCode&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="AI" scheme="https://username.github.io/categories/AI/"/>
+    
+    
+    <category term="AI" scheme="https://username.github.io/tags/AI/"/>
+    
+  </entry>
   
   <entry>
     <title>Learn Harness Engineering</title>
@@ -92,9 +117,9 @@
     
     <category term="后端" scheme="https://username.github.io/tags/%E5%90%8E%E7%AB%AF/"/>
     
-    <category term="Database" scheme="https://username.github.io/tags/Database/"/>
-    
     <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
+    
+    <category term="Database" scheme="https://username.github.io/tags/Database/"/>
     
     <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
@@ -154,9 +179,9 @@
     
     <category term="后端" scheme="https://username.github.io/tags/%E5%90%8E%E7%AB%AF/"/>
     
-    <category term="Database" scheme="https://username.github.io/tags/Database/"/>
-    
     <category term="Redis" scheme="https://username.github.io/tags/Redis/"/>
+    
+    <category term="Database" scheme="https://username.github.io/tags/Database/"/>
     
     <category term="中间件" scheme="https://username.github.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
     
@@ -308,18 +333,18 @@
   </entry>
   
   <entry>
-    <title>Java内存模型JMM与volatile</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
+    <title>CompletableFuture基本使用</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:09:24.993Z</updated>
+    <updated>2023-09-28T08:04:33.161Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;Java内存模型之JMM&quot;&gt;&lt;a href=&quot;#Java内存模型之JMM&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型之JMM&quot;&gt;&lt;/a&gt;Java内存模型之JMM&lt;/h1&gt;&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a href=&quot;#大厂面试题&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
         
       
     
@@ -337,18 +362,18 @@
   </entry>
   
   <entry>
-    <title>CompletableFuture基本使用</title>
-    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/"/>
-    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/CompletableFuture/</id>
+    <title>Java内存模型JMM与volatile</title>
+    <link href="https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/"/>
+    <id>https://username.github.io/2023/02/18/Java/%E5%B9%B6%E5%8F%91/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8BJMM%E4%B8%8Evolatile/</id>
     <published>2023-02-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:04:33.161Z</updated>
+    <updated>2023-09-28T08:09:24.993Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;Future和Callable接口&quot;&gt;&lt;a href=&quot;#Future和Callable接口&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1 id=&quot;Java内存模型之JMM&quot;&gt;&lt;a href=&quot;#Java内存模型之JMM&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型之JMM&quot;&gt;&lt;/a&gt;Java内存模型之JMM&lt;/h1&gt;&lt;h2 id=&quot;大厂面试题&quot;&gt;&lt;a href=&quot;#大厂面试题&quot;</summary>
         
       
     
@@ -474,33 +499,6 @@
   </entry>
   
   <entry>
-    <title>JVM字节码指令集</title>
-    <link href="https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"/>
-    <id>https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/</id>
-    <published>2022-11-28T08:51:33.000Z</published>
-    <updated>2023-09-28T08:17:55.556Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="Java" scheme="https://username.github.io/categories/Java/"/>
-    
-    
-    <category term="Java" scheme="https://username.github.io/tags/Java/"/>
-    
-    <category term="JVM" scheme="https://username.github.io/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
     <title>JVM类加载子系统</title>
     <link href="https://username.github.io/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/"/>
     <id>https://username.github.io/2022/11/28/Java/JVM/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/</id>
@@ -528,18 +526,18 @@
   </entry>
   
   <entry>
-    <title>JVM垃圾回收</title>
-    <link href="https://username.github.io/2022/11/24/Java/JVM/JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"/>
-    <id>https://username.github.io/2022/11/24/Java/JVM/JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</id>
-    <published>2022-11-24T08:51:33.000Z</published>
-    <updated>2023-09-28T08:17:26.602Z</updated>
+    <title>JVM字节码指令集</title>
+    <link href="https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"/>
+    <id>https://username.github.io/2022/11/28/Java/JVM/%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/</id>
+    <published>2022-11-28T08:51:33.000Z</published>
+    <updated>2023-09-28T08:17:55.556Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;垃圾回收概述&quot;&gt;&lt;a href=&quot;#垃圾回收概述&quot; class=&quot;headerlink&quot; title=&quot;垃圾回收概述&quot;&gt;&lt;/a&gt;垃圾回收概述&lt;/h1&gt;&lt;p&gt;&lt;img</summary>
+    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot;</summary>
         
       
     
@@ -555,18 +553,18 @@
   </entry>
   
   <entry>
-    <title>JVM执行引擎</title>
-    <link href="https://username.github.io/2022/11/18/Java/JVM/%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/"/>
-    <id>https://username.github.io/2022/11/18/Java/JVM/%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/</id>
-    <published>2022-11-18T08:51:33.000Z</published>
-    <updated>2023-09-28T08:16:18.438Z</updated>
+    <title>JVM垃圾回收</title>
+    <link href="https://username.github.io/2022/11/24/Java/JVM/JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"/>
+    <id>https://username.github.io/2022/11/24/Java/JVM/JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</id>
+    <published>2022-11-24T08:51:33.000Z</published>
+    <updated>2023-09-28T08:17:26.602Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;执行引擎概述&quot;&gt;&lt;a href=&quot;#执行引擎概述&quot; class=&quot;headerlink&quot; title=&quot;执行引擎概述&quot;&gt;&lt;/a&gt;执行引擎概述&lt;/h2&gt;&lt;p&gt;&lt;img</summary>
+    <summary type="html">&lt;h1 id=&quot;垃圾回收概述&quot;&gt;&lt;a href=&quot;#垃圾回收概述&quot; class=&quot;headerlink&quot; title=&quot;垃圾回收概述&quot;&gt;&lt;/a&gt;垃圾回收概述&lt;/h1&gt;&lt;p&gt;&lt;img</summary>
         
       
     
